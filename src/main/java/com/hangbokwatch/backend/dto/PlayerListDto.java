@@ -11,6 +11,7 @@ import java.util.Comparator;
 public class PlayerListDto implements Comparable<PlayerListDto> {
     private String battleTag;
     private String playerName;
+    private String forUrl;
     private Integer playerLevel;
     private String isPublic;
     private String platform;
@@ -27,19 +28,21 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private String mostHero3;
 
     @Builder
-    public PlayerListDto(String battleTag, String playerName, Integer playerLevel, String isPublic, String platform, String portrait,
-                         Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer winGame,
+    public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer winGame,
                          Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
         this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic; this.platform = platform;
         this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint; this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
-        this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.battleTag = battleTag;
+        this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.battleTag = battleTag; this.forUrl = forUrl;
     }
 
     @Builder
-    public PlayerListDto(String battleTag, String playerName, Integer playerLevel, String isPublic, String platform, String portrait) {
-        this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
-        this.platform = platform; this.portrait = portrait; this.battleTag = battleTag;
+    public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint ) {
+        this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic; this.platform = platform;
+        this.portrait = portrait; this.battleTag = battleTag; this.tankRatingPoint = tankRatingPoint; this.forUrl = forUrl;
+        this.dealRatingPoint = dealRatingPoint; this.healRatingPoint = healRatingPoint;
     }
 
     @Override
@@ -49,10 +52,10 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         }else if(this.isPublic.compareTo(o.isPublic)<0) {
             return 1;
         }else {
-            if ((this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3 - (o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3 !=0) {
-                return (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3 - (o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3;
+            if ((o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3 - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3 !=0) {
+                return (o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3 - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3;
             }else {
-                return this.getPlayerLevel() - o.getPlayerLevel();
+                return o.getPlayerLevel() - this.getPlayerLevel();
             }
         }
     }

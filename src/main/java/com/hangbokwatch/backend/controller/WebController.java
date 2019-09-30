@@ -4,6 +4,7 @@ import com.hangbokwatch.backend.dto.PlayerListDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -14,9 +15,9 @@ import java.util.List;
 @Controller
 public class WebController {
 
-    @GetMapping("/showPlayerDetail/*")
-    public String getPlayerDetail(Model model) {
-        System.out.println("battleTag : "  );
+    @GetMapping("/showPlayerDetail/{battleTag}")
+    public String getPlayerDetail(@PathVariable String battleTag) {
+        System.out.println("battleTag : " + battleTag);
         return "playerDetail";
     }
 }

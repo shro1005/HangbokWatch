@@ -10032,3 +10032,149 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+
+.player {
+  display: table;
+  table-layout: fixed;
+  min-width: 500px;
+  float: left;
+}
+
+.player-detail {
+  display: table-row;
+  background-color: #3c4860;
+}
+
+.player-portrait {
+  display: table-cell;
+  width: 85px;
+  height: 85px;
+  background-size: cover;
+}
+  /*@media (min-width: 576px) {*/
+  /*  .player-portrait {*/
+  /*    max-width: 32px;*/
+  /*    max-height: 32px;} }*/
+  /*@media (min-width: 768px) {*/
+  /*  .player-portrait {*/
+  /*    max-width: 56px;*/
+  /*    max-height: 56px;} }*/
+  /*@media (min-width: 992px) {*/
+  /*  .player-portrait {*/
+  /*    max-width: 80px;*/
+  /*    max-height: 80px;} }*/
+  /*@media (min-width: 1200px) {*/
+  /*  .player-portrait {*/
+  /*    max-width: 100px;*/
+  /*    max-height: 100px;} }*/
+
+.player-platform {
+  /*padding: 0 3%;*/
+  text-align: center;
+  width: 9%;
+}
+.player-lock, .player-name, .player-platform, .for-table{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.platform-icon {
+  height: 70px;
+  fill: #f6f6f6;
+  stroke: #f6f6f6;
+  stroke-width: 0;
+}
+
+@media only screen and (min-width: 768px){
+  .player-name {
+    font-size: 1.1rem;
+    line-height: 1.8rem;
+    white-space: normal;
+  } }
+
+.player-name {
+  /*padding: 0 5%;*/
+  width: 20%;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: hsla(0,0%,96.5%,.8);
+}
+
+.player-platform-icon {
+  display: inline-block;
+  font-family: FuturaNo2D,century gothic,arial,sans-serif;
+  font-weight: 600;
+}
+.player-platform-icon {
+  padding: 4px 10px;
+  border-radius: 3px;
+  line-height: 1;
+  font-weight: 700;
+  background-color: hsla(0,0%,96.5%,.8);
+  color: #3c4860;
+}
+
+.player-rating {
+  display: table;
+  table-layout: fixed;
+  float: left;
+  width : 80%;
+  height: auto;
+}
+
+.player-isPublic-N.player-tank-rating {
+  display: none;
+
+}
+.player-isPublic-Y.player-tank-rating {
+  display: table-cell;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
+  white-space: normal;
+  vertical-align : middle;
+  align-content: center;
+  text-align: center;
+  width: 33.3%;
+}
+.player-isPublic-N.player-deal-rating{
+  display: none;
+}
+.player-isPublic-Y.player-deal-rating {
+  display: table-cell;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
+  white-space: normal;
+  vertical-align : middle;
+  align-content: center;
+  text-align: center;
+  width: 33.3%;
+}
+.player-isPublic-N.player-heal-rating{
+  display: none;
+}
+.player-isPublic-Y.player-heal-rating {
+  display: table-cell;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
+  white-space: normal;
+  vertical-align : middle;
+  align-content: center;
+  text-align: center;
+  width: 33.3%;
+}
+.player-isPublic-N.player-lock{
+  display: table-cell;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
+  white-space: normal;
+  vertical-align : middle;
+  align-content: center;
+  text-align: center;
+  width: 100%;
+}
+.player-isPublic-Y.player-lock{
+  display: none;
+}
+
