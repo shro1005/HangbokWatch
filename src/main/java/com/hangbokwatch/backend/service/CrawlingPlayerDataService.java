@@ -8,9 +8,12 @@ import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,12 +23,13 @@ import java.util.List;
 @Service
 public class CrawlingPlayerDataService {
     private static String GET_PLAYER_LIST_URL = "https://playoverwatch.com/ko-kr/search/account-by-name/";
-    private static String GET_PLAYER_PROFILE_URL = "https://ow-api.com/v1/stats/pc/asia/";
-    private List<PlayerListDto> playerList;
+    private static String GET_PLAYER_PROFILE_URL2 = "https://ow-api.com/v1/stats/pc/asia/";
+    private static String GET_PLAYER_PROFILE_URL = "https://playoverwatch.com/ko-kr/career/pc/";
+//    private List<PlayerListDto> playerList;
 
     public List<PlayerListDto>  crawlingPlayerList(String playerName) {
         // 반환할 playerListDto 초기화
-        playerList = new ArrayList<PlayerListDto>();
+        List<PlayerListDto> playerList = new ArrayList<PlayerListDto>();
 
         //Json String을 Json객체로 바꾸기 위한 매퍼 초기화
         ObjectMapper mapper = new ObjectMapper();
@@ -53,15 +57,14 @@ public class CrawlingPlayerDataService {
                 if(dto.getIsPublic()) {
                     playerListDto.setIsPublic("Y");
                     // 프로필 공개한 플레이어의 경우 경쟁전 점수와 승리, 패배, 무승부 경기수를 가져온다.
-                    playerListDto = crawlingPlayerProfile(playerListDto);
-                    System.out.println(playerListDto.getTankRatingPoint());
+//                    playerListDto = crawlingPlayerProfile2(playerListDto);
+//                    System.out.println(playerListDto.getTankRatingPoint());
                 }
-//                playerListDto.toString();
+                playerListDto.setCnt(3);
+                System.out.println(playerListDto.toString());
                 playerList.add(playerListDto);
-                Collections.sort(playerList);
-
-//                System.out.println(pName +" / "+ battleTag);
             }
+            Collections.sort(playerList);
         } catch(Exception e) {
             if(e.getClass() == SocketException.class) {
                 PlayerListDto playerListDto = new PlayerListDto("message","현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","", 0,0,0);
@@ -69,6 +72,10 @@ public class CrawlingPlayerDataService {
                 System.out.println("블리자드 내부 에러 발생");
             }else if(e.getClass() == UnknownHostException.class){
                 PlayerListDto playerListDto = new PlayerListDto("message","연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.","",0,"","","",0,0,0);
+                playerList.add(playerListDto);
+                System.out.println("블리자드 내부 에러 발생");
+            }else if(e.getClass() == SocketTimeoutException.class){
+                PlayerListDto playerListDto = new PlayerListDto("message","현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","",0,0,0);
                 playerList.add(playerListDto);
                 System.out.println("블리자드 내부 에러 발생");
             }
@@ -79,19 +86,51 @@ public class CrawlingPlayerDataService {
 
     public PlayerListDto crawlingPlayerProfile(PlayerListDto playerListDto) {
         ObjectMapper mapper = new ObjectMapper();
+//        playerList = new ArrayList<PlayerListDto>();
         try {
-            System.out.println("crawlingPlayerProfile working -> player url : " + playerListDto.getForUrl());
+            Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+playerListDto.getForUrl())
+                                .get();
+            Elements elements = rawData.select("div.competitive-rank-role");
+            for (Element roleElement : elements) {
+                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
+                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
+//                    System.out.println(roleElement.text());
+                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
+                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
+                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
+                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
+                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
+                }
+            }
+            int cnt = 3;
+            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
+            if(cnt == 0 ) {cnt = 1;}
+            playerListDto.setCnt(cnt);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+//        return playerList;
+        return playerListDto;
+    }
+
+    public PlayerListDto crawlingPlayerProfile2(PlayerListDto playerListDto) {
+        ObjectMapper mapper = new ObjectMapper();
+//        playerList = new ArrayList<PlayerListDto>();
+        try {
+            System.out.println("crawlingPlayerProfile working -> battleTag : " + playerListDto.getForUrl());
             // Jsoup를 이용해 오버워치 웹크롤링 : 유저 프로필을 json String 형식으로 가져오는 부분
-            String json = Jsoup.connect(GET_PLAYER_PROFILE_URL+playerListDto.getForUrl()+"/profile")
+            String json = Jsoup.connect(GET_PLAYER_PROFILE_URL2+playerListDto.getForUrl()+"/profile")
                     .ignoreContentType(true)
                     .execute().body();
             JsonNode jsonNode = mapper.readTree(json);
-            System.out.println("jsonNode : " + jsonNode);
+//            System.out.println("jsonNode : " + jsonNode);
             if (jsonNode.isObject()) {
                 ObjectNode obj = (ObjectNode) jsonNode;
                 if(obj.has("ratings")){
                     JsonNode ratings = obj.get("ratings");
-                    System.out.println(ratings);
+//                    System.out.println(ratings);
                     Iterator itr = ratings.elements();
 
                     while (itr.hasNext()) {
@@ -105,30 +144,13 @@ public class CrawlingPlayerDataService {
                             playerListDto.setHealRatingPoint(ratingObj.get("level").asInt());
                         }
                     }
-//                    JsonNode tankRating = obj.get("ratings").get(0);
-//                    if(tankRating.isObject()) {
-//                        ObjectNode tankObj = (ObjectNode) tankRating;
-//                        if(tankObj.has("level")) {
-//                            Integer tankRatingPoint = tankObj.get("level").asInt();
-//                            System.out.println(tankRatingPoint);
-//                            playerListDto.setTankRatingPoint(tankRatingPoint);
-//                        }
-//                    }
-//                    JsonNode dealRating = obj.get("ratings").get(1);
-//                    if(dealRating.isObject()) {
-//                        ObjectNode dealObj = (ObjectNode) dealRating;
-//                        if(dealObj.has("level")) { playerListDto.setTankRatingPoint(dealObj.get("level").asInt()); }
-//                    }
-//                    JsonNode healRating = obj.get("ratings").get(2);
-//                    if(healRating.isObject()) {
-//                        ObjectNode healObj = (ObjectNode) healRating;
-//                        if(healObj.has("level")) { playerListDto.setTankRatingPoint(healObj.get("level").asInt()); }
-//                    }
                 }
             }
+//            playerList.add(playerListDto);
         }catch(Exception e) {
             e.printStackTrace();
         }
+//        return playerList;
         return playerListDto;
     }
 }

@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class WebRestController {
@@ -21,7 +24,22 @@ public class WebRestController {
         String playerName = playerDto.getPlayerName();
         System.out.println("playerName : " + playerName);
         List<PlayerListDto> playerList = cpl.crawlingPlayerList(playerName);
+        System.out.println(playerList.size());
         return playerList;
     }
 
+    @PostMapping("showUserProfile")
+    public List<PlayerListDto> getPlayerProfile(@RequestBody List<PlayerListDto> playerList) {
+        List<PlayerListDto> resultPlayerList = new ArrayList<PlayerListDto>();
+        for(PlayerListDto playerDto : playerList) {
+            if("Y".equals(playerDto.getIsPublic())) {
+                playerDto = cpl.crawlingPlayerProfile(playerDto);
+            }
+            System.out.println(playerDto.toString());
+            resultPlayerList.add(playerDto);
+        }
+        System.out.println("15개 조회 끝");
+        Collections.sort(resultPlayerList);
+        return resultPlayerList;
+    }
 }

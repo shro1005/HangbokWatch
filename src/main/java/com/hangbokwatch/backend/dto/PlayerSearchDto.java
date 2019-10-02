@@ -10,9 +10,21 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PlayerSearchDto {
     private String playerName;
+    private String forUrl;
+    private String isPublic;
+    private String battleTag;
+    private String portrait;
+    private Integer playerLevel;
+    private String platform;
 
     @Builder
     public  PlayerSearchDto(String playerName) {
         this.playerName = playerName;
+    }
+
+    @Builder
+    public PlayerSearchDto(String battleTag, String forUrl, String isPublic, String portrait, String platform, Integer playerLevel) {
+        this.battleTag = battleTag; this.forUrl = forUrl; this.isPublic = isPublic; this.portrait = portrait;
+        this.platform = platform; this.playerLevel = playerLevel;
     }
 }

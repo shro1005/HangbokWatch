@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Comparator;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,35 +27,60 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private String mostHero1;
     private String mostHero2;
     private String mostHero3;
+    private Integer cnt;
+    private List<PlayerListDto> list;
 
     @Builder
     public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
                          String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer winGame,
-                         Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
-        this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic; this.platform = platform;
-        this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
-        this.healRatingPoint = healRatingPoint; this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
-        this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.battleTag = battleTag; this.forUrl = forUrl;
+                         Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3){ //) {
+        this.playerName = playerName;
+        this.playerLevel = playerLevel;
+        this.isPublic = isPublic;
+        this.platform = platform;
+        this.portrait = portrait;
+        this.tankRatingPoint = tankRatingPoint;
+        this.dealRatingPoint = dealRatingPoint;
+        this.healRatingPoint = healRatingPoint;
+        this.winGame = winGame;
+        this.loseGame = loseGame;
+        this.drawGame = drawGame;
+        this.mostHero1 = mostHero1;
+        this.mostHero2 = mostHero2;
+        this.mostHero3 = mostHero3;
+        this.battleTag = battleTag;
+        this.forUrl = forUrl;
+//        this.list = list;
     }
 
     @Builder
     public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
-                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint ) {
-        this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic; this.platform = platform;
-        this.portrait = portrait; this.battleTag = battleTag; this.tankRatingPoint = tankRatingPoint; this.forUrl = forUrl;
-        this.dealRatingPoint = dealRatingPoint; this.healRatingPoint = healRatingPoint;
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint) {
+        this.playerName = playerName;
+        this.playerLevel = playerLevel;
+        this.isPublic = isPublic;
+        this.platform = platform;
+        this.portrait = portrait;
+        this.battleTag = battleTag;
+        this.tankRatingPoint = tankRatingPoint;
+        this.forUrl = forUrl;
+        this.dealRatingPoint = dealRatingPoint;
+        this.healRatingPoint = healRatingPoint;
     }
+
+    @Builder
+    public PlayerListDto(){}
 
     @Override
     public int compareTo(PlayerListDto o) {
-        if(this.isPublic.compareTo(o.isPublic)>0) {
+        if (this.isPublic.compareTo(o.isPublic) > 0) {
             return -1;
-        }else if(this.isPublic.compareTo(o.isPublic)<0) {
+        } else if (this.isPublic.compareTo(o.isPublic) < 0) {
             return 1;
-        }else {
-            if ((o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3 - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3 !=0) {
-                return (o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint())/3 - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint())/3;
-            }else {
+        } else {
+            if ((o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint()) / o.getCnt() - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint()) / this.getCnt() != 0) {
+                return (o.getTankRatingPoint() + o.getDealRatingPoint() + o.getHealRatingPoint()) / o.getCnt() - (this.getTankRatingPoint() + this.getDealRatingPoint() + this.getHealRatingPoint()) / this.getCnt();
+            } else {
                 return o.getPlayerLevel() - this.getPlayerLevel();
             }
         }
@@ -65,10 +91,14 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         return "PlayerListDto{" +
                 "battleTag='" + battleTag + '\'' +
                 ", playerName='" + playerName + '\'' +
+                ", forUrl='" + forUrl + '\'' +
                 ", playerLevel=" + playerLevel +
                 ", isPublic='" + isPublic + '\'' +
                 ", platform='" + platform + '\'' +
                 ", portrait='" + portrait + '\'' +
+                ", tankRatingPoint=" + tankRatingPoint +
+                ", dealRatingPoint=" + dealRatingPoint +
+                ", healRatingPoint=" + healRatingPoint +
                 '}';
     }
 }
