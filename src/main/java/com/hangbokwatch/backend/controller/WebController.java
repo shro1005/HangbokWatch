@@ -1,6 +1,8 @@
 package com.hangbokwatch.backend.controller;
 
 import com.hangbokwatch.backend.dto.PlayerListDto;
+import com.hangbokwatch.backend.service.SavePlayerDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +16,13 @@ import java.util.List;
  */
 @Controller
 public class WebController {
+    @Autowired
+    SavePlayerDetailService spd;
 
-    @GetMapping("/showPlayerDetail/{battleTag}")
-    public String getPlayerDetail(@PathVariable String battleTag) {
-        System.out.println("battleTag : " + battleTag);
+    @GetMapping("/showPlayerDetail/{forUrl}")
+    public String getPlayerDetail(@PathVariable String forUrl) {
+        System.out.println("getPlayerDetail -> forUrl : " + forUrl);
+        spd.savePlayerExample(forUrl);
         return "playerDetail";
     }
 }
