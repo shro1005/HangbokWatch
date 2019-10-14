@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class PlayerListDto implements Comparable<PlayerListDto> {
+    private Long id;
     private String battleTag;
     private String playerName;
     private String forUrl;
@@ -23,7 +24,7 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private Integer winGame;
     private Integer loseGame;
     private Integer drawGame;
-    private Integer winRate;
+    private String winRate;
     private String mostHero1;
     private String mostHero2;
     private String mostHero3;
@@ -31,9 +32,10 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private List<PlayerListDto> list;
 
     @Builder
-    public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
+    public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
                          String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer winGame,
-                         Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3){ //) {
+                         Integer loseGame, Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3){ //) {
+        this.id = id;
         this.playerName = playerName;
         this.playerLevel = playerLevel;
         this.isPublic = isPublic;
@@ -45,6 +47,7 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         this.winGame = winGame;
         this.loseGame = loseGame;
         this.drawGame = drawGame;
+        this.winRate = winRate;
         this.mostHero1 = mostHero1;
         this.mostHero2 = mostHero2;
         this.mostHero3 = mostHero3;
@@ -54,8 +57,9 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     }
 
     @Builder
-    public PlayerListDto(String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
+    public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
                          String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint) {
+        this.id = id;
         this.playerName = playerName;
         this.playerLevel = playerLevel;
         this.isPublic = isPublic;

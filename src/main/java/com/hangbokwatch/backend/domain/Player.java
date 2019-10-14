@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 public class Player {
 
     @Id
+    @Column(name="id", nullable = false)
+    private Long id;
+
     @Column(name="battle_tag", nullable = false)
     private String battleTag;
 
@@ -69,18 +72,18 @@ public class Player {
     private LocalDateTime udtDtm;
 
     @Builder
-    public Player(String battleTag, String playerName, Integer playerLevel, String isPublic, String platform,
+    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String isPublic, String platform,
                   String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
                   Integer winGame, Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
-        this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
+        this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint; this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
         this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3;
     }
 
     @Builder
-    public Player(String battleTag, String playerName, Integer playerLevel, String isPublic, String platform, String portrait) {
-        this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
+    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String isPublic, String platform, String portrait) {
+        this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait;
     }
 
