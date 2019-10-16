@@ -12,6 +12,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reinhardt {
+    /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -25,8 +26,8 @@ public class Reinhardt {
 //    @Column(name = "draw_game")
 //    private Integer drawGame;
 //
-//    @Column(name = "entire_game")
-//    private Integer entireGame;
+    @Column(name = "entire_game")
+    private Integer entireGame;
 
     @Column(name = "win_rate")
     private String winRate;
@@ -47,14 +48,15 @@ public class Reinhardt {
     private String deathAvg;
 
     @Column(name = "block_damage_per_life")
-    private String blockDamage;
+    private String blockDamagePerLife;
 
     @Column(name = "damage_to_hero_per_life")
-    private String damageToHero;
+    private String damageToHeroPerLife;
 
     @Column(name = "damage_to_shield_per_life")
-    private String damageToShield;
+    private String damageToShieldPerLife;
 
+    /**영웅별 특수 데이터*/
     @Column(name = "earthshatter_kill_avg")
     private String earthshatterKillAvg;
 
@@ -64,6 +66,7 @@ public class Reinhardt {
     @Column(name = "fire_strike_kill_avg")
     private String fireStrikeKillAvg;
 
+    /**메달 데이터*/
     @Column(name = "gold_medal")
     private String goldMedal;
 
@@ -73,4 +76,26 @@ public class Reinhardt {
     @Column(name = "bronze_medal")
     private String bronzeMedal;
 
+    @Override
+    public String toString() {
+        return "Reinhardt{" +
+                "id=" + id +
+                ", winGame=" + winGame +
+                ", loseGame=" + loseGame +
+                ", winRate='" + winRate + '\'' +
+                ", playTime='" + playTime + '\'' +
+                ", killPerDeath='" + killPerDeath + '\'' +
+                ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
+                ", deathAvg='" + deathAvg + '\'' +
+                ", blockDamage='" + blockDamagePerLife + '\'' +
+                ", damageToHero='" + damageToHeroPerLife + '\'' +
+                ", damageToShield='" + damageToShieldPerLife + '\'' +
+                ", earthshatterKillAvg='" + earthshatterKillAvg + '\'' +
+                ", chargeKillAvg='" + chargeKillAvg + '\'' +
+                ", fireStrikeKillAvg='" + fireStrikeKillAvg + '\'' +
+                ", goldMedal='" + goldMedal + '\'' +
+                ", silverMedal='" + silverMedal + '\'' +
+                ", bronzeMedal='" + bronzeMedal + '\'' +
+                '}';
+    }
 }

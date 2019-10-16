@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="dva")
+@Entity(name="winston")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Dva {
+public class Winston {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -57,11 +57,14 @@ public class Dva {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "mecha_suicide_kill_avg")
-    private String mechaSuicideKillAvg;
+    @Column(name = "jump_pack_kill_avg")
+    private String jumpPackKillAvg;
 
-    @Column(name = "mecah_call_avg")
-    private String mechaCallAvg;
+    @Column(name = "primal_rage_kill_avg")
+    private String primalRageKillAvg;
+
+    @Column(name = "push_emeny_avg")
+    private String pushEnmeyAvg;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -75,7 +78,7 @@ public class Dva {
 
     @Override
     public String toString() {
-        return "Dva{" +
+        return "Winston{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -84,11 +87,12 @@ public class Dva {
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
-                ", blockDamage='" + blockDamagePerLife + '\'' +
-                ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", damageToShield='" + damageToShieldPerLife + '\'' +
-                ", mechaSuicideKillAvg='" + mechaSuicideKillAvg + '\'' +
-                ", mechaCallAvg='" + mechaCallAvg + '\'' +
+                ", blockDamagePerLife='" + blockDamagePerLife + '\'' +
+                ", damageToHeroPerLife='" + damageToHeroPerLife + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", jumpPackKillAvg='" + jumpPackKillAvg + '\'' +
+                ", primalRageKillAvg='" + primalRageKillAvg + '\'' +
+                ", pushEnmeyAvg='" + pushEnmeyAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +

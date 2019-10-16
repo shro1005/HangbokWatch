@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="dva")
+@Entity(name="wreckingball")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Dva {
+public class WreckingBall {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -57,11 +57,14 @@ public class Dva {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "mecha_suicide_kill_avg")
-    private String mechaSuicideKillAvg;
+    @Column(name = "grappling_claw_kill_avg")
+    private String grapplingClawKillAvg;
 
-    @Column(name = "mecah_call_avg")
-    private String mechaCallAvg;
+    @Column(name = "piledriver_kill_avg")
+    private String piledriverKillAvg;
+
+    @Column(name = "minefield_kill_avg")
+    private String minefieldKillAvg;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -72,26 +75,4 @@ public class Dva {
 
     @Column(name = "bronze_medal")
     private String bronzeMedal;
-
-    @Override
-    public String toString() {
-        return "Dva{" +
-                "id=" + id +
-                ", winGame=" + winGame +
-                ", loseGame=" + loseGame +
-                ", winRate='" + winRate + '\'' +
-                ", playTime='" + playTime + '\'' +
-                ", killPerDeath='" + killPerDeath + '\'' +
-                ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
-                ", deathAvg='" + deathAvg + '\'' +
-                ", blockDamage='" + blockDamagePerLife + '\'' +
-                ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", damageToShield='" + damageToShieldPerLife + '\'' +
-                ", mechaSuicideKillAvg='" + mechaSuicideKillAvg + '\'' +
-                ", mechaCallAvg='" + mechaCallAvg + '\'' +
-                ", goldMedal='" + goldMedal + '\'' +
-                ", silverMedal='" + silverMedal + '\'' +
-                ", bronzeMedal='" + bronzeMedal + '\'' +
-                '}';
-    }
 }

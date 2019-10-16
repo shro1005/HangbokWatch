@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="dva")
+@Entity(name="zarya")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Dva {
+public class Zarya {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -57,11 +57,17 @@ public class Dva {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "mecha_suicide_kill_avg")
-    private String mechaSuicideKillAvg;
+    @Column(name = "energy_avg")
+    private String energyAvg;
 
-    @Column(name = "mecah_call_avg")
-    private String mechaCallAvg;
+    @Column(name = "high_energy_kill_avg")
+    private String highEnergyKillAvg;
+
+    @Column(name = "graviton_surge_kill_avg")
+    private String gravitonSurgeKillAvg;
+
+    @Column(name = "projected_barrier_avg")
+    private String projectedBarrierAvg;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -75,7 +81,7 @@ public class Dva {
 
     @Override
     public String toString() {
-        return "Dva{" +
+        return "Zarya{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -87,8 +93,10 @@ public class Dva {
                 ", blockDamage='" + blockDamagePerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
                 ", damageToShield='" + damageToShieldPerLife + '\'' +
-                ", mechaSuicideKillAvg='" + mechaSuicideKillAvg + '\'' +
-                ", mechaCallAvg='" + mechaCallAvg + '\'' +
+                ", energyAvg='" + energyAvg + '\'' +
+                ", highEnergyKillAvg='" + highEnergyKillAvg + '\'' +
+                ", gravitonSurgeKillAvg='" + gravitonSurgeKillAvg + '\'' +
+                ", projectedBarrierAvg='" + projectedBarrierAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +

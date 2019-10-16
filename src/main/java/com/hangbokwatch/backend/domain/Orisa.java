@@ -12,7 +12,7 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Orisa {  // 0x02E000000000013E
-
+    /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -26,8 +26,8 @@ public class Orisa {  // 0x02E000000000013E
 //    @Column(name = "draw_game")
 //    private Integer drawGame;
 //
-//    @Column(name = "entire_game")
-//    private Integer entireGame;
+    @Column(name = "entire_game")
+    private Integer entireGame;
 
     @Column(name = "win_rate")
     private String winRate;
@@ -48,14 +48,19 @@ public class Orisa {  // 0x02E000000000013E
     private String deathAvg;
 
     @Column(name = "block_damage_per_life")
-    private String blockDamage;
+    private String blockDamagePerLife;
 
     @Column(name = "damage_to_hero_per_life")
-    private String damageToHero;
+    private String damageToHeroPerLife;
 
     @Column(name = "damage_to_shield_per_life")
-    private String damageToShield;
+    private String damageToShieldPerLife;
 
+    /**영웅별 특수 데이터*/
+    @Column(name = "damage_amp_avg")
+    private String damageAmpAvg;
+
+    /**메달 데이터*/
     @Column(name = "gold_medal")
     private String goldMedal;
 
@@ -76,9 +81,9 @@ public class Orisa {  // 0x02E000000000013E
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
-                ", blockDamage='" + blockDamage + '\'' +
-                ", damageToHero='" + damageToHero + '\'' +
-                ", damageToShield='" + damageToShield + '\'' +
+                ", blockDamage='" + blockDamagePerLife + '\'' +
+                ", damageToHero='" + damageToHeroPerLife + '\'' +
+                ", damageToShield='" + damageToShieldPerLife + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +

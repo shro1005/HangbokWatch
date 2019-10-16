@@ -4,12 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.hangbokwatch.backend.dao.DvaRepositroy;
-import com.hangbokwatch.backend.dao.OrisaRepository;
-import com.hangbokwatch.backend.dao.ReinhardtRepository;
-import com.hangbokwatch.backend.domain.Dva;
-import com.hangbokwatch.backend.domain.Orisa;
-import com.hangbokwatch.backend.domain.Reinhardt;
+import com.hangbokwatch.backend.dao.*;
+import com.hangbokwatch.backend.domain.*;
 import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
@@ -21,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
@@ -43,6 +38,16 @@ public class CrawlingPlayerDataService {
     OrisaRepository orisaRepository;
     @Autowired
     ReinhardtRepository reinhardtRepository;
+    @Autowired
+    ZaryaRepository zaryaRepository;
+    @Autowired
+    RoadHogRepository roadhogRepository;
+    @Autowired
+    WinstonRepository winstonRepository;
+    @Autowired
+    SigmaRepository sigmaRepository;
+    @Autowired
+    WreckingBallRepository wreckingBallRepository;
 
     public List<PlayerListDto>  crawlingPlayerList(String playerName) {
         // 반환할 playerListDto 초기화
@@ -148,12 +153,31 @@ public class CrawlingPlayerDataService {
             Elements competitiveHerosDetail = competitiveDatas.select("div.js-stats");
             // 시간 확인
             stopWatch.stop();
-            System.out.println(stopWatch.prettyPrint());
-            //
+
+            /**경쟁전 점수 데이터 추출*/
+            for (Element roleElement : competitivePoint) {
+                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
+                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
+//                    System.out.println(roleElement.text());
+                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
+                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
+                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
+                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
+                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
+                }
+            }
+            int cnt = 3;
+            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
+            if(cnt == 0 ) {cnt = 1;}
+            playerListDto.setCnt(cnt);
+
+            /** 영웅별 상세정보 추출 */
             for(Element heroDetails : competitiveHerosDetail) {
                 Integer winGame = 0; String winRate = "0%"; Integer loseGame = 0; String playTime = "00:00"; String killPerDeath = "0"; String spentOnFireAvg = "00:00";
-                Long death = 1l; String deathAvg = "0"; Long blockDamage = 0l; Long damageToHero = 0l; Long damageToShield = 0l;
-                String goldMedal = "0"; String silverMedal = "0"; String bronzeMedal = "0";
+                Long death = 1l; String deathAvg = "0"; Long blockDamage = 0l; Long damageToHero = 0l; Long damageToShield = 0l; Integer entireGame = 0;
+                String goldMedal = "0"; String silverMedal = "0"; String bronzeMedal = "0"; String soloKillAvg = "0";
 
                 /**디바 시작 */
                 if ("0x02E000000000007A".equals(heroDetails.attr("data-category-id"))) { //디바
@@ -209,7 +233,7 @@ public class CrawlingPlayerDataService {
                                 td = tr.select("td");
                                 deathAvg = td.last().text();
                                 break;
-                            case "0x086000000000048E" :
+                            case "0x08600000000002D5" :
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
@@ -240,27 +264,37 @@ public class CrawlingPlayerDataService {
                             case "0x086000000000036D" :
                                 td = tr.select("td");
                                 bronzeMedal = td.last().text();
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
                                 break;
                             default:
                                 break;
                         }
                     }
-                    Long blockDamagePerLife = Math.round((blockDamage/death*100)/100.0);
-                    Long damageToHeroPerLife = Math.round((damageToHero/death*100)/100.0);
-                    Long damageToShieldPerLife = Math.round((damageToShield/death*100)/100.0);
-                    Dva dva = new Dva(playerListDto.getId(), winGame, loseGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), mechaSuicideKillAvg, mechaCallAvg, goldMedal, silverMedal, bronzeMedal);
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    Dva dva = new Dva(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), mechaSuicideKillAvg,
+                            mechaCallAvg, goldMedal, silverMedal, bronzeMedal);
+
                     dvaRepositroy.save(dva);
-                    System.out.println("dva data save success : " + dva.toString());
+                    System.out.println("============================ dva data save success =======================================");
+                    System.out.println(dva.toString());
+                    System.out.println("==========================================================================================");
                     // 시간 확인
                     stopWatch.stop();
-                    System.out.println(stopWatch.prettyPrint());
-                    //
+
                 /**오리사 시작 */
                 }else if("0x02E000000000013E".equals(heroDetails.attr("data-category-id"))) {  //오리사
                     //시간 확인
                     stopWatch.start("오리사 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
 
                     Elements orisaDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    String damageAmpAvg = "0";
 
                     for(Element tr : orisaDates) {
                         Elements td;
@@ -330,20 +364,33 @@ public class CrawlingPlayerDataService {
                                 td = tr.select("td");
                                 bronzeMedal = td.last().text();
                                 break;
+                            case "0x08600000000004F3" :
+                                td = tr.select("td");
+                                damageAmpAvg = td.last().text();
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
                             default:
                                 break;
                         }
                     }
-                    Long blockDamagePerLife = Math.round((blockDamage/death*100)/100.0);
-                    Long damageToHeroPerLife = Math.round((damageToHero/death*100)/100.0);
-                    Long damageToShieldPerLife = Math.round((damageToShield/death*100)/100.0);
-                    Orisa orisa = new Orisa(playerListDto.getId(), winGame, loseGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    Orisa orisa = new Orisa(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), damageAmpAvg, goldMedal,
+                            silverMedal, bronzeMedal);
+
                     orisaRepository.save(orisa);
-                    System.out.println("orisa data save success : " + orisa.toString());
+                    System.out.println("=============================orisa data save success======================================");
+                    System.out.println(orisa.toString());
+                    System.out.println("==========================================================================================");
                     // 시간 확인
                     stopWatch.stop();
-                    System.out.println(stopWatch.prettyPrint());
-                    //
+//                    System.out.println(stopWatch.prettyPrint());
+
                 /**라인하르트 시작 */
                 }else if("0x02E0000000000007".equals(heroDetails.attr("data-category-id"))) {
                     //시간 확인
@@ -355,6 +402,576 @@ public class CrawlingPlayerDataService {
                     String chargeKillAvg = "0"; String earthshatterKillAvg = "0"; String fireStrikeKillAvg = "0";
 
                     for (Element tr : reinhardtDates) {
+                        Elements td;
+                        switch (tr.attr("data-stat-id")) {
+                            case "0x0860000000000039":
+                                td = tr.select("td");
+                                winGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x08600000000003D1":
+                                td = tr.select("td");
+                                winRate = td.last().text();
+                                break;
+                            case "0x0860000000000430":
+                                td = tr.select("td");
+                                loseGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                playTime = td.last().text().substring(0, 2);
+                                if (td.last().text().length() == 8) {
+                                    playTime += "시간";
+                                } else {
+                                    if ("00".equals(playTime)) {
+                                        playTime = td.last().text().substring(3) + "초";
+                                    } else {
+                                        playTime += "분";
+                                    }
+                                }
+                                break;
+                            case "0x08600000000003D2":
+                                td = tr.select("td");
+                                killPerDeath = td.last().text();
+                                break;
+                            case "0x08600000000004DB":
+                                td = tr.select("td");
+                                spentOnFireAvg = td.last().text();
+                                break;
+                            case "0x086000000000002A":
+                                td = tr.select("td");
+                                death = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004D3":
+                                td = tr.select("td");
+                                deathAvg = td.last().text();
+                                break;
+                            case "0x0860000000000259":
+                                td = tr.select("td");
+                                blockDamage = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004B7":
+                                td = tr.select("td");
+                                damageToHero = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000515":
+                                td = tr.select("td");
+                                damageToShield = Long.parseLong(td.last().text());
+                                break;
+                            case "0x086000000000036F":
+                                td = tr.select("td");
+                                goldMedal = td.last().text();
+                                break;
+                            case "0x086000000000036E":
+                                td = tr.select("td");
+                                silverMedal = td.last().text();
+                                break;
+                            case "0x086000000000036D":
+                                td = tr.select("td");
+                                bronzeMedal = td.last().text();
+                                break;
+                            case "0x08600000000004E7" :
+                                td = tr.select("td");
+                                earthshatterKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000004E5" :
+                                td = tr.select("td");
+                                chargeKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000004E8" :
+                                td = tr.select("td");
+                                fireStrikeKillAvg = td.last().text();
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
+                            default:
+                                break;
+                        }
+                    }
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    Reinhardt reinhardt = new Reinhardt(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg,
+                            deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
+                            earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, goldMedal, silverMedal, bronzeMedal);
+
+                    reinhardtRepository.save(reinhardt);
+                    System.out.println("============================reinhardt data save success===================================");
+                    System.out.println(reinhardt.toString());
+                    System.out.println("==========================================================================================");
+                    // 시간 확인
+                    stopWatch.stop();
+
+                /**자리야 시작 */
+                }else if("0x02E0000000000068".equals(heroDetails.attr("data-category-id"))) {
+                    //시간 확인
+                    stopWatch.start("자리야 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
+
+                    Elements zaryaDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    //자리야 영웅 특별 데이터
+                    String energyAvg = "0"; String highEnergyKillAvg = "0"; String gravitonSurgeKillAvg = "0"; String projectedBarrierAvg = "0";
+
+                    for (Element tr : zaryaDates) {
+                        Elements td;
+                        switch (tr.attr("data-stat-id")) {
+                            case "0x0860000000000039":
+                                td = tr.select("td");
+                                winGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x08600000000003D1":
+                                td = tr.select("td");
+                                winRate = td.last().text();
+                                break;
+                            case "0x0860000000000430":
+                                td = tr.select("td");
+                                loseGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                playTime = td.last().text().substring(0, 2);
+                                if (td.last().text().length() == 8) {
+                                    playTime += "시간";
+                                } else {
+                                    if ("00".equals(playTime)) {
+                                        playTime = td.last().text().substring(3) + "초";
+                                    } else {
+                                        playTime += "분";
+                                    }
+                                }
+                                break;
+                            case "0x08600000000003D2":
+                                td = tr.select("td");
+                                killPerDeath = td.last().text();
+                                break;
+                            case "0x08600000000004DB":
+                                td = tr.select("td");
+                                spentOnFireAvg = td.last().text();
+                                break;
+                            case "0x086000000000002A":
+                                td = tr.select("td");
+                                death = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004D3":
+                                td = tr.select("td");
+                                deathAvg = td.last().text();
+                                break;
+                            case "0x0860000000000225":
+                                td = tr.select("td");
+                                blockDamage = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004B7":
+                                td = tr.select("td");
+                                damageToHero = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000515":
+                                td = tr.select("td");
+                                damageToShield = Long.parseLong(td.last().text());
+                                break;
+                            case "0x086000000000036F":
+                                td = tr.select("td");
+                                goldMedal = td.last().text();
+                                break;
+                            case "0x086000000000036E":
+                                td = tr.select("td");
+                                silverMedal = td.last().text();
+                                break;
+                            case "0x086000000000036D":
+                                td = tr.select("td");
+                                bronzeMedal = td.last().text();
+                                break;
+                            case "0x0860000000000231" :
+                                td = tr.select("td");
+                                energyAvg = td.last().text();
+                                break;
+                            case "0x08600000000004F0" :
+                                td = tr.select("td");
+                                highEnergyKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000004F1" :
+                                td = tr.select("td");
+                                gravitonSurgeKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000004EF" :
+                                td = tr.select("td");
+                                projectedBarrierAvg = td.last().text();
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
+                            default:
+                                break;
+                        }
+                    }
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    Zarya zarya = new Zarya(playerListDto.getId(), winGame, loseGame, entireGame,winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), energyAvg,
+                            highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, goldMedal, silverMedal, bronzeMedal);
+
+                    zaryaRepository.save(zarya);
+                    System.out.println("===============================zarya data save success====================================");
+                    System.out.println(zarya.toString());
+                    System.out.println("==========================================================================================");
+                    // 시간 확인
+                    stopWatch.stop();
+
+                /**로드호그 시작 */
+                }else if("0x02E0000000000040".equals(heroDetails.attr("data-category-id"))) {
+                    //시간 확인
+                    stopWatch.start("로드호그 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
+
+                    Elements roadhogDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    //로드호그 영웅 특별 데이터
+                    String wholeHogKillAvg = "0"; String chainHookAccuracy = "0%"; String hookingEnemyAvg = "0"; Long selfHeal = 0l;
+
+                    for (Element tr : roadhogDates) {
+                        Elements td;
+                        switch (tr.attr("data-stat-id")) {
+                            case "0x0860000000000039":
+                                td = tr.select("td");
+                                winGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x08600000000003D1":
+                                td = tr.select("td");
+                                winRate = td.last().text();
+                                break;
+                            case "0x0860000000000430":
+                                td = tr.select("td");
+                                loseGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                playTime = td.last().text().substring(0, 2);
+                                if (td.last().text().length() == 8) {
+                                    playTime += "시간";
+                                } else {
+                                    if ("00".equals(playTime)) {
+                                        playTime = td.last().text().substring(3) + "초";
+                                    } else {
+                                        playTime += "분";
+                                    }
+                                }
+                                break;
+                            case "0x08600000000003D2":
+                                td = tr.select("td");
+                                killPerDeath = td.last().text();
+                                break;
+                            case "0x08600000000004DB":
+                                td = tr.select("td");
+                                spentOnFireAvg = td.last().text();
+                                break;
+                            case "0x086000000000002A":
+                                td = tr.select("td");
+                                death = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004D3":
+                                td = tr.select("td");
+                                deathAvg = td.last().text();
+                                break;
+                            case "0x08600000000004DA":
+                                td = tr.select("td");
+                                soloKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000004B7":
+                                td = tr.select("td");
+                                damageToHero = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000515":
+                                td = tr.select("td");
+                                damageToShield = Long.parseLong(td.last().text());
+                                break;
+                            case "0x086000000000036F":
+                                td = tr.select("td");
+                                goldMedal = td.last().text();
+                                break;
+                            case "0x086000000000036E":
+                                td = tr.select("td");
+                                silverMedal = td.last().text();
+                                break;
+                            case "0x086000000000036D":
+                                td = tr.select("td");
+                                bronzeMedal = td.last().text();
+                                break;
+                            case "0x0860000000000500" :
+                                td = tr.select("td");
+                                wholeHogKillAvg = td.last().text();
+                                break;
+                            case "0x086000000000020B" :
+                                td = tr.select("td");
+                                chainHookAccuracy = td.last().text();
+                                break;
+                            case "0x08600000000004FF" :
+                                td = tr.select("td");
+                                hookingEnemyAvg = td.last().text();
+                                break;
+                            case "0x08600000000003E6" :
+                                td = tr.select("td");
+                                selfHeal = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
+                            default:
+                                break;
+                        }
+                    }
+
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+                    Double selfHealPerLife = Math.round((selfHeal / (double)death) * 100) / 100.0;
+
+                    RoadHog roadhog = new RoadHog(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            soloKillAvg, damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), wholeHogKillAvg,
+                            chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
+
+                    roadhogRepository.save(roadhog);
+                    System.out.println("============================roadhog data save success=====================================");
+                    System.out.println(roadhog.toString());
+                    System.out.println("==========================================================================================");
+                    // 시간 확인
+                    stopWatch.stop();
+
+                /**윈스턴 시작 */
+                }else if("0x02E0000000000009".equals(heroDetails.attr("data-category-id"))) {
+                    //시간 확인
+                    stopWatch.start("윈스턴 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
+
+                    Elements winstonDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    //윈스턴 영웅 특별 데이터
+                    String jumpPackKillAvg = "0"; String primalRageKillAvg = "0"; String pushEnmeyAvg = "0";
+
+                    for (Element tr : winstonDates) {
+                        Elements td;
+                        switch (tr.attr("data-stat-id")) {
+                            case "0x0860000000000039":
+                                td = tr.select("td");
+                                winGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x08600000000003D1":
+                                td = tr.select("td");
+                                winRate = td.last().text();
+                                break;
+                            case "0x0860000000000430":
+                                td = tr.select("td");
+                                loseGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                playTime = td.last().text().substring(0, 2);
+                                if (td.last().text().length() == 8) {
+                                    playTime += "시간";
+                                } else {
+                                    if ("00".equals(playTime)) {
+                                        playTime = td.last().text().substring(3) + "초";
+                                    } else {
+                                        playTime += "분";
+                                    }
+                                }
+                                break;
+                            case "0x08600000000003D2":
+                                td = tr.select("td");
+                                killPerDeath = td.last().text();
+                                break;
+                            case "0x08600000000004DB":
+                                td = tr.select("td");
+                                spentOnFireAvg = td.last().text();
+                                break;
+                            case "0x086000000000002A":
+                                td = tr.select("td");
+                                death = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004D3":
+                                td = tr.select("td");
+                                deathAvg = td.last().text();
+                                break;
+                            case "0x0860000000000272":
+                                td = tr.select("td");
+                                blockDamage = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004B7":
+                                td = tr.select("td");
+                                damageToHero = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000515":
+                                td = tr.select("td");
+                                damageToShield = Long.parseLong(td.last().text());
+                                break;
+                            case "0x086000000000036F":
+                                td = tr.select("td");
+                                goldMedal = td.last().text();
+                                break;
+                            case "0x086000000000036E":
+                                td = tr.select("td");
+                                silverMedal = td.last().text();
+                                break;
+                            case "0x086000000000036D":
+                                td = tr.select("td");
+                                bronzeMedal = td.last().text();
+                                break;
+                            case "0x0860000000000508" :
+                                td = tr.select("td");
+                                jumpPackKillAvg = td.last().text();
+                                break;
+                            case "0x086000000000050B" :
+                                td = tr.select("td");
+                                primalRageKillAvg = td.last().text();
+                                break;
+                            case "0x086000000000050A" :
+                                td = tr.select("td");
+                                pushEnmeyAvg = td.last().text();
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
+                            default:
+                                break;
+                        }
+                    }
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    Winston winston = new Winston(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), jumpPackKillAvg,
+                            primalRageKillAvg, pushEnmeyAvg, goldMedal, silverMedal, bronzeMedal);
+
+                    winstonRepository.save(winston);
+                    System.out.println("============================winston data save success+====================================");
+                    System.out.println(winston.toString());
+                    System.out.println("==========================================================================================");
+                    // 시간 확인
+                    stopWatch.stop();
+
+                /**시그마 시작 */
+                }else if("0x02E000000000023B".equals(heroDetails.attr("data-category-id"))) {
+                    //시간 확인
+                    stopWatch.start("시그마 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
+
+                    Elements sigmaDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    //시그마 영웅 특별 데이터
+                    Long absorptionDamage = 0l; String graviticFluxKillAvg = "0"; String accretionKillAvg = "0";
+
+                    for (Element tr : sigmaDates) {
+                        Elements td;
+                        switch (tr.attr("data-stat-id")) {
+                            case "0x0860000000000039":
+                                td = tr.select("td");
+                                winGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x08600000000003D1":
+                                td = tr.select("td");
+                                winRate = td.last().text();
+                                break;
+                            case "0x0860000000000430":
+                                td = tr.select("td");
+                                loseGame = Integer.parseInt(td.last().text());
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                playTime = td.last().text().substring(0, 2);
+                                if (td.last().text().length() == 8) {
+                                    playTime += "시간";
+                                } else {
+                                    if ("00".equals(playTime)) {
+                                        playTime = td.last().text().substring(3) + "초";
+                                    } else {
+                                        playTime += "분";
+                                    }
+                                }
+                                break;
+                            case "0x08600000000003D2":
+                                td = tr.select("td");
+                                killPerDeath = td.last().text();
+                                break;
+                            case "0x08600000000004DB":
+                                td = tr.select("td");
+                                spentOnFireAvg = td.last().text();
+                                break;
+                            case "0x086000000000002A":
+                                td = tr.select("td");
+                                death = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004D3":
+                                td = tr.select("td");
+                                deathAvg = td.last().text();
+                                break;
+                            case "0x08600000000006A1":
+                                td = tr.select("td");
+                                blockDamage = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000004B7":
+                                td = tr.select("td");
+                                damageToHero = Long.parseLong(td.last().text());
+                                break;
+                            case "0x0860000000000515":
+                                td = tr.select("td");
+                                damageToShield = Long.parseLong(td.last().text());
+                                break;
+                            case "0x086000000000036F":
+                                td = tr.select("td");
+                                goldMedal = td.last().text();
+                                break;
+                            case "0x086000000000036E":
+                                td = tr.select("td");
+                                silverMedal = td.last().text();
+                                break;
+                            case "0x086000000000036D":
+                                td = tr.select("td");
+                                bronzeMedal = td.last().text();
+                                break;
+                            case "0x08600000000006B8" :
+                                td = tr.select("td");
+                                absorptionDamage = Long.parseLong(td.last().text());
+                                break;
+                            case "0x08600000000006C0" :
+                                td = tr.select("td");
+                                graviticFluxKillAvg = td.last().text();
+                                break;
+                            case "0x08600000000006BB" :
+                                td = tr.select("td");
+                                accretionKillAvg = td.last().text();
+                                break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
+                            default:
+                                break;
+                        }
+                    }
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+                    Double absorptionDamagePerLife = Math.round((absorptionDamage/(double)death)*100)/100.0;
+
+                    Sigma sigma = new Sigma(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), absorptionDamagePerLife.toString(),
+                            graviticFluxKillAvg, accretionKillAvg, goldMedal, silverMedal, bronzeMedal);
+
+                    sigmaRepository.save(sigma);
+                    System.out.println("============================sigma data save success=======================================");
+                    System.out.println(sigma.toString());
+                    System.out.println("==========================================================================================");
+                    // 시간 확인
+                    stopWatch.stop();
+
+                /**레킹볼 시작 */
+                }else if("0x02E000000000023B".equals(heroDetails.attr("data-category-id"))) {
+                    //시간 확인
+                    stopWatch.start("레킹볼 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
+
+                    Elements wreckingBallDates = heroDetails.select("tr.DataTable-tableRow");
+
+                    //레킹볼 영웅 특별 데이터
+                    String grapplingClawKillAvg = "0"; String piledriverKillAvg = "0"; String minefieldKillAvg = "0";
+
+                    for (Element tr : wreckingBallDates) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
                             case "0x0860000000000039":
@@ -422,37 +1039,46 @@ public class CrawlingPlayerDataService {
                                 td = tr.select("td");
                                 bronzeMedal = td.last().text();
                                 break;
-                            case "0x08600000000004E7" :
+                            case "0x086000000000064C" :
                                 td = tr.select("td");
-                                earthshatterKillAvg = td.last().text();
+                                grapplingClawKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004E5" :
+                            case "0x086000000000064F" :
                                 td = tr.select("td");
-                                chargeKillAvg = td.last().text();
+                                piledriverKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004E8" :
+                            case "0x086000000000064D" :
                                 td = tr.select("td");
-                                fireStrikeKillAvg = td.last().text();
+                                minefieldKillAvg = td.last().text();
                                 break;
+                            case "0x0860000000000038" :
+                                td = tr.select("td");
+                                entireGame = Integer.parseInt(td.last().text());
                             default:
                                 break;
                         }
                     }
-                    Long blockDamagePerLife = Math.round((blockDamage / death * 100) / 100.0);
-                    Long damageToHeroPerLife = Math.round((damageToHero / death * 100) / 100.0);
-                    Long damageToShieldPerLife = Math.round((damageToShield / death * 100) / 100.0);
-                    Reinhardt reinhardt = new Reinhardt(playerListDto.getId(), winGame, loseGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, goldMedal, silverMedal, bronzeMedal);
-                    reinhardtRepository.save(reinhardt);
-                    System.out.println("reinhardt data save success : " + reinhardt.toString());
+                    Double blockDamagePerLife = Math.round((blockDamage/(double)death)*100)/100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero/(double)death)*100)/100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield/(double)death)*100)/100.0;
+
+                    WreckingBall wreckingBall = new WreckingBall(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                            blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), grapplingClawKillAvg,
+                            piledriverKillAvg, minefieldKillAvg, goldMedal, silverMedal, bronzeMedal);
+
+                    wreckingBallRepository.save(wreckingBall);
+                    System.out.println("============================wreckingBall data save success================================");
+                    System.out.println(wreckingBall.toString());
+                    System.out.println("==========================================================================================");
                     // 시간 확인
                     stopWatch.stop();
-                    System.out.println(stopWatch.prettyPrint());
-                    //
                 }
             }
         }catch(Exception e) {
             e.printStackTrace();
         }
+        // 시간 확인
+        System.out.println(stopWatch.prettyPrint());
         return null;
     }
 

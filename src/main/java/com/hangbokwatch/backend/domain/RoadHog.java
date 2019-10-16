@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="dva")
+@Entity(name="roadhog")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Dva {
+public class RoadHog {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -47,8 +47,8 @@ public class Dva {
     @Column(name = "death_avg")
     private String deathAvg;
 
-    @Column(name = "block_damage_per_life")
-    private String blockDamagePerLife;
+    @Column(name = "solo_kill_avg")
+    private String soloKillAvg;
 
     @Column(name = "damage_to_hero_per_life")
     private String damageToHeroPerLife;
@@ -57,11 +57,17 @@ public class Dva {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "mecha_suicide_kill_avg")
-    private String mechaSuicideKillAvg;
+    @Column(name = "whole_hog_kill_avg")
+    private String wholeHogKillAvg;
 
-    @Column(name = "mecah_call_avg")
-    private String mechaCallAvg;
+    @Column(name = "chain_hook_accuracy")
+    private String chainHookAccuracy;
+
+    @Column(name = "hooking_enemy_avg")
+    private String hookingEnemyAvg;
+
+    @Column(name = "self_heal_per_life")
+    private String selfHealPerLife;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -75,7 +81,7 @@ public class Dva {
 
     @Override
     public String toString() {
-        return "Dva{" +
+        return "Roadhog{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -84,11 +90,13 @@ public class Dva {
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
-                ", blockDamage='" + blockDamagePerLife + '\'' +
-                ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", damageToShield='" + damageToShieldPerLife + '\'' +
-                ", mechaSuicideKillAvg='" + mechaSuicideKillAvg + '\'' +
-                ", mechaCallAvg='" + mechaCallAvg + '\'' +
+                ", soloKillAvg='" + soloKillAvg + '\'' +
+                ", damageToHeroPerLife='" + damageToHeroPerLife + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", wholeHogKillAvg='" + wholeHogKillAvg + '\'' +
+                ", chainHookAccuracy='" + chainHookAccuracy + '\'' +
+                ", hookingEnemyAvg='" + hookingEnemyAvg + '\'' +
+                ", selfHealPerLife='" + selfHealPerLife + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +
