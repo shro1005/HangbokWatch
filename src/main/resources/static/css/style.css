@@ -8324,6 +8324,42 @@ h1, h2, h3, h4, h5,
     .hero-wrap.hero-wrap-2 .slider-text {
       height: 700px !important; }
 
+.hero-wrap-s {
+  width: 100%;
+  height: 00px;
+  position: inherit;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top center; }
+.hero-wrap-s .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  content: '';
+  opacity: 1;
+  background: #fff;
+  background: white;
+  background: -moz-linear-gradient(top, white 0%, white 3%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-gradient(left top, left bottom, color-stop(0%, white), color-stop(3%, white), color-stop(54%, rgba(255, 255, 255, 0)), color-stop(100%, rgba(255, 255, 255, 0)));
+  background: -webkit-linear-gradient(top, white 0%, white 3%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0) 100%);
+  background: -o-linear-gradient(top, white 0%, white 3%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0) 100%);
+  background: -ms-linear-gradient(top, white 0%, white 3%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-gradient(linear, left top, left bottom, from(white), color-stop(3%, white), color-stop(54%, rgba(255, 255, 255, 0)), to(rgba(255, 255, 255, 0)));
+  background: linear-gradient(to bottom, white 0%, white 3%, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff', GradientType=0 );
+  height: 300px; }
+.hero-wrap-s.hero-wrap-2 {
+  height: 300px !important;
+  position: relative; }
+.hero-wrap-s.hero-wrap-2 .overlay {
+  width: 100%;
+  opacity: .05;
+  height: 300px; }
+.hero-wrap-s.hero-wrap-2 .slider-text-s {
+  height: 300px !important; }
+
 .slider-text {
   height: 700px; }
   .slider-text h1 {
@@ -8382,6 +8418,66 @@ h1, h2, h3, h4, h5,
   .slider-text .bread {
     font-weight: 400 !important;
     position: relative; }
+
+.slider-text-s {
+  height: 350px; }
+.slider-text-s h1 {
+  font-size: 60px;
+  color: #000000;
+  line-height: 1.1;
+  font-weight: 400; }
+.slider-text-s h1 span {
+  display: block; }
+.slider-text-s .icon-wrap .icon {
+  width: 70px;
+  height: 70px;
+  background: #e86ed0;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  border-radius: 50%; }
+.slider-text-s .icon-wrap .icon span {
+  color: #fff; }
+.slider-text-s .icon-wrap .heading-title {
+  position: relative; }
+.slider-text-s .icon-wrap .heading-title:after {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  content: '';
+  width: 30px;
+  height: 2px;
+  background: #fff; }
+.slider-text-s .icon-wrap .heading-title span {
+  font-family: "Nunito Sans", Arial, sans-serif;
+  color: #fff; }
+.slider-text-s p {
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.8); }
+.slider-text-s .breadcrumbs {
+  font-size: 14px;
+  margin-bottom: 20px;
+  z-index: 99;
+  text-transform: uppercase;
+  font-weight: 500; }
+.slider-text-s .breadcrumbs span {
+  color: rgba(0, 0, 0, 0.7); }
+.slider-text-s .breadcrumbs span i {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 13px; }
+.slider-text-s .breadcrumbs span a {
+  color: rgba(0, 0, 0, 0.7); }
+.slider-text-s .breadcrumbs span a:hover, .slider-text-s .breadcrumbs span a:focus {
+  color: #e86ed0; }
+.slider-text-s .breadcrumbs span a:hover i, .slider-text-s .breadcrumbs span a:focus i {
+  color: #e86ed0; }
+.slider-text-s .bread {
+  font-weight: 400 !important;
+  position: relative; }
+
 
 .search-location .form-group {
   position: relative; }
@@ -10177,4 +10273,25 @@ textarea.form-control {
 .player-isPublic-Y.player-lock{
   display: none;
 }
+
+.player-detail-layout{
+  min-width: 500px;
+  float: left;
+}
+
+.player-profile{
+  background-color: #3c4860;
+}
+.player-profile .player-icon{
+  position: absolute;
+  left: 25px;
+  top: 30px;
+}
+.player-profile.player-inf{
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-left: 150px;
+}
+
+
 

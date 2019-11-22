@@ -3,6 +3,7 @@ package com.hangbokwatch.backend.controller;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import com.hangbokwatch.backend.dto.PlayerSearchDto;
 import com.hangbokwatch.backend.service.CrawlingPlayerDataService;
+import com.hangbokwatch.backend.service.SearchPlayerListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,8 @@ import java.util.Objects;
 public class WebRestController {
     @Autowired
     CrawlingPlayerDataService cpl;
+    @Autowired
+    SearchPlayerListService spl;
 
     @PostMapping("/showUserList")
     public List<PlayerListDto> getPlayerList(@RequestBody PlayerSearchDto playerDto) {
@@ -28,7 +31,7 @@ public class WebRestController {
         return playerList;
     }
 
-    @PostMapping("showUserProfile")
+    @PostMapping("/showUserProfile")
     public List<PlayerListDto> getPlayerProfile(@RequestBody List<PlayerListDto> playerList) {
         List<PlayerListDto> resultPlayerList = new ArrayList<PlayerListDto>();
         for(PlayerListDto playerDto : playerList) {
@@ -41,5 +44,15 @@ public class WebRestController {
         System.out.println("15개 조회 끝");
         Collections.sort(resultPlayerList);
         return resultPlayerList;
+    }
+
+    @PostMapping("/showPlayerList")
+    public List<PlayerListDto> showPlayerList(@RequestBody PlayerSearchDto playerDto) {
+        System.out.println("WebRestController - getPlayerList 호출됨!");
+        String playerName = playerDto.getPlayerName();
+        System.out.println("playerName : " + playerName);
+        List<PlayerListDto> playerList = spl.(playerName);
+        System.out.println(playerList.size());
+        return playerList;
     }
 }
