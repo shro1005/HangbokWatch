@@ -48,10 +48,10 @@ public class WebRestController {
 
     @PostMapping("/showPlayerList")
     public List<PlayerListDto> showPlayerList(@RequestBody PlayerSearchDto playerDto) {
-        System.out.println("WebRestController - getPlayerList 호출됨!");
+        System.out.println("WebRestController - showPlayerList 호출됨!");
         String playerName = playerDto.getPlayerName();
         System.out.println("playerName : " + playerName);
-        List<PlayerListDto> playerList = spl.(playerName);
+        List<PlayerListDto> playerList = spl.searchPlayerList(playerName);
         System.out.println(playerList.size());
         return playerList;
     }

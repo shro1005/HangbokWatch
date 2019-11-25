@@ -27,6 +27,9 @@ public class Player {
     @Column(name="player_level", nullable = false)
     private Integer playerLevel;
 
+    @Column(name="for_url", nullable = false)
+    private String forUrl;
+
     @Column(name="is_public", nullable = false)
     private String isPublic;
 
@@ -72,19 +75,19 @@ public class Player {
     private LocalDateTime udtDtm;
 
     @Builder
-    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String isPublic, String platform,
+    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String forUrl, String isPublic, String platform,
                   String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
                   Integer winGame, Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
         this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint; this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
-        this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3;
+        this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.forUrl = forUrl;
     }
 
     @Builder
-    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String isPublic, String platform, String portrait) {
+    public Player(Long id, String battleTag, String playerName, Integer playerLevel, String forUrl, String isPublic, String platform, String portrait) {
         this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
-        this.platform = platform; this.portrait = portrait;
+        this.platform = platform; this.portrait = portrait; this.forUrl = forUrl;
     }
 
 }

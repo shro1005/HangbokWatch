@@ -53,6 +53,12 @@ public class CrawlingPlayerDataService {
         // 반환할 playerListDto 초기화
         List<PlayerListDto> playerList = new ArrayList<PlayerListDto>();
 
+        if(playerName.indexOf("#") == -1) {  // 배틀태그로 입력하지 않았을 경우
+            System.out.println("최초 검색시 배틀태그로 입력해야합니다. / 검색값 : " + playerName );
+            return playerList;
+        }
+        playerName = playerName.replace("#", "%23");  // # -> %23 으로 파싱한 후에 검색
+
         //Json String을 Json객체로 바꾸기 위한 매퍼 초기화
         ObjectMapper mapper = new ObjectMapper();
         try {
