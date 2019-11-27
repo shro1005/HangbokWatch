@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hangbokwatch.backend.dao.*;
 import com.hangbokwatch.backend.domain.*;
+import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
-import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -49,7 +49,7 @@ public class CrawlingPlayerDataService {
     @Autowired
     WreckingBallRepository wreckingBallRepository;
 
-    public List<PlayerListDto>  crawlingPlayerList(String playerName) {
+    public List<PlayerListDto> crawlingPlayerList(String playerName) {
         // 반환할 playerListDto 초기화
         List<PlayerListDto> playerList = new ArrayList<PlayerListDto>();
 
@@ -145,7 +145,7 @@ public class CrawlingPlayerDataService {
         return playerListDto;
     }
 
-    public PlayerDetailDto crawlingPlayerDetail(PlayerListDto playerListDto) {
+    public CompetitiveDetailDto crawlingPlayerDetail(PlayerListDto playerListDto, CompetitiveDetailDto chdDto) {
         ObjectMapper mapper = new ObjectMapper();
         // 시간 확인을 위한 스탑워치
         StopWatch stopWatch = new StopWatch();
@@ -160,24 +160,24 @@ public class CrawlingPlayerDataService {
             // 시간 확인
             stopWatch.stop();
 
-            /**경쟁전 점수 데이터 추출*/
-            for (Element roleElement : competitivePoint) {
-                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
-                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
-//                    System.out.println(roleElement.text());
-                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
-                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
-                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
-                }
-            }
-            int cnt = 3;
-            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
-            if(cnt == 0 ) {cnt = 1;}
-            playerListDto.setCnt(cnt);
+//            /**경쟁전 점수 데이터 추출*/
+//            for (Element roleElement : competitivePoint) {
+//                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
+//                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
+////                    System.out.println(roleElement.text());
+//                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
+//                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
+//                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
+//                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
+//                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
+//                }
+//            }
+//            int cnt = 3;
+//            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
+//            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
+//            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
+//            if(cnt == 0 ) {cnt = 1;}
+//            playerListDto.setCnt(cnt);
 
             /** 영웅별 상세정보 추출 */
             for(Element heroDetails : competitiveHerosDetail) {
@@ -287,6 +287,7 @@ public class CrawlingPlayerDataService {
                             mechaCallAvg, goldMedal, silverMedal, bronzeMedal);
 
                     dvaRepositroy.save(dva);
+                    chdDto.setDva(dva);
                     System.out.println("============================ dva data save success =======================================");
                     System.out.println(dva.toString());
                     System.out.println("==========================================================================================");
@@ -390,6 +391,7 @@ public class CrawlingPlayerDataService {
                             silverMedal, bronzeMedal);
 
                     orisaRepository.save(orisa);
+                    chdDto.setOrisa(orisa);
                     System.out.println("=============================orisa data save success======================================");
                     System.out.println(orisa.toString());
                     System.out.println("==========================================================================================");
@@ -503,6 +505,7 @@ public class CrawlingPlayerDataService {
                             earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, goldMedal, silverMedal, bronzeMedal);
 
                     reinhardtRepository.save(reinhardt);
+                    chdDto.setReinhardt(reinhardt);
                     System.out.println("============================reinhardt data save success===================================");
                     System.out.println(reinhardt.toString());
                     System.out.println("==========================================================================================");
@@ -619,6 +622,7 @@ public class CrawlingPlayerDataService {
                             highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, goldMedal, silverMedal, bronzeMedal);
 
                     zaryaRepository.save(zarya);
+                    chdDto.setZarya(zarya);
                     System.out.println("===============================zarya data save success====================================");
                     System.out.println(zarya.toString());
                     System.out.println("==========================================================================================");
@@ -736,6 +740,7 @@ public class CrawlingPlayerDataService {
                             chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
 
                     roadhogRepository.save(roadhog);
+                    chdDto.setRoadHog(roadhog);
                     System.out.println("============================roadhog data save success=====================================");
                     System.out.println(roadhog.toString());
                     System.out.println("==========================================================================================");
@@ -848,6 +853,7 @@ public class CrawlingPlayerDataService {
                             primalRageKillAvg, pushEnmeyAvg, goldMedal, silverMedal, bronzeMedal);
 
                     winstonRepository.save(winston);
+                    chdDto.setWinston(winston);
                     System.out.println("============================winston data save success+====================================");
                     System.out.println(winston.toString());
                     System.out.println("==========================================================================================");
@@ -961,6 +967,7 @@ public class CrawlingPlayerDataService {
                             graviticFluxKillAvg, accretionKillAvg, goldMedal, silverMedal, bronzeMedal);
 
                     sigmaRepository.save(sigma);
+                    chdDto.setSigma(sigma);
                     System.out.println("============================sigma data save success=======================================");
                     System.out.println(sigma.toString());
                     System.out.println("==========================================================================================");
@@ -1073,6 +1080,7 @@ public class CrawlingPlayerDataService {
                             piledriverKillAvg, minefieldKillAvg, goldMedal, silverMedal, bronzeMedal);
 
                     wreckingBallRepository.save(wreckingBall);
+                    chdDto.setWreckingBall(wreckingBall);
                     System.out.println("============================wreckingBall data save success================================");
                     System.out.println(wreckingBall.toString());
                     System.out.println("==========================================================================================");
@@ -1085,7 +1093,7 @@ public class CrawlingPlayerDataService {
         }
         // 시간 확인
         System.out.println(stopWatch.prettyPrint());
-        return null;
+        return chdDto;
     }
 
     /** 사설 오버워치 api (ow-api.com) 에서 데이터 받아옴 */

@@ -129,6 +129,23 @@ function morePlayers() {
     // alert(playerData.length);
 }
 
+function playerDetail(obj) {
+    console.log($(obj).attr('attr-p'), $(obj).attr('attr-u'));
+    const isPublic = $(obj).attr('attr-p');
+    const forUrl = $(obj).attr('attr-u');
+    if(isPublic == 'Y') {
+        location.href = "/showPlayerDetail/"+forUrl;
+    } else {
+        alert("플레이어가 프로필을 비공개했습니다.\n" +
+            "인게임에서 프로필 공개 이후 다시 검색해주세요.");
+        return;
+    }
+}
+
+
+
+출처: https://thingsthis.tistory.com/130 [여행과 일상]
+
 function drawList(data) {
     // return new Promise(function(data){})
     if(data.battleTag === 'message') {
@@ -139,7 +156,7 @@ function drawList(data) {
     const detailDiv2 = $('<div class="player-detail" onclick="location.href=\'/showPlayerDetail/'+data.playerName+'#'+data.battleTag+'\'" style="cursor: pointer">'
         + '<img src="'+data.portrait+'" onerror="this.src = \'https://blzgdapipro-a.akamaihd.net/game/unlocks/0x02500000000002F7.png\';" alt="">'
         +'</div>');
-    const detailDiv = $('<a class="player-detail" onclick="playerDetail('+data+')">'
+    const detailDiv = $('<a class="player-detail" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="'+data.isPublic+'" attr-u="'+data.forUrl+'">'  //href="/showPlayerDetail/'+data.forUrl+'"  / onclick="playerDetail('+data+')"
         +    '<div class="player-portrait" ><img class="player-portrait" src="'+data.portrait+'" onerror="this.src = \'https://blzgdapipro-a.akamaihd.net/game/unlocks/0x02500000000002F7.png\';" alt></div>'
         // +    '<div class="player-portrait" style="background-image: url(\''+data.portrait+'\')"></div>'
         //   +    '<div class="player-platform"><svg class="platform-icon" viewBox="0 0 70 70"><text x="35" y=35" >'+data.platform+'</text></svg></div>'
@@ -161,12 +178,3 @@ function drawList(data) {
     }
 }
 
-function playerDetail(data) {
-    if(data.isPublic == 'Y') {
-        location.href = "/showPlayerDetail/"+data.forUrl;
-    } else {
-        alert("플레이어가 프로필을 비공개했습니다.\n" +
-            "인게임에서 프로필 공개 이후 다시 검색해주세요.");
-        return;
-    }
-}
