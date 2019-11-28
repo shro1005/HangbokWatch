@@ -4,6 +4,7 @@ import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.service.ShowPlayerDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -17,9 +18,20 @@ public class WebController {
     ShowPlayerDetailService spd;
 
     @GetMapping("/showPlayerDetail/{forUrl}")
-    public String getPlayerDetail(@PathVariable String forUrl) {
+    public String getPlayerDetail(@PathVariable String forUrl, Model model) {
         System.out.println("getPlayerDetail -> forUrl : " + forUrl);
         CompetitiveDetailDto cdDto = spd.showPlayerExample(forUrl);
+
+
+        model.addAttribute("player", cdDto.getPlayer());
+        model.addAttribute("dva", cdDto.getDva());
+        model.addAttribute("reinhardt", cdDto.getReinhardt());
+        model.addAttribute("roadHog", cdDto.getRoadHog());
+        model.addAttribute("orisa", cdDto.getOrisa());
+        model.addAttribute("winston", cdDto.getWinston());
+        model.addAttribute("zarya", cdDto.getZarya());
+        model.addAttribute("sigma", cdDto.getSigma());
+
         return "playerDetail";
     }
 }
