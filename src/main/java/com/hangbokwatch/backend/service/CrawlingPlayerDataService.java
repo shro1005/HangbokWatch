@@ -14,11 +14,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +54,9 @@ public class CrawlingPlayerDataService {
     SigmaRepository sigmaRepository;
     @Autowired
     WreckingBallRepository wreckingBallRepository;
+
+    @Value("${spring.HWresource.HWimages}")
+    private String portraitPath;
 
     public List<PlayerListDto> crawlingPlayerList(String playerName) {
         // 반환할 playerListDto 초기화
@@ -80,6 +89,17 @@ public class CrawlingPlayerDataService {
                 }
                 String forUrl = dto.getUrlName();
                 String portrait = "https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/" + dto.getPortrait() + ".png";  //d1u1mce87gyfbn.cloudfront.net
+                System.out.println(dto.getPortrait());
+                /** 이미지 저장*/
+                try {
+                    URL url = new URL(portrait);
+                    portrait = "/HWimages/portrait/"+ dto.getPortrait() + ".png";
+                    BufferedImage bi = ImageIO.read(url);
+                    ImageIO.write(bi, "png", new File(portraitPath+"portrait/"+ dto.getPortrait() + ".png"));
+                }catch (IIOException e) {
+                    portrait = "/HWimages/portrait/0x02500000000002F7.png";
+                }
+
                 String isPublic = "N"; Integer tankratingPoint = 0; Integer dealRatingPoint = 0; Integer healRatingPoint = 0;
                 PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint);
                 if(dto.getIsPublic()) {

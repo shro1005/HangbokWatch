@@ -23,3 +23,5 @@ spring:
   h2:
     console:
       enabled: true
+  HWresource:
+    HWimages: /Users/kyun/workspace/HangbokWatch_Project/HangbokWatch_Resource/HWimages/

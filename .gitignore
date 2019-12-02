@@ -5,6 +5,8 @@ webtemplate/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**
 !**/src/test/**
+*.yml
+HangbokWatch_Resource/
 
 ### STS ###
 .apt_generated
