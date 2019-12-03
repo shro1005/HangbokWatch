@@ -477,6 +477,25 @@ pre {
   .resultContainer {
     max-width: 960px; } }
 
+.resultContainer-s {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto; }
+@media (min-width: 576px) {
+  .resultContainer-s {
+    max-width: 540px; } }
+@media (min-width: 768px) {
+  .resultContainer-s {
+    max-width: 720px; } }
+@media (min-width: 992px) {
+  .resultContainer-s {
+    max-width: 960px; } }
+@media (min-width: 1200px) {
+  .resultContainer-s {
+    max-width: 1080px; } }
+
 .container-fluid {
   width: 100%;
   padding-right: 15px;
@@ -9186,7 +9205,8 @@ textarea.form-control {
 
 .ftco-section-s {
   padding: 1.5em 0;
-  position: relative; }
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.02);}
 @media (max-width: 767.98px) {
   .ftco-section-s {
     padding: 1.5em 0; } }
@@ -10325,11 +10345,13 @@ textarea.form-control {
   position: absolute;
   left: 25px;
   top: 20px;
+  background-color: #e86ed0;
 }
 
 .player-profile .player-icon .player-portrait{
-  width: 100px;
-  height: 100px;
+  width: 97px;
+  height: 97px;
+  margin: 1.5px;
 }
 
 .player-profile .player-inf{
@@ -10339,16 +10361,120 @@ textarea.form-control {
   color: white;
 }
 .player-profile .player-inf .player-name{
-  font-size: 30px;
+  font-size: 25px;
   line-height: 30px;
   font-weight: 500;
+  color: white;
+}
+
+.player-profile .player-inf .player-name .tag{
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 500;
+  color: white;
+  display: inline-block;
 }
 
 .player-profile .player-inf .player-level{
   font-size: 20px;
-  line-height: 20px;
+  line-height: 28px;
   font-weight: 300;
 }
 
+.player-profile .player-inf .profile-buttons{
 
+}
 
+.player-profile .player-inf .profile-buttons .refresh-button{
+
+}
+
+.player-profile .player-inf .profile-buttons .favorite-button{
+
+}
+
+/* =================== 버튼 예시 1 시======================*/
+.example-btn {
+  box-sizing: border-box;
+  appearance: none;
+  background-color: transparent;
+  border: 2px solid #e86ed0;
+  border-radius: 0.6em;
+  color: #e86ed0;
+  cursor: pointer;
+  display: inline-block;
+  align-self: center;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1;
+  padding: 0.6em 1.8em;
+  text-decoration: none;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin-right: 5px;
+  margin-top: 2px;
+}
+.example-btn:hover, .example-btn:focus {
+   color: #fff;
+   outline: 0;
+ }
+
+/*BUTTON */
+#favorite-N {
+  transition: box-shadow 300ms ease-in-out, color 300ms ease-in-out;
+}
+#favorite-N:hover {
+   box-shadow: 0 0 40px 40px #e86ed0 inset;
+}
+
+/*BUTTON */
+#favorite-Y {
+  border-color: #e86ed0;
+  color: #fff;
+  box-shadow: 0 0 40px 40px #e86ed0 inset, 0 0 0 0 #e86ed0;
+  transition: all 150ms ease-in-out;
+}
+#favorite-Y:hover {
+   box-shadow: 0 0 10px 0 #e86ed0 inset, 0 0 10px 4px #e86ed0;
+}
+
+/* =================== 버튼 예시 1 끝======================*/
+
+/* player detail main */
+.player-detail-layout .competitive-tap{
+
+}
+
+.player-detail-layout .quickmatch-tap{
+
+}
+
+.player-detail-layout .player-competitive-point{
+  font-size: 30px;
+  line-height: 40px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.player-detail-layout .player-competitive-point .tank-point{
+  background-color: white;
+  display: inline-block;
+  border: 0.5px solid rgba(60,72,96,0.4);
+  max-width: 32.73333%;
+}
+
+.player-detail-layout .player-competitive-point .deal-point{
+  background-color: white;
+  display: inline-block;
+  border: 0.5px solid rgba(60,72,96,0.4);
+  max-width: 32.73333%;
+}
+
+.player-detail-layout .player-competitive-point .heal-point{
+  background-color: white;
+  display: inline-block;
+  border: 0.5px solid rgba(60,72,96,0.4);
+  max-width: 32.73333%;
+}

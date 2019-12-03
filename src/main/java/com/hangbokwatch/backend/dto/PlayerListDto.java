@@ -21,6 +21,9 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private Integer tankRatingPoint;
     private Integer dealRatingPoint;
     private Integer healRatingPoint;
+    private String tankRatingImg;
+    private String dealRatingImg;
+    private String healRatingImg;
     private Integer winGame;
     private Integer loseGame;
     private Integer drawGame;
@@ -33,8 +36,9 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
 
     @Builder
     public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
-                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer winGame,
-                         Integer loseGame, Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3){ //) {
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
+                         String tankRatingImg, String dealRatingImg, String healRatingImg, Integer winGame, Integer loseGame,
+                         Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3){ //) {
         this.id = id;
         this.playerName = playerName;
         this.playerLevel = playerLevel;
@@ -44,6 +48,9 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         this.tankRatingPoint = tankRatingPoint;
         this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint;
+        this.tankRatingImg = tankRatingImg;
+        this.dealRatingImg = dealRatingImg;
+        this.healRatingImg = healRatingImg;
         this.winGame = winGame;
         this.loseGame = loseGame;
         this.drawGame = drawGame;

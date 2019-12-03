@@ -76,7 +76,7 @@
 </div>
 
 <section class="ftco-section-s">
-    <div class="resultContainer">	<!--container-->
+    <div class="resultContainer-s">	<!--container-->
         <div style="width: 300px; height: 250px; position: absolute; left: -30px;">  <!--왼쪽 광고-->
             <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"-->
                 <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
@@ -93,9 +93,20 @@
                     <img class="player-portrait" src="{{player.portrait}}" onerror="this.src = 'https://blzgdapipro-a.akamaihd.net/game/unlocks/0x02500000000002F7.png';" alt="">
                 </div>
                 <div class="player-inf">
-                    <div class="player-name">{{player.battleTag}}</div>
-                    <div class="player-level">Lv {{player.playerLevel}}</div>
+                    <div class="player-name">{{player.playerName}} <div class="tag">{{tag}}</div></div>
+                    <div class="player-level">LV. {{player.playerLevel}}</div>
+                    <div class="profile-buttons">
+                        <div class="example-btn refresh-button" id="favorite-N">전적 갱신</div>
+                        <div class="example-btn favorite-button" id="favorite-Y">즐겨찾기</div>
+                    </div>
                 </div>
+            </div>
+            <div class="competitive-tap"></div>
+            <div class="quickmatch-tap"></div>
+            <div class="player-competitive-point">
+                <div class="tank-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.tankRatingPoint}}</div>
+                <div class="deal-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.dealRatingPoint}}</div>
+                <div class="heal-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.healRatingPoint}}</div>
             </div>
         </div>
         <!-- 프로필 공개유저 -->
@@ -200,10 +211,8 @@
 <script src="/js/bootstrap-datepicker.js"></script>
 <script src="/js/jquery.timepicker.min.js"></script>
 <script src="/js/scrollax.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-<script src="/js/google-map.js"></script>
 <script src="/js/main.js"></script>
-<script src="/js/app/custom-hangbok-home.js"></script>
+<script src="/js/app/hangbok-detail.js"></script>
 
 </body>
 </html>

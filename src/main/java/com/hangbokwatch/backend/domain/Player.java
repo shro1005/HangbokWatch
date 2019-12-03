@@ -42,11 +42,20 @@ public class Player {
     @Column(name="tank_rating_point")
     private Integer tankRatingPoint;
 
+    @Column(name="tank_rating_img")
+    private String tankRatingImg;
+
     @Column(name="deal_rating_point")
     private Integer dealRatingPoint;
 
+    @Column(name="deal_rating_img")
+    private String dealRatingImg;
+
     @Column(name="heal_rating_point")
     private Integer healRatingPoint;
+
+    @Column(name="heal_rating_img")
+    private String healRatingImg;
 
     @Column(name="win_game")
     private Integer winGame;
@@ -77,10 +86,12 @@ public class Player {
     @Builder
     public Player(Long id, String battleTag, String playerName, Integer playerLevel, String forUrl, String isPublic, String platform,
                   String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
+                  String tankRatingImg, String dealRatingImg, String healRatingImg,
                   Integer winGame, Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
         this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
-        this.healRatingPoint = healRatingPoint; this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
+        this.healRatingPoint = healRatingPoint; this.tankRatingImg = tankRatingImg; this.dealRatingImg = dealRatingImg; this.healRatingImg = healRatingImg;
+        this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
         this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.forUrl = forUrl;
     }
 

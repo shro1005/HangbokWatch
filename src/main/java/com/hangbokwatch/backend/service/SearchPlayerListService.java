@@ -27,6 +27,7 @@ public class SearchPlayerListService {
         for (Player player : searchResult) {
             PlayerListDto playerListDto = new PlayerListDto(player.getId(), player.getBattleTag(), player.getPlayerName(), player.getForUrl(), player.getPlayerLevel()
             , player.getIsPublic(), player.getPlatform(), player.getPortrait(), player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
+            , player.getTankRatingImg(), player.getDealRatingImg(), player.getHealRatingImg()
             , player.getWinGame(), player.getLoseGame(), player.getDrawGame(), "", player.getMostHero1(), player.getMostHero2(), player.getMostHero3());
 
             playerListDtos.add(playerListDto);

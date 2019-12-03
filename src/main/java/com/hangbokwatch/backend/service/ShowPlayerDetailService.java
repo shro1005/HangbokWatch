@@ -42,21 +42,23 @@ public class ShowPlayerDetailService {
 
             /** 기존에 없는 플레이어 조회시 */
             if(playerRepository.findByBattleTag(forUrl).size() == 0) {
+                stopWatch.start("API를 통한 플레이어 기본 정보 추출");
                 List<PlayerListDto> playerListDtos = cpd.crawlingPlayerList(forUrl);
-                Player player = null;
+                stopWatch.stop();
                 for (PlayerListDto playerListDto : playerListDtos) {
                     if ("Y".equals(playerListDto.getIsPublic())) {
-                        PlayerListDto playerDto = cpd.crawlingPlayerProfile(playerListDto);
-                        player = new Player(playerDto.getId(), playerDto.getBattleTag(), playerDto.getPlayerName(), playerDto.getPlayerLevel(), playerDto.getForUrl(), playerDto.getIsPublic(), playerDto.getPlatform()
-                                , playerDto.getPortrait(), playerDto.getTankRatingPoint(), playerDto.getDealRatingPoint(), playerDto.getHealRatingPoint(), playerDto.getWinGame()
-                                , playerDto.getLoseGame(), playerDto.getDrawGame(), playerDto.getMostHero1(), playerDto.getMostHero2(), playerDto.getMostHero3());
-                        playerRepository.save(player);
-                        System.out.println(forUrl + " : player 테이블 save 성공");
+//                        PlayerListDto playerDto = cpd.crawlingPlayerProfile(playerListDto);
+//                        player = new Player(playerDto.getId(), playerDto.getBattleTag(), playerDto.getPlayerName(), playerDto.getPlayerLevel(), playerDto.getForUrl(), playerDto.getIsPublic(), playerDto.getPlatform()
+//                                , playerDto.getPortrait(), playerDto.getTankRatingPoint(), playerDto.getDealRatingPoint(), playerDto.getHealRatingPoint()
+//                                , playerDto.getTankRatingImg(), playerDto.getDealRatingImg(), playerDto.getHealRatingImg()
+//                                , playerDto.getWinGame(), playerDto.getLoseGame(), playerDto.getDrawGame(), playerDto.getMostHero1(), playerDto.getMostHero2(), playerDto.getMostHero3());
+//                        playerRepository.save(player);
+//                        System.out.println(forUrl + " : player 테이블 save 성공");
 
                         stopWatch.start("경쟁정 디테일 크롤링 및 데이터 저장 까지 총 시간");
                         //
                         cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto);
-                        cdDto.setPlayer(player);
+
                         // 시간 확인
                         stopWatch.stop();
                         System.out.println(stopWatch.prettyPrint());

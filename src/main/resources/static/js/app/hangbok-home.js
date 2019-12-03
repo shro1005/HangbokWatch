@@ -4,9 +4,24 @@ var sendData = [];
 var main = {
     init : function(){
         // alert('main init 호출');
-        var _this = this;
+        $(window).on('load', function () {
+            const flag = $('.fromDetail').attr("id");
+            const userInput = $('.fromDetail').attr("value");;
+            // console.log("flag : " + flag + " , userInput : " + userInput);
+            if(flag=='Y') {
+                _this.search(userInput);
+
+                event.preventDefault();
+
+                $('html,body').animate({
+                    scrollTop: $('.goto-here').offset().top
+                }, 500, 'easeInOutExpo');
+            }
+        });
+
+        const _this = this;
         $('#btn-search').on('click', function (event) {
-            _this.search();
+            _this.search("");
 
             event.preventDefault();
 
@@ -20,7 +35,7 @@ var main = {
         $(document).keypress(function (e) {
             if (e.which == 13) {
                 // alert('enter key is pressed');
-                _this.search();
+                _this.search("");
 
                 e.preventDefault();
 
@@ -32,17 +47,20 @@ var main = {
             }
         });
     },
-    search : function () {
+    search : function (userInput) {
         // alert('main search 호출');
         playerData = [];
         $(".player").remove();
         $(".more_btn_div").remove();
+        let playerName = $('input[id="playerName"]').val();
 
-        var playerName = $('input[id="playerName"]').val();
-        var inputName = {
-            playerName : playerName
+        if(playerName == "") {
+            playerName = userInput;
         }
-
+        const inputName = {
+            playerName: playerName
+        };
+        console.log("playerName : " + playerName);
         $.ajax({
             type: 'POST',
             url: '/showPlayerList',
@@ -51,8 +69,8 @@ var main = {
             data: JSON.stringify(inputName),
             async : false
         }).done(function (datas) {
-            console.log("showPlayerList => " + datas);
-            console.log("/showPlayerList => 결과 내역 사이즈 : " + datas.length);
+            // console.log("showPlayerList => " + datas);
+            // console.log("/showPlayerList => 결과 내역 사이즈 : " + datas.length);
             if(datas.length != 0) {
                 $.each(datas, function (idx, data) {
                     playerData.push(data);
@@ -67,32 +85,36 @@ var main = {
                     data: JSON.stringify(inputName),
                     async : false
                 }).done(function (crawlingResult) {
-                    console.log("showUserList => " + crawlingResult);
-                    console.log("/showUserList => 결과 내역 사이즈 : " + crawlingResult.length);
+                    // console.log("showUserList => " + crawlingResult);
+                    // console.log("/showUserList => 결과 내역 사이즈 : " + crawlingResult.length);
                     if(crawlingResult.length == 0) {
                         const noticeDiv = $('<div class="player notice_playerList"> 행복워치에 등록된 유저가 아닙니다.<br>' +
                             '행복워치에서 최초 검색 시 배틀태그(플레이어명#00000)를 정확하게 입력해야 합니다.</div>');
                         //const testDiv = $('<div></div>');
                         $("#search-result").append(noticeDiv);
                     }else {
-                        $.ajax({
-                            type: 'POST',
-                            url: '/showUserProfile',
-                            dataType: 'json',
-                            contentType: 'application/json; charset=utf-8',
-                            data: JSON.stringify(crawlingResult),
-                            async : false
-                        }).done(function(players){
-                            $.each(players, function(idx, player){
-                                drawList(player);
-                            });
+                        // $.ajax({
+                        //     type: 'POST',
+                        //     url: '/showUserProfile',
+                        //     dataType: 'json',
+                        //     contentType: 'application/json; charset=utf-8',
+                        //     data: JSON.stringify(crawlingResult),
+                        //     async : false
+                        // }).done(function(players){
+                        //     $.each(players, function(idx, player){
+                        //         drawList(player);
+                        //     });
+                        // });
+                        $.each(crawlingResult, function(i, player){
+                            // console.log(player.battleTag, player.playerName);
+                            location.href = "/showPlayerDetail/" + player.forUrl;
                         });
                     }
                 });
             }
         });
     }
-}
+};
 main.init();
 
 function morePlayers() {
@@ -141,10 +163,6 @@ function playerDetail(obj) {
         return;
     }
 }
-
-
-
-출처: https://thingsthis.tistory.com/130 [여행과 일상]
 
 function drawList(data) {
     // return new Promise(function(data){})
