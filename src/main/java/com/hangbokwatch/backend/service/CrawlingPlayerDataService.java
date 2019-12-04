@@ -22,10 +22,8 @@ import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.UnknownHostException;
+import java.io.IOException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -95,9 +93,6 @@ public class CrawlingPlayerDataService {
                 PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint);
                 if(dto.getIsPublic()) {
                     playerListDto.setIsPublic("Y");
-                    // 프로필 공개한 플레이어의 경우 경쟁전 점수와 승리, 패배, 무승부 경기수를 가져온다.
-//                    playerListDto = crawlingPlayerProfile2(playerListDto);
-//                    System.out.println(playerListDto.getTankRatingPoint());
                 }
                 playerListDto.setCnt(3);
                 System.out.println(playerListDto.toString());
@@ -135,7 +130,7 @@ public class CrawlingPlayerDataService {
             Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+playerListDto.getPlatform()+"/"+playerListDto.getForUrl())
                                 .get();
             stopWatch.stop();
-            stopWatch.start("경쟁전 점수 추");
+            stopWatch.start("경쟁전 점수 추출");
             Elements elements = rawData.select("div.competitive-rank-role");
             for (Element roleElement : elements) {
                 Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
@@ -195,17 +190,43 @@ public class CrawlingPlayerDataService {
             // 시간 확인
             stopWatch.stop();
 
-            stopWatch.start("경쟁전 점수 추출");
-            Elements competitivePoint = rawData.select("div.competitive-rank-role");
-            for (Element roleElement : competitivePoint) {
+            stopWatch.start("경쟁전 역할별 점수 및 티어 이미지 추출");
+            Elements competitiveRole = rawData.select("div.competitive-rank-role");
+            String tierUrl ="";
+            String substrTier = "";
+            for (Element roleElement : competitiveRole) {
                 Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
                 if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
 //                    System.out.println(roleElement.text());
                     playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
+                    // 티어 이미지 추출
+                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                    tierUrl = tierIcon.attr("src");
+                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+                    // 티어 이미지 저장
+                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
+//                    tierUrl = "/HWimages/tier/"+ substrTier + ".png";
+                    playerListDto.setTankRatingImg(tierUrl);
                 }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
                     playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
+                    // 티어 이미지 추출
+                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                    tierUrl = tierIcon.attr("src");
+                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+                    // 티어 이미지 저장
+                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
+//                    tierUrl = "/HWimages/tier/"+ substrTier + ".png";
+                    playerListDto.setDealRatingImg(tierUrl);
                 }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
                     playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
+                    // 티어 이미지 추출
+                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                    tierUrl = tierIcon.attr("src");
+                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+                    // 티어 이미지 저장
+                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
+//                    tierUrl = "/HWimages/tier/"+ substrTier + ".png";
+                    playerListDto.setHealRatingImg(tierUrl);
                 }
             }
             // 시간 확인
@@ -216,22 +237,9 @@ public class CrawlingPlayerDataService {
             Element portraitEl = rawData.selectFirst("img[class=player-portrait]");
             String portrait = portraitEl.attr("src");
             String substrPR = portrait.substring(portrait.indexOf("/overwatch/")+11, portrait.indexOf(".png"));
-
-            // 시간 확인
-            stopWatch.stop();
-            stopWatch.start("프로필 이미지 저장");
-            /** 이미지 저장*/
-            try {
-                URL url = new URL(portrait);
-                portrait = "/HWimages/portrait/"+ substrPR + ".png";
-                BufferedImage bi = ImageIO.read(url);
-                ImageIO.write(bi, "png", new File(portraitPath+"portrait/"+ substrPR + ".png"));
-            }catch (IIOException e) {
-                portrait = "/HWimages/portrait/0x02500000000002F7.png";
-            }
+            //프로필 사진 저장
+            portrait = saveImg(stopWatch, portrait, substrPR, "portrait");
             playerListDto.setPortrait(portrait);
-            // 시간 확인
-            stopWatch.stop();
 
             int cnt = 3;
             if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
@@ -240,6 +248,21 @@ public class CrawlingPlayerDataService {
             if(cnt == 0 ) {cnt = 1;}
             playerListDto.setCnt(cnt);
 
+            /** 모스트 영웅3 추출*/
+            Elements competitiveDatas = rawData.select("div#competitive");
+            Elements mostHeros = competitiveDatas.select("div.ProgressBar-title");
+            int mostCnt = 3;
+            if(mostHeros.size() < 3) {mostCnt = mostHeros.size();}
+            int count = 0;
+            for(Element mostHero : mostHeros) {
+                count++;
+                if(count == 1) {playerListDto.setMostHero1(mostHero.text());}
+                else if(count == 2) {playerListDto.setMostHero2(mostHero.text());}
+                else if(count == 3) {playerListDto.setMostHero3(mostHero.text());}
+                if(mostCnt <= count) {break;}
+            }
+
+            stopWatch.stop();
             stopWatch.start("player 테이블에 저장");
             Player player = new Player(playerListDto.getId(), playerListDto.getBattleTag(), playerListDto.getPlayerName(), playerListDto.getPlayerLevel(), playerListDto.getForUrl(), playerListDto.getIsPublic(), playerListDto.getPlatform()
                     , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
@@ -250,7 +273,7 @@ public class CrawlingPlayerDataService {
             stopWatch.stop();
 
             /** 영웅별 경쟁전 상세정보 추출 */
-            Elements competitiveDatas = rawData.select("div#competitive");
+
             Elements competitiveHerosDetail = competitiveDatas.select("div.js-stats");
 
             for(Element heroDetails : competitiveHerosDetail) {
@@ -1169,7 +1192,32 @@ public class CrawlingPlayerDataService {
         return chdDto;
     }
 
-    /** 사설 오버워치 api (ow-api.com) 에서 데이터 받아옴 */
+    public String saveImg(StopWatch stopWatch, String imgUrl, String imgName, String savePath) {
+        // 시간 확인
+        stopWatch.stop();
+        stopWatch.start(savePath+" 이미지 저장");
+        String forDB = "/HWimages/"+savePath+"/"+ imgName + ".png";
+        File file = new File(portraitPath+ savePath + "/" +imgName + ".png");
+        if(!file.exists()) { // 파일 미존재시 저
+            /** 이미지 저장*/
+            try {
+                URL url = new URL(imgUrl);
+                BufferedImage bi = ImageIO.read(url);
+                ImageIO.write(bi, "png", new File(portraitPath + savePath + "/" + imgName + ".png"));
+            } catch (IIOException | MalformedURLException e) {
+                forDB = "/HWimages/" + savePath + "/default.png";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            System.out.println("이미 존재하는 이미지입니다. (" + forDB + ")");
+        }
+//        // 시간 확인
+//        stopWatch.stop();
+        return forDB;
+    }
+
+    /** 사설 오버워치 api (ow-api.com) 에서 데이터 받아옴  (미사용) */
     public PlayerListDto crawlingPlayerProfile2(PlayerListDto playerListDto) {
         ObjectMapper mapper = new ObjectMapper();
 //        playerList = new ArrayList<PlayerListDto>();

@@ -10346,12 +10346,15 @@ textarea.form-control {
   left: 25px;
   top: 20px;
   background-color: #e86ed0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
 .player-profile .player-icon .player-portrait{
   width: 97px;
   height: 97px;
-  margin: 1.5px;
+  margin: 2px;
 }
 
 .player-profile .player-inf{
@@ -10453,7 +10456,9 @@ textarea.form-control {
 
 .player-detail-layout .player-competitive-point{
   font-size: 30px;
-  line-height: 40px;
+  font-weight: 600;
+  color: #3c4860;
+  /*font-style: italic;*/
   margin-top: 10px;
   text-align: center;
 }
@@ -10461,20 +10466,47 @@ textarea.form-control {
 .player-detail-layout .player-competitive-point .tank-point{
   background-color: white;
   display: inline-block;
-  border: 0.5px solid rgba(60,72,96,0.4);
+  border: 2px solid rgba(232,110,208,1) /*rgba(60,72,96,0.4)*/;
+  line-height: 40px;
   max-width: 32.73333%;
 }
 
 .player-detail-layout .player-competitive-point .deal-point{
   background-color: white;
   display: inline-block;
-  border: 0.5px solid rgba(60,72,96,0.4);
+  border: 2px solid rgba(232,110,208,1) /*rgba(60,72,96,0.4)*/;
+  line-height: 40px;
   max-width: 32.73333%;
 }
 
 .player-detail-layout .player-competitive-point .heal-point{
   background-color: white;
   display: inline-block;
-  border: 0.5px solid rgba(60,72,96,0.4);
+  border: 2px solid rgba(232,110,208,1) /*rgba(60,72,96,0.4)*/;
+  line-height: 40px;
   max-width: 32.73333%;
+}
+
+.rank-image img{
+  height: 70px;
+  width: 70px;
+  margin-right: 17px;
+}
+
+.rank-role {
+  position: absolute;
+  background-color: rgba(232,110,208,1);
+  margin-left: -17px;
+  margin-top: -2px;
+  font-size: 15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height: 35px;
+  width: 35px;
+}
+.rank-role img{
+  /*display: block;*/
+  /*margin: auto;*/
+  max-width:100%; max-height:100%;
 }

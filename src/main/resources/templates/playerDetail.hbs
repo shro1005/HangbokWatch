@@ -104,9 +104,33 @@
             <div class="competitive-tap"></div>
             <div class="quickmatch-tap"></div>
             <div class="player-competitive-point">
-                <div class="tank-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.tankRatingPoint}}</div>
-                <div class="deal-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.dealRatingPoint}}</div>
-                <div class="heal-point col-md-4"><div class="rank-image"><img src="" onerror="" alt=""></div>{{player.healRatingPoint}}</div>
+                <div class="tank-point col-md-4">
+                    <div class="rank-role">
+                        <img src="/HWimages/role/icon-tank-8a52daaf01.png">
+                    </div>
+                    <div class="rank-image">
+                        <img src="{{player.tankRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.tankRatingPoint}}
+                    </div>
+                    {{player.tankRatingPoint}}
+                </div>
+                <div class="deal-point col-md-4">
+                    <div class="rank-role">
+                        <img src="/HWimages/role/icon-offense-6267addd52.png">
+                    </div>
+                    <div class="rank-image">
+                        <img src="{{player.dealRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.dealRatingPoint}}
+                    </div>
+                    {{player.dealRatingPoint}}
+                </div>
+                <div class="heal-point col-md-4">
+                    <div class="rank-role">
+                        <img src="/HWimages/role/icon-support-46311a4210.png">
+                    </div>
+                    <div class="rank-image">
+                        <img src="{{player.healRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.healRatingPoint}}
+                    </div>
+                    {{player.healRatingPoint}}
+                </div>
             </div>
         </div>
         <!-- 프로필 공개유저 -->
