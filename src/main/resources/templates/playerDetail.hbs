@@ -7,7 +7,6 @@
 
     <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="">
     <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css">
     <link rel="stylesheet" href="/css/animate.css">
 
@@ -104,33 +103,7 @@
             <div class="competitive-tap"></div>
             <div class="quickmatch-tap"></div>
             <div class="player-competitive-point">
-                <div class="tank-point col-md-4">
-                    <div class="rank-role">
-                        <img src="/HWimages/role/icon-tank-8a52daaf01.png">
-                    </div>
-                    <div class="rank-image">
-                        <img src="{{player.tankRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.tankRatingPoint}}
-                    </div>
-                    {{player.tankRatingPoint}}
-                </div>
-                <div class="deal-point col-md-4">
-                    <div class="rank-role">
-                        <img src="/HWimages/role/icon-offense-6267addd52.png">
-                    </div>
-                    <div class="rank-image">
-                        <img src="{{player.dealRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.dealRatingPoint}}
-                    </div>
-                    {{player.dealRatingPoint}}
-                </div>
-                <div class="heal-point col-md-4">
-                    <div class="rank-role">
-                        <img src="/HWimages/role/icon-support-46311a4210.png">
-                    </div>
-                    <div class="rank-image">
-                        <img src="{{player.healRatingImg}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">{{player.healRatingPoint}}
-                    </div>
-                    {{player.healRatingPoint}}
-                </div>
+
             </div>
         </div>
         <!-- 프로필 공개유저 -->
@@ -236,6 +209,43 @@
 <script src="/js/jquery.timepicker.min.js"></script>
 <script src="/js/scrollax.min.js"></script>
 <script src="/js/main.js"></script>
+<script src="/js/progress.bar.js"></script>
+<script src="/js/handlebars-v4.0.4.js"></script>
+
+
+<script id="competitive-points" type="text/x-handlebars-template">
+    \{{#roles}}
+    <div class="rank-point col-md-4">
+        <div class="rank-role">
+            <img src="\{{roleImgPath}}">
+        </div>
+        <div class="rank-image">
+            <img src="\{{rankImgPath}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">\{{rankPoint}}
+        </div>
+        <div class="progress-container \{{role}}" id="\{{wingame}}/\{{losegame}}"></div>
+        <div class="winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+    </div>
+    \{{/roles}}
+</script>
+<script type="text/javascript">
+    let competitive_points = $("#competitive-points").html();
+    let template = Handlebars.compile(competitive_points);
+
+    let ratingPoint = ["{{player.tankRatingPoint}}","{{player.dealRatingPoint}}", "{{player.healRatingPoint}}"];
+    $.each(ratingPoint, function (i, point) {
+       if(point == "0") {ratingPoint[i] = "배치중";}
+    });
+
+    const data = {
+        roles:[
+            {role: "tank-container", roleImgPath: "/HWimages/role/icon-tank-8a52daaf01.png", rankImgPath: "{{player.tankRatingImg}}", rankPoint: ratingPoint[0], wingame: "{{player.tankWinGame}}", losegame: "{{player.tankLoseGame}}"},
+            {role: "deal-container", roleImgPath: "/HWimages/role/icon-offense-6267addd52.png", rankImgPath: "{{player.dealRatingImg}}", rankPoint: ratingPoint[1], wingame: "{{player.dealWinGame}}", losegame: "{{player.dealLoseGame}}"},
+            {role: "heal-container", roleImgPath: "/HWimages/role/icon-support-46311a4210.png", rankImgPath: "{{player.healRatingImg}}", rankPoint: ratingPoint[2], wingame: "{{player.healWinGame}}", losegame: "{{player.healLoseGame}}"}
+        ]
+    };
+    const item = template(data);
+    $('.player-competitive-point').append(item);
+</script>
 <script src="/js/app/hangbok-detail.js"></script>
 
 </body>

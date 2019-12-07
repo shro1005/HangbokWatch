@@ -25,10 +25,15 @@ public class SearchPlayerListService {
         }
 
         for (Player player : searchResult) {
+            Double winRate = (new Double(player.getWinGame())/new Double(player.getWinGame()+player.getLoseGame())*100);
+            Integer winRateInt = (int) (double) winRate;
+            System.out.println("winRate : " + winRate + " / intWinRate : " + winRateInt);
+
             PlayerListDto playerListDto = new PlayerListDto(player.getId(), player.getBattleTag(), player.getPlayerName(), player.getForUrl(), player.getPlayerLevel()
             , player.getIsPublic(), player.getPlatform(), player.getPortrait(), player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
             , player.getTankRatingImg(), player.getDealRatingImg(), player.getHealRatingImg()
-            , player.getWinGame(), player.getLoseGame(), player.getDrawGame(), "", player.getMostHero1(), player.getMostHero2(), player.getMostHero3());
+            , player.getWinGame(), player.getLoseGame(), player.getDrawGame(), Integer.toString(winRateInt)
+            , player.getMostHero1(), player.getMostHero2(), player.getMostHero3());
 
             playerListDtos.add(playerListDto);
         }

@@ -30,6 +30,20 @@ public class ShowPlayerDetailService {
     ZaryaRepository zaryaRepository;
     @Autowired
     SigmaRepository sigmaRepository;
+    @Autowired
+    AnaRepository anaRepository;
+    @Autowired
+    BaptisteRepository baptisteRepository;
+    @Autowired
+    BrigitteRepository brigitteRepository;
+    @Autowired
+    LucioRepository lucioRepository;
+    @Autowired
+    MercyRepository mercyRepository;
+    @Autowired
+    MoiraRepository moiraRepository;
+    @Autowired
+    ZenyattaRepository zenyattaRepository;
 
     @Autowired
     CrawlingPlayerDataService cpd;

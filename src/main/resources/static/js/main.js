@@ -131,7 +131,8 @@
 			} 
 			if ( st > 350 ) {
 				if ( !navbar.hasClass('awake') ) {
-					navbar.addClass('awake');	
+					navbar.addClass('awake');
+					$('.search-location-tap').show();
 				}
 				
 				if(sd.length > 0) {
@@ -142,6 +143,7 @@
 				if ( navbar.hasClass('awake') ) {
 					navbar.removeClass('awake');
 					navbar.addClass('sleep');
+					$('.search-location-tap').hide();
 				}
 				if(sd.length > 0) {
 					sd.removeClass('sleep');
@@ -292,11 +294,6 @@
     fixedContentPos: false
   });
 
-
-	$('#book_pick_date,#book_off_date').datepicker({
-	  'format': 'm/d/yyyy',
-	  'autoclose': true
-	});
 	$('#time_pick').timepicker();
 
 	var goHere = function() {

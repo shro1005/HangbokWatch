@@ -4,40 +4,53 @@
     <title>행복워치</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css">
-    <link rel="stylesheet" href="/css/animate.css">
-    
-    <link rel="stylesheet" href="/css/owl.carousel.min.css">
-    <link rel="stylesheet" href="/css/owl.theme.default.min.css">
-    <link rel="stylesheet" href="/css/magnific-popup.css">
+      <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/aos.css">
+      <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css">
+      <link rel="stylesheet" href="/css/animate.css">
 
-    <link rel="stylesheet" href="/css/ionicons.min.css">
+      <link rel="stylesheet" href="/css/owl.carousel.min.css">
+      <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+      <link rel="stylesheet" href="/css/magnific-popup.css">
 
-    <link rel="stylesheet" href="/css/bootstrap-datepicker.css">
-    <link rel="stylesheet" href="/css/jquery.timepicker.css">
+      <link rel="stylesheet" href="/css/aos.css">
 
-    
-    <link rel="stylesheet" href="/css/flaticon.css">
-    <link rel="stylesheet" href="/css/icomoon.css">
-    <link rel="stylesheet" href="/css/style.css">
+      <link rel="stylesheet" href="/css/ionicons.min.css">
+
+      <link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+      <link rel="stylesheet" href="/css/jquery.timepicker.css">
+
+
+      <link rel="stylesheet" href="/css/flaticon.css">
+      <link rel="stylesheet" href="/css/icomoon.css">
+      <link rel="stylesheet" href="/css/style.css">
+
   </head>
   <body>
     
 	  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 	    <div class="container">
-	      <a class="navbar-brand" href="index.html">행복옵치</a>
+	      <a class="navbar-brand" href="/">행복옵치</a>
 	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 	        <span class="oi oi-menu"></span> Menu
 	      </button>
 
 	      <div class="collapse navbar-collapse" id="ftco-nav">
+              <form action="#" class="search-location-tap" style="display: none">
+                  <div class="row justify-content-center">
+                      <div class="col-lg-10 align-items-end">
+                          <div class="form-group-tap">
+                              <div class="form-field">
+                                  <input type="text" id="playerName-tap" class="form-control" placeholder="'플레이어명' 혹은 '배틀태그#0000'">
+                                  <button type="button" id="btn-search-tap"><span class="ion-ios-search"></span></button>  <!---->
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </form>
 	        <ul class="navbar-nav ml-auto">
-				<li class="nav-item active"><a href="index.html" class="nav-link">홈</a></li>  <!--home-->
+				<li class="nav-item active"><a href="/" class="nav-link">홈</a></li>  <!--home-->
 				<li class="nav-item"><a href="about.html" class="nav-link">찜</a></li>  <!--favorite-->
 				<li class="nav-item"><a href="agent.html" class="nav-link">순위표</a></li>   <!--leaderBoard-->
 				<li class="nav-item"><a href="services.html" class="nav-link">행복옵치</a></li>   <!--scream-->
@@ -63,7 +76,7 @@
 						<div class="col-lg-10 align-items-end">
 							<div class="form-group">
 								<div class="form-field">
-									<input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '플레이어명#배틀태그'를 입력해주세요">
+									<input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '배틀태그#0000'를 입력해주세요">
 									<button type="button" id="btn-search"><span class="ion-ios-search"></span></button>  <!---->
 						  		</div>
 					  		</div>
@@ -81,57 +94,8 @@
 			</div>
     </div>
 
-<!--    <section class="ftco-section ftco-no-pb">-->
-<!--      <div class="container">-->
-<!--      	<div class="row justify-content-center">-->
-<!--          <div class="col-md-12 heading-section text-center ftco-animate mb-5">-->
-<!--          	<span class="subheading">Our Services</span>-->
-<!--            <h2 class="mb-2">The smartest way to buy a home</h2>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="row d-flex">-->
-<!--          <div class="col-md-3 d-flex align-self-stretch ftco-animate">-->
-<!--            <div class="media block-6 services d-block text-center">-->
-<!--            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-piggy-bank"></span></div>-->
-<!--              <div class="media-body py-md-4">-->
-<!--                <h3>No Downpayment</h3>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>      -->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex align-self-stretch ftco-animate">-->
-<!--            <div class="media block-6 services d-block text-center">-->
-<!--            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-wallet"></span></div>-->
-<!--              <div class="media-body py-md-4">-->
-<!--                <h3>All Cash Offer</h3>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>      -->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex align-self-stretch ftco-animate">-->
-<!--            <div class="media block-6 services d-block text-center">-->
-<!--            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-file"></span></div>-->
-<!--              <div class="media-body py-md-4">-->
-<!--                <h3>Experts in Your Corner</h3>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>      -->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex align-self-stretch ftco-animate">-->
-<!--            <div class="media block-6 services d-block text-center">-->
-<!--            	<div class="icon d-flex justify-content-center align-items-center"><span class="flaticon-locked"></span></div>-->
-<!--              <div class="media-body py-md-4">-->
-<!--                <h3>Lokced in Pricing</h3>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>      -->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </section>-->
-
     <section class="ftco-section goto-here">
-    	<div class="resultContainer">	<!--container-->
+    	<div class="resultContainer-s">	<!--container-->
 			<div style="width: 300px; height: 250px; position: absolute; left: -30px;">  <!--왼쪽 광고-->
 				<div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"-->
 					<iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
@@ -145,345 +109,18 @@
     		<div class="row justify-content-center">
 				<div class="col-md-12 heading-section text-center ftco-animate mb-5">
 					<span class="subheading">플레이어 검색</span>
-					<h2 class="mb-2">플레이어를 검색하세요.</h2>
 				</div>
         	</div>
-			<div class="row" id="search-result">
+            <div class="player-list-container">
+
             </div>
-            <div class="row" id="search-result-lock">
-            </div>
+<!--            <div class="row" id="search-result-lock">-->
+<!--            </div>-->
             <div class="" id="more-button">
             </div>
     	</div>
+
     </section>
-
-<!--    <section class="ftco-section ftco-degree-bg services-section img mx-md-5" style="background-image: url(images/bg_2.jpg);">-->
-<!--    	<div class="overlay"></div>-->
-<!--    	<div class="container">-->
-<!--    		<div class="row justify-content-start mb-5">-->
-<!--          <div class="col-md-6 text-center heading-section heading-section-white ftco-animate">-->
-<!--          	<span class="subheading">Work flow</span>-->
-<!--            <h2 class="mb-3">How it works</h2>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--    		<div class="row">-->
-<!--    			<div class="col-md-6">-->
-<!--    				<div class="row">-->
-<!--		    			<div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">-->
-<!--		            <div class="media block-6 services services-2">-->
-<!--		              <div class="media-body py-md-4 text-center">-->
-<!--		              	<div class="icon mb-3 d-flex align-items-center justify-content-center"><span>01</span></div>-->
-<!--		                <h3>Evaluate Property</h3>-->
-<!--		                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--		              </div>-->
-<!--		            </div>      -->
-<!--		          </div>-->
-<!--		          <div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">-->
-<!--		            <div class="media block-6 services services-2">-->
-<!--		              <div class="media-body py-md-4 text-center">-->
-<!--		              	<div class="icon mb-3 d-flex align-items-center justify-content-center"><span>02</span></div>-->
-<!--		                <h3>Meet Your Agent</h3>-->
-<!--		                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--		              </div>-->
-<!--		            </div>      -->
-<!--		          </div>-->
-<!--		          <div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">-->
-<!--		            <div class="media block-6 services services-2">-->
-<!--		              <div class="media-body py-md-4 text-center">-->
-<!--		              	<div class="icon mb-3 d-flex align-items-center justify-content-center"><span>03</span></div>-->
-<!--		                <h3>Close the Deal</h3>-->
-<!--		                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--		              </div>-->
-<!--		            </div>      -->
-<!--		          </div>-->
-<!--		          <div class="col-md-12 col-lg-6 d-flex align-self-stretch ftco-animate">-->
-<!--		            <div class="media block-6 services services-2">-->
-<!--		              <div class="media-body py-md-4 text-center">-->
-<!--		              	<div class="icon mb-3 d-flex align-items-center justify-content-center"><span>04</span></div>-->
-<!--		                <h3>Have Your Property</h3>-->
-<!--		                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--		              </div>-->
-<!--		            </div>      -->
-<!--		          </div>-->
-<!--		        </div>-->
-<!--		      </div>-->
-<!--    		</div>-->
-<!--    	</div>-->
-<!--    </section>-->
-
-<!--    <section class="ftco-section ftco-no-pb">-->
-<!--			<div class="container">-->
-<!--				<div class="row no-gutters">-->
-<!--					<div class="col-md-6 p-md-5 img img-2 d-flex justify-content-center align-items-center" style="background-image: url(images/about.jpg);">-->
-<!--					</div>-->
-<!--					<div class="col-md-6 wrap-about py-md-5 ftco-animate">-->
-<!--	          <div class="heading-section p-md-5">-->
-<!--	            <h2 class="mb-4">We Put People First.</h2>-->
-
-<!--	            <p>A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>-->
-<!--	            <p>On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their.</p>-->
-<!--	          </div>-->
-<!--					</div>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--		</section>-->
-
-<!--		<section class="ftco-counter img" id="section-counter">-->
-<!--    	<div class="container">-->
-<!--    		<div class="row">-->
-<!--          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">-->
-<!--            <div class="block-18 py-4 mb-4">-->
-<!--              <div class="text text-border d-flex align-items-center">-->
-<!--                <strong class="number" data-number="305">0</strong>-->
-<!--                <span>Area <br>Population</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">-->
-<!--            <div class="block-18 py-4 mb-4">-->
-<!--              <div class="text text-border d-flex align-items-center">-->
-<!--                <strong class="number" data-number="1090">0</strong>-->
-<!--                <span>Total <br>Properties</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">-->
-<!--            <div class="block-18 py-4 mb-4">-->
-<!--              <div class="text text-border d-flex align-items-center">-->
-<!--                <strong class="number" data-number="209">0</strong>-->
-<!--                <span>Average <br>House</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-6 col-lg-3 justify-content-center counter-wrap ftco-animate">-->
-<!--            <div class="block-18 py-4 mb-4">-->
-<!--              <div class="text d-flex align-items-center">-->
-<!--                <strong class="number" data-number="67">0</strong>-->
-<!--                <span>Total <br>Branches</span>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--    	</div>-->
-<!--    </section>-->
-
-<!--    <section class="ftco-section testimony-section">-->
-<!--      <div class="container">-->
-<!--        <div class="row justify-content-center mb-5">-->
-<!--          <div class="col-md-7 text-center heading-section ftco-animate">-->
-<!--          	<span class="subheading">Testimonial</span>-->
-<!--            <h2 class="mb-3">Happy Clients</h2>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="row ftco-animate">-->
-<!--          <div class="col-md-12">-->
-<!--            <div class="carousel-testimony owl-carousel ftco-owl">-->
-<!--              <div class="item">-->
-<!--                <div class="testimony-wrap py-4">-->
-<!--                  <div class="text">-->
-<!--                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>-->
-<!--                    <div class="d-flex align-items-center">-->
-<!--                    	<div class="user-img" style="background-image: url(images/person_1.jpg)"></div>-->
-<!--                    	<div class="pl-3">-->
-<!--		                    <p class="name">Roger Scott</p>-->
-<!--		                    <span class="position">Marketing Manager</span>-->
-<!--		                  </div>-->
-<!--	                  </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <div class="item">-->
-<!--                <div class="testimony-wrap py-4">-->
-<!--                  <div class="text">-->
-<!--                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>-->
-<!--                    <div class="d-flex align-items-center">-->
-<!--                    	<div class="user-img" style="background-image: url(images/person_2.jpg)"></div>-->
-<!--                    	<div class="pl-3">-->
-<!--		                    <p class="name">Roger Scott</p>-->
-<!--		                    <span class="position">Marketing Manager</span>-->
-<!--		                  </div>-->
-<!--	                  </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <div class="item">-->
-<!--                <div class="testimony-wrap py-4">-->
-<!--                  <div class="text">-->
-<!--                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>-->
-<!--                    <div class="d-flex align-items-center">-->
-<!--                    	<div class="user-img" style="background-image: url(images/person_3.jpg)"></div>-->
-<!--                    	<div class="pl-3">-->
-<!--		                    <p class="name">Roger Scott</p>-->
-<!--		                    <span class="position">Marketing Manager</span>-->
-<!--		                  </div>-->
-<!--	                  </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <div class="item">-->
-<!--                <div class="testimony-wrap py-4">-->
-<!--                  <div class="text">-->
-<!--                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>-->
-<!--                    <div class="d-flex align-items-center">-->
-<!--                    	<div class="user-img" style="background-image: url(images/person_1.jpg)"></div>-->
-<!--                    	<div class="pl-3">-->
-<!--		                    <p class="name">Roger Scott</p>-->
-<!--		                    <span class="position">Marketing Manager</span>-->
-<!--		                  </div>-->
-<!--	                  </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--              <div class="item">-->
-<!--                <div class="testimony-wrap py-4">-->
-<!--                  <div class="text">-->
-<!--                    <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>-->
-<!--                    <div class="d-flex align-items-center">-->
-<!--                    	<div class="user-img" style="background-image: url(images/person_2.jpg)"></div>-->
-<!--                    	<div class="pl-3">-->
-<!--		                    <p class="name">Roger Scott</p>-->
-<!--		                    <span class="position">Marketing Manager</span>-->
-<!--		                  </div>-->
-<!--	                  </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </section>-->
-
-<!--    <section class="ftco-section ftco-agent ftco-no-pt">-->
-<!--    	<div class="container">-->
-<!--    		<div class="row justify-content-center pb-5">-->
-<!--          <div class="col-md-12 heading-section text-center ftco-animate">-->
-<!--          	<span class="subheading">Agents</span>-->
-<!--            <h2 class="mb-4">Our Agents</h2>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="row">-->
-<!--        	<div class="col-md-3 ftco-animate">-->
-<!--        		<div class="agent">-->
-<!--    					<div class="img">-->
-<!--		    				<img src="images/team-1.jpg" class="img-fluid" alt="Colorlib Template">-->
-<!--	    				</div>-->
-<!--	    				<div class="desc">-->
-<!--	    					<h3><a href="properties.html">James Stallon</a></h3>-->
-<!--								<p class="h-info"><span class="location">Listing</span> <span class="details">&mdash; 10 Properties</span></p>-->
-<!--	    				</div>-->
-<!--    				</div>-->
-<!--        	</div>-->
-<!--        	<div class="col-md-3 ftco-animate">-->
-<!--        		<div class="agent">-->
-<!--    					<div class="img">-->
-<!--		    				<img src="images/team-2.jpg" class="img-fluid" alt="Colorlib Template">-->
-<!--	    				</div>-->
-<!--	    				<div class="desc">-->
-<!--	    					<h3><a href="properties.html">James Stallon</a></h3>-->
-<!--								<p class="h-info"><span class="location">Listing</span> <span class="details">&mdash; 10 Properties</span></p>-->
-<!--	    				</div>-->
-<!--    				</div>-->
-<!--        	</div>-->
-<!--        	<div class="col-md-3 ftco-animate">-->
-<!--        		<div class="agent">-->
-<!--    					<div class="img">-->
-<!--		    				<img src="images/team-3.jpg" class="img-fluid" alt="Colorlib Template">-->
-<!--	    				</div>-->
-<!--	    				<div class="desc">-->
-<!--	    					<h3><a href="properties.html">James Stallon</a></h3>-->
-<!--								<p class="h-info"><span class="location">Listing</span> <span class="details">&mdash; 10 Properties</span></p>-->
-<!--	    				</div>-->
-<!--    				</div>-->
-<!--        	</div>-->
-<!--        	<div class="col-md-3 ftco-animate">-->
-<!--        		<div class="agent">-->
-<!--    					<div class="img">-->
-<!--		    				<img src="images/team-4.jpg" class="img-fluid" alt="Colorlib Template">-->
-<!--	    				</div>-->
-<!--	    				<div class="desc">-->
-<!--	    					<h3><a href="properties.html">James Stallon</a></h3>-->
-<!--								<p class="h-info"><span class="position">Listing</span> <span class="details">&mdash; 10 Properties</span></p>-->
-<!--	    				</div>-->
-<!--    				</div>-->
-<!--        	</div>-->
-<!--        </div>-->
-<!--    	</div>-->
-<!--    </section>-->
-
-
-<!--    <section class="ftco-section ftco-no-pt">-->
-<!--      <div class="container">-->
-<!--        <div class="row justify-content-center mb-5">-->
-<!--          <div class="col-md-7 heading-section text-center ftco-animate">-->
-<!--          	<span class="subheading">Blog</span>-->
-<!--            <h2>Recent Blog</h2>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="row d-flex">-->
-<!--          <div class="col-md-3 d-flex ftco-animate">-->
-<!--          	<div class="blog-entry justify-content-end">-->
-<!--              <div class="text">-->
-<!--                <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>-->
-<!--                <div class="meta mb-3">-->
-<!--                  <div><a href="#">July. 24, 2019</a></div>-->
-<!--                  <div><a href="#">Admin</a></div>-->
-<!--                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>-->
-<!--                </div>-->
-<!--                <a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_1.jpg');">-->
-<!--	              </a>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex ftco-animate">-->
-<!--          	<div class="blog-entry justify-content-end">-->
-<!--              <div class="text">-->
-<!--                <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>-->
-<!--                <div class="meta mb-3">-->
-<!--                  <div><a href="#">July. 24, 2019</a></div>-->
-<!--                  <div><a href="#">Admin</a></div>-->
-<!--                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>-->
-<!--                </div>-->
-<!--                <a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_2.jpg');">-->
-<!--	              </a>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex ftco-animate">-->
-<!--          	<div class="blog-entry justify-content-end">-->
-<!--              <div class="text">-->
-<!--                <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>-->
-<!--                <div class="meta mb-3">-->
-<!--                  <div><a href="#">July. 24, 2019</a></div>-->
-<!--                  <div><a href="#">Admin</a></div>-->
-<!--                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>-->
-<!--                </div>-->
-<!--                <a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_3.jpg');">-->
-<!--	              </a>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="col-md-3 d-flex ftco-animate">-->
-<!--          	<div class="blog-entry justify-content-end">-->
-<!--              <div class="text">-->
-<!--                <h3 class="heading"><a href="#">Why Lead Generation is Key for Business Growth</a></h3>-->
-<!--                <div class="meta mb-3">-->
-<!--                  <div><a href="#">July. 24, 2019</a></div>-->
-<!--                  <div><a href="#">Admin</a></div>-->
-<!--                  <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>-->
-<!--                </div>-->
-<!--                <a href="blog-single.html" class="block-20 img" style="background-image: url('images/image_4.jpg');">-->
-<!--	              </a>-->
-<!--                <p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </section>		-->
 
     <footer class="ftco-footer ftco-section">
       <div class="container">
@@ -554,12 +191,9 @@
         </div>
       </div>
     </footer>
-    
-  
 
-  <!-- loader -->
-  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
-
+<!--  &lt;!&ndash; loader &ndash;&gt;-->
+<!--  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>-->
 
   <script src="/js/jquery.min.js"></script>
   <script src="/js/jquery-migrate-3.0.1.min.js"></script>
@@ -572,11 +206,114 @@
   <script src="/js/jquery.magnific-popup.min.js"></script>
   <script src="/js/aos.js"></script>
   <script src="/js/jquery.animateNumber.min.js"></script>
-  <script src="/js/bootstrap-datepicker.js"></script>
   <script src="/js/jquery.timepicker.min.js"></script>
   <script src="/js/scrollax.min.js"></script>
   <script src="/js/main.js"></script>
-  <script src="/js/app/hangbok-home.js"></script>
+  <script src="/js/app/hangbok-home.js" charset="UTF-8"></script>
+
+  <script src="/js/handlebars-v4.0.4.js"></script>
+  <script id="player_list" type="text/x-handlebars-template" charset="UTF-8">
+      <p class="grid-header"></p>
+      <div class="row" id="search-result">
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <thead>
+                      <tr>
+                          <th>플레이어</th>
+                          <th>플랫폼</th>
+                          <th>돌격</th>
+                          <th>공격</th>
+                          <th>지원</th>
+                          <th>승률</th>
+                          <th>모스트</th>
+                          <th>최근전적갱신</th>
+                      </tr>
+                  </thead>
+                  <tbody class="tbody">
+                      \{{#players}}
+                      <tr>
+                          <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+                              <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <div class="player-platform">\{{platform}}</div>
+                          </td>
+
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{tankRatingPoint}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{dealRatingPoint}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{healRatingPoint}}</div>
+                          </td>
+            <!--              <td class="text-success"> 15.67% <i class="mdi mdi-arrow-up"></i>-->
+            <!--              </td>-->
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <div class="progress progress-slim">
+                                  <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                              </div>
+                              <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                              <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                              <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                          </td>
+                          <td>Jul 12, 2019 </td>
+                      </tr>
+                      \{{/players}}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </script>
+
+  <script id="more_player_list" type="text/x-handlebars-template" charset="UTF-8">
+      \{{#players}}
+      <tr>
+      <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+              <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+      </td>
+      <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <div class="player-platform">\{{platform}}</div>
+      </td>
+
+      <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+              <div>\{{tankRatingPoint}}</div>
+      </td>
+      <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+              <div>\{{dealRatingPoint}}</div>
+      </td>
+      <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+              <div>\{{healRatingPoint}}</div>
+      </td>
+      <!--              <td class="text-success"> 15.67% <i class="mdi mdi-arrow-up"></i>-->
+              <!--              </td>-->
+              <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <div class="progress progress-slim">
+              <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+      </td>
+      <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+              <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+              <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+              </td>
+              <td>Jul 12, 2019 </td>
+      </tr>
+       \{{/players}}
+  </script>
     
   </body>
 </html>

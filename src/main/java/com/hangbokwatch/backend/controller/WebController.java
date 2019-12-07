@@ -43,7 +43,7 @@ public class WebController {
         model.addAttribute("zarya", cdDto.getZarya());
         model.addAttribute("sigma", cdDto.getSigma());
 
-        return "playerDetail";
+        return "playerDetail-test";
     }
 
     @GetMapping("/showPlayerListFromDetail/{userInput}")

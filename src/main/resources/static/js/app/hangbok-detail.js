@@ -1,3 +1,4 @@
+
 const main = {
     init : function(){
         const _this = this;
@@ -23,6 +24,8 @@ const main = {
                 return false;
             }
         });
+
+        drawProgressBar();
     },
     search : function () {
         // alert('main search 호출');
@@ -44,4 +47,55 @@ const main = {
 
     }
 };
+
+const drawProgressBar = () => {
+    const divs = $('.progress-container');
+    // console.log(divs);
+    for (let i = 0 ; i < divs.length ; i++) {
+        // const container = $('#')
+        const winLoseGame = divs[i].id;
+        // console.log(winLoseGame);
+        const winGame = winLoseGame.substr(0, winLoseGame.indexOf("/"));
+        const loseGame = winLoseGame.substr(winLoseGame.indexOf("/")+1, winLoseGame.length);
+        // console.log(winGame, loseGame);
+        let winRate = 0.0;
+        if(winGame != '0' && loseGame != '0') {
+            // console.log(parseFloat(winGame), parseFloat(loseGame));
+            winRate = parseFloat(winGame) / (parseFloat(winGame) + parseFloat(loseGame));
+            // console.log(winRate);
+        }
+        let bar = new ProgressBar.Line(divs[i], {
+            strokeWidth: 2,
+            easing: 'easeInOut',
+            duration: 1500,
+            color: 'rgba(232,110,208,1)',
+            trailColor: '#3c4860',
+            trailWidth: 2,
+            svgStyle: {width: '100%', height: '100%'},
+            text: {
+                style: {
+                    // Text color.
+                    // Default: same as stroke color (options.color)
+                    color: '#3c4860',
+                    /* position: 'absolute', */
+                    right: '0',
+                    top: '30px',
+                    padding: 0,
+                    margin: 0,
+                    transform: null
+                },
+                autoStyleContainer: false
+            },
+            from: {color: 'rgba(232,110,208,1)'},
+            to: {color: 'rgba(232,110,208,1)'},   //#ED6A5A
+            step: (state, bar) => {
+                bar.setText(Math.round(bar.value() * 100) + ' %');
+            }
+        });
+
+        bar.animate(winRate);  // Number from 0.0 to 1.0
+    }
+};
+
+
 main.init();
