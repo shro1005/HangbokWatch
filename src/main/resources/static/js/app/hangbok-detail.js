@@ -1,4 +1,5 @@
 
+
 const main = {
     init : function(){
         const _this = this;
@@ -25,6 +26,7 @@ const main = {
             }
         });
 
+        setContainerHeingt();
         drawProgressBar();
     },
     search : function () {
@@ -46,6 +48,13 @@ const main = {
     doFavorite : function () {
 
     }
+};
+
+const setContainerHeingt = () => {
+    const objSet = document.getElementsByClassName("resultContainer-detail")[0];
+    const objTarHeight = document.getElementsByClassName("player-detail-layout")[0].offsetHeight;
+    // console.log(objTarHeight);
+    objSet.style.height = objTarHeight + "px";
 };
 
 const drawProgressBar = () => {

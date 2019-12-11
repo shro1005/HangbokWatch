@@ -74,8 +74,8 @@
     </div>
 </div>
 
-<section class="ftco-section-s">
-    <div class="resultContainer-s">	<!--container-->
+<section class="ftco-section-detail">
+    <div class="resultContainer-detail">	<!--container-->
         <div style="width: 300px; height: 250px; position: absolute; left: -30px;">  <!--왼쪽 광고-->
             <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"-->
                 <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
@@ -107,15 +107,15 @@
 <!--            </div>-->
 
 
-        <div class="main-container">
+        <div class="main-container row">
 
             <!-- LEFT-CONTAINER -->
             <div class="left-container detail-container col-md-4">
                 <div class="menu-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                    <h2 class="titular">MENU BOX</h2>
+                    <h2 class="titular">영웅 목록</h2>
                     <ul class="menu-box-menu">
                         <li>
-                            <a class="menu-box-tab" href="#6"><span class="icon fontawesome-envelope scnd-font-color"></span>Messages<div class="menu-box-number">24</div></a>
+                            <a class="menu-box-tab" href="#6"><img class="{{hero}}-img">Messages<div class="menu-box-number">24</div></a>
                         </li>
                         <li>
                             <a class="menu-box-tab" href="#8"><span class="icon entypo-paper-plane scnd-font-color"></span>Invites<div class="menu-box-number">3</div></a>
@@ -434,7 +434,7 @@
 
 <!--  footer 시작   -->
 <footer class="ftco-footer ftco-section">
-    <div class="container row">
+    <div class="container">
         <div class="row mb-5">
             <div class="col-md">
                 <div class="ftco-footer-widget mb-4">
@@ -538,13 +538,20 @@
     </div>
     \{{/roles}}
 </script>
+<script id="hero-list" type="text/x-handlebars-template">
+    \{{#heros}}
+    <li>
+        <a class="menu-box-tab" href="#6"><img class="{{hero}}-img">Messages<div class="menu-box-number">24</div></a>
+    </li>
+    \{{/heros}}
+</script>
 <script type="text/javascript">
     let competitive_points = $("#competitive-points").html();
     let template = Handlebars.compile(competitive_points);
 
     let ratingPoint = ["{{player.tankRatingPoint}}","{{player.dealRatingPoint}}", "{{player.healRatingPoint}}"];
     $.each(ratingPoint, function (i, point) {
-       if(point == "0") {ratingPoint[i] = "배치중";}
+        if(point == "0") {ratingPoint[i] = "배치중";}
     });
 
     const data = {
@@ -554,6 +561,29 @@
             {role: "heal-container", roleImgPath: "/HWimages/role/icon-support-46311a4210.png", rankImgPath: "{{player.healRatingImg}}", rankPoint: ratingPoint[2], wingame: "{{player.healWinGame}}", losegame: "{{player.healLoseGame}}"}
         ]
     };
+    const item = template(data);
+    $('.player-competitive-point').append(item);
+</script>
+<script type="text/javascript">
+    let hero_list = $("#hero-list").html();
+    let template = Handlebars.compile(hero_list);
+
+    const data = {
+        roles:[]
+    };
+
+    let heroList = []; heroList = {{heroList}};
+    let heroListKR = []; heroListKR = {{heroListKR}};
+
+    $.each(heroList, function(i, hero){
+       const heroName = hero;
+       const heroNameKR = heroListKR[i];
+
+       console.log(heroName, heroNameKR);
+       // {heroName: heroName, heroNameKR: heroNameKR, }
+    });
+
+
     const item = template(data);
     $('.player-competitive-point').append(item);
 </script>

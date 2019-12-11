@@ -15,6 +15,8 @@ public class ShowPlayerDetailService {
     @Autowired
     PlayerRepository playerRepository;
     @Autowired
+    PlayerDetailRepository playerDetailRepository;
+    @Autowired
     DvaRepositroy dvaRepositroy;
     @Autowired
     ReinhardtRepository reinhardtRepository;
@@ -61,18 +63,10 @@ public class ShowPlayerDetailService {
                 stopWatch.stop();
                 for (PlayerListDto playerListDto : playerListDtos) {
                     if ("Y".equals(playerListDto.getIsPublic())) {
-//                        PlayerListDto playerDto = cpd.crawlingPlayerProfile(playerListDto);
-//                        player = new Player(playerDto.getId(), playerDto.getBattleTag(), playerDto.getPlayerName(), playerDto.getPlayerLevel(), playerDto.getForUrl(), playerDto.getIsPublic(), playerDto.getPlatform()
-//                                , playerDto.getPortrait(), playerDto.getTankRatingPoint(), playerDto.getDealRatingPoint(), playerDto.getHealRatingPoint()
-//                                , playerDto.getTankRatingImg(), playerDto.getDealRatingImg(), playerDto.getHealRatingImg()
-//                                , playerDto.getWinGame(), playerDto.getLoseGame(), playerDto.getDrawGame(), playerDto.getMostHero1(), playerDto.getMostHero2(), playerDto.getMostHero3());
-//                        playerRepository.save(player);
-//                        System.out.println(forUrl + " : player 테이블 save 성공");
-
                         stopWatch.start("경쟁정 디테일 크롤링 및 데이터 저장 까지 총 시간");
                         //
                         cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto);
-
+                        cdDto = selectPlayerHeroDetail(playerListDto.getId(), cdDto);
                         // 시간 확인
                         stopWatch.stop();
                         System.out.println(stopWatch.prettyPrint());
@@ -99,6 +93,11 @@ public class ShowPlayerDetailService {
         cdDto.setZarya(zaryaRepository.findZaryaById(playerId));
         cdDto.setSigma(sigmaRepository.findSigmaById(playerId));
         cdDto.setWreckingBall(wreckingBallRepository.findWreckingBallById(playerId));
+
+        List<PlayerDetail> playerDetailList = playerDetailRepository.findByIdAndSeasonOrderByHeroOrderAsc(playerId, 19l);
+        cdDto.setPlayerDetailList(playerDetailList);
         return cdDto;
     }
+
+
 }

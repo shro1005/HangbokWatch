@@ -7,18 +7,22 @@ import lombok.Setter;
 @Setter
 public class PlayerDetailDto {
     private Long id;
-    private String battleTag;
-    private String playerName;
-    private Integer playerLevel;
-    private String platform;
-    private String portrait;
-    private Integer tankRatingPoint;
-    private Integer dealRatingPoint;
-    private Integer healRatingPoint;
-    private Integer winGame;
-    private Integer loseGame;
-    private Integer drawGame;
-    private Integer winRate;
-    private String mostHero1;
+    private Long season;
+    private Integer order;
+    private String heroName;
+    private String heroNameKR;
+    private String killPerDeath;
+    private String winRate;
+    private String playTime;
+    private String deathAvg;
+    private String healPerLife;
+    private String blockDamagePerLife;
+    private String damageToHeroPerLife;
+    private String damageToShieldPerLife;
+    private String index1;
+    private String index2;
+    private String index3;
+    private String index4;
+    private String index5;
 
 }

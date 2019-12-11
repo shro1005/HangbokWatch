@@ -30,19 +30,25 @@ public class WebController {
     public String getPlayerDetail(@PathVariable String forUrl, Model model) {
         System.out.println("getPlayerDetail -> forUrl : " + forUrl);
         CompetitiveDetailDto cdDto = spd.showPlayerExample(forUrl);
-        String battleTag = cdDto.getPlayer().getBattleTag();
-        String tag = battleTag.substring(battleTag.indexOf("#"), battleTag.length());
 
-        model.addAttribute("tag",tag);
-        model.addAttribute("player", cdDto.getPlayer());
-        model.addAttribute("dva", cdDto.getDva());
-        model.addAttribute("reinhardt", cdDto.getReinhardt());
-        model.addAttribute("roadHog", cdDto.getRoadHog());
-        model.addAttribute("orisa", cdDto.getOrisa());
-        model.addAttribute("winston", cdDto.getWinston());
-        model.addAttribute("zarya", cdDto.getZarya());
-        model.addAttribute("sigma", cdDto.getSigma());
+        if(cdDto.getPlayer() != null) {
+            String battleTag = cdDto.getPlayer().getBattleTag();
+            String tag = battleTag.substring(battleTag.indexOf("#"));
 
+            model.addAttribute("tag", tag);
+            model.addAttribute("player", cdDto.getPlayer());
+            model.addAttribute("dva", cdDto.getDva());
+            model.addAttribute("reinhardt", cdDto.getReinhardt());
+            model.addAttribute("roadHog", cdDto.getRoadHog());
+            model.addAttribute("orisa", cdDto.getOrisa());
+            model.addAttribute("winston", cdDto.getWinston());
+            model.addAttribute("zarya", cdDto.getZarya());
+            model.addAttribute("sigma", cdDto.getSigma());
+
+
+        }else {
+
+        }
         return "playerDetail-test";
     }
 

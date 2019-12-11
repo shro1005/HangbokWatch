@@ -479,6 +479,7 @@ pre {
 
 .resultContainer-s {
   width: 100%;
+  height: auto;
   padding-right: 15px;
   padding-left: 15px;
   margin-right: auto;
@@ -494,6 +495,25 @@ pre {
     max-width: 960px; } }
 @media (min-width: 1200px) {
   .resultContainer-s {
+    max-width: 1080px; } }
+
+.resultContainer-detail {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto; }
+@media (min-width: 576px) {
+  .resultContainer-detail {
+    max-width: 540px; } }
+@media (min-width: 768px) {
+  .resultContainer-detail {
+    max-width: 720px; } }
+@media (min-width: 992px) {
+  .resultContainer-detail {
+    max-width: 960px; } }
+@media (min-width: 1200px) {
+  .resultContainer-detail {
     max-width: 1080px; } }
 
 .container-fluid {
@@ -8667,6 +8687,14 @@ textarea.form-control {
   .ftco-section-s {
     padding: 1.5em 0; } }
 
+.ftco-section-detail {
+  padding: 3em 0;
+  position: relative;
+  }
+@media (max-width: 767.98px) {
+  .ftco-section-detail {
+    padding: 3em 0; } }
+
 .ftco-no-pt {
   padding-top: 0; }
 
@@ -9469,7 +9497,7 @@ h1, h2, p, a, span{
 .main-container {
   font-family: 'Ubuntu', sans-serif;
   /*width: 950px;*/
-  /*height: 1725px;*/
+  height: auto;
   /*margin: 6em auto;*/
 }
 
