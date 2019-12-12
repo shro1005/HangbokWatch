@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="moira")
+@Entity(name="reaper")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Moira {
+public class Reaper {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -54,14 +54,11 @@ public class Moira {
     private String damageToHeroPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "coalescence_kill_avg")
-    private String coalescenceKillAvg;
+    @Column(name = "death_blossom_kill_avg")
+    private String deathBlossomKillAvg;
 
-    @Column(name = "coalescence_heal_avg")
-    private String coalescenceHealAvg;
-
-    @Column(name = "selfheal_per_life")
-    private String selfHealPerLife;
+    @Column(name = "solo_kill_avg")
+    private String soloKillAvg;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -75,7 +72,7 @@ public class Moira {
 
     @Override
     public String toString() {
-        return "Moira{" +
+        return "Reaper{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -86,9 +83,8 @@ public class Moira {
                 ", deathAvg='" + deathAvg + '\'' +
                 ", healPerLife='" + healPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", coalescenceKillAvg='" + coalescenceKillAvg + '\'' +
-                ", coalescenceHealAvg='" + coalescenceHealAvg + '\'' +
-                ", selfhealPerLife='" + selfHealPerLife + '\'' +
+                ", deathBlossomKillAvg='" + deathBlossomKillAvg + '\'' +
+                ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +

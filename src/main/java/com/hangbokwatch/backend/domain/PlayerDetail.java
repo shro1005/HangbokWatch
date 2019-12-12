@@ -46,6 +46,9 @@ public class PlayerDetail {
     @Column(name = "death_avg")
     private String deathAvg;
 
+    @Column(name = "spent_on_fire_avg")
+    private String spentOnFireAvg;
+
     @Column(name = "heal_per_life")
     private String healPerLife;
 
@@ -75,10 +78,10 @@ public class PlayerDetail {
 
     @Builder
     public PlayerDetail(Long id, Long season, Integer heroOrder, String heroName, String heroNameKR, String killPerDeath, String winRate,
-                  String playTime, String deathAvg, String healPerLife, String blockDamagePerLife, String damageToHeroPerLife, String damageToShieldPerLife,
+                  String playTime, String deathAvg, String spentOnFireAvg, String healPerLife, String blockDamagePerLife, String damageToHeroPerLife, String damageToShieldPerLife,
                   String index1, String index2, String index3, String index4, String index5) {
         this.id = id ;this.season = season; this.heroOrder = heroOrder; this.heroName = heroName; this.heroNameKR = heroNameKR;
-        this.killPerDeath = killPerDeath; this.winRate = winRate; this.playTime = playTime; this.deathAvg = deathAvg;
+        this.killPerDeath = killPerDeath; this.winRate = winRate; this.playTime = playTime; this.deathAvg = deathAvg; this.spentOnFireAvg = spentOnFireAvg;
         this.healPerLife = healPerLife; this.blockDamagePerLife = blockDamagePerLife; this.damageToHeroPerLife = damageToHeroPerLife;
         this.damageToShieldPerLife = damageToShieldPerLife; this.index1 = index1; this.index2 = index2; this.index3 = index3; this.index4 = index4; this.index5 = index5;
     }
