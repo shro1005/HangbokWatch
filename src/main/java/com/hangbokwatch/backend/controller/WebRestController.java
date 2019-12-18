@@ -1,9 +1,11 @@
 package com.hangbokwatch.backend.controller;
 
+import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import com.hangbokwatch.backend.dto.PlayerSearchDto;
 import com.hangbokwatch.backend.service.CrawlingPlayerDataService;
 import com.hangbokwatch.backend.service.SearchPlayerListService;
+import com.hangbokwatch.backend.service.ShowPlayerDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +22,8 @@ public class WebRestController {
     CrawlingPlayerDataService cpl;
     @Autowired
     SearchPlayerListService spl;
+    @Autowired
+    ShowPlayerDetailService spd;
 
     @PostMapping("/showUserList")
     public List<PlayerListDto> getPlayerList(@RequestBody PlayerSearchDto playerDto) {
@@ -54,5 +58,12 @@ public class WebRestController {
         List<PlayerListDto> playerList = spl.searchPlayerList(playerName);
         System.out.println(playerList.size());
         return playerList;
+    }
+
+    @PostMapping("/getDetailData")
+    public List<PlayerDetailDto> getDetailData(@RequestBody PlayerSearchDto playerSearchDto) {
+        Long id = playerSearchDto.getId();
+        List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id);
+        return playerDetailList;
     }
 }

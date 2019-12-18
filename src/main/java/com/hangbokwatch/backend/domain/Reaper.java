@@ -47,11 +47,14 @@ public class Reaper {
     @Column(name = "death_avg")
     private String deathAvg;
 
-    @Column(name = "heal_per_life")
-    private String healPerLife;
+    @Column(name = "last_hit_per_life")
+    private String lastHitPerLife;
 
     @Column(name = "damage_to_hero_per_life")
     private String damageToHeroPerLife;
+
+    @Column(name = "damage_to_shield_per_life")
+    private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
     @Column(name = "death_blossom_kill_avg")
@@ -81,7 +84,8 @@ public class Reaper {
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
-                ", healPerLife='" + healPerLife + '\'' +
+                ", lastHitPerLife='" + lastHitPerLife + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
                 ", deathBlossomKillAvg='" + deathBlossomKillAvg + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +

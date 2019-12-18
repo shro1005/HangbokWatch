@@ -44,7 +44,8 @@ public class WebController {
             model.addAttribute("winston", cdDto.getWinston());
             model.addAttribute("zarya", cdDto.getZarya());
             model.addAttribute("sigma", cdDto.getSigma());
-
+            model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
+            model.addAttribute("count", cdDto.getCount());
 
         }else {
 

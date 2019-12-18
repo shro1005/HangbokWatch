@@ -84,6 +84,7 @@ public class Orisa {  // 0x02E000000000013E
                 ", blockDamage='" + blockDamagePerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
                 ", damageToShield='" + damageToShieldPerLife + '\'' +
+                ", damageAmpAvg='" + damageAmpAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +

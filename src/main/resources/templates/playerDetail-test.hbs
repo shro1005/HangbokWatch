@@ -114,21 +114,9 @@
                 <div class="menu-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
                     <h2 class="titular">영웅 목록</h2>
                     <ul class="menu-box-menu">
-                        <li>
-                            <a class="menu-box-tab" href="#6"><img class="{{hero}}-img">Messages<div class="menu-box-number">24</div></a>
-                        </li>
-                        <li>
-                            <a class="menu-box-tab" href="#8"><span class="icon entypo-paper-plane scnd-font-color"></span>Invites<div class="menu-box-number">3</div></a>
-                        </li>
-                        <li>
-                            <a class="menu-box-tab" href="#10"><span class="icon entypo-calendar scnd-font-color"></span>Events<div class="menu-box-number">5</div></a>
-                        </li>
-                        <li>
-                            <a class="menu-box-tab" href="#12"><span class="icon entypo-cog scnd-font-color"></span>Account Settings</a>
-                        </li>
-                        <li>
-                            <a class="menu-box-tab" href="#13"><sapn class="icon entypo-chart-line scnd-font-color"></sapn>Statistics</a>
-                        </li>
+<!--                        <li>-->
+<!--                            <a class="menu-box-tab" href="#13"><sapn class="icon entypo-chart-line scnd-font-color"></sapn>Statistics</a>-->
+<!--                        </li>-->
                     </ul>
                 </div>
                 <div class="donut-chart-block block"> <!-- DONUT CHART BLOCK (LEFT-CONTAINER) -->
@@ -233,7 +221,7 @@
                     <div class="profile-picture big-profile-picture clear">
                         <img width="150px" alt="Anne Hathaway picture" src="http://upload.wikimedia.org/wikipedia/commons/e/e1/Anne_Hathaway_Face.jpg" >
                     </div>
-                    <h1 class="user-name">Anne Hathaway</h1>
+                    <h1 class="user-name" id="{{player.id}}">Anne Hathaway</h1>
                     <div class="profile-description">
                         <p class="scnd-font-color">Lorem ipsum dolor sit amet consectetuer adipiscing</p>
                     </div>
@@ -541,7 +529,11 @@
 <script id="hero-list" type="text/x-handlebars-template">
     \{{#heros}}
     <li>
-        <a class="menu-box-tab" href="#6"><img class="{{hero}}-img">Messages<div class="menu-box-number">24</div></a>
+        <a class="menu-box-tab" href="#">
+            <img class="\{{heroName}}-img hero-round-img" src="\{{src}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+            \{{heroNameKR}}
+            <div class="menu-box-number">\{{playTime}}</div>
+        </a>
     </li>
     \{{/heros}}
 </script>
@@ -564,29 +556,39 @@
     const item = template(data);
     $('.player-competitive-point').append(item);
 </script>
+<!--
 <script type="text/javascript">
     let hero_list = $("#hero-list").html();
     let template = Handlebars.compile(hero_list);
 
-    const data = {
+    const hero = {
         roles:[]
     };
 
-    let heroList = []; heroList = {{heroList}};
-    let heroListKR = []; heroListKR = {{heroListKR}};
+    $.each(, function (i, val) {
+        const heroNameKR = val.heroNameKR;
+        const winRate = val.winRate;
+        const playTime = val.playTime;
+        const deathAvg = val.deathAvg;
+        const spentOnFireAvg = val.spentOnFireAvg;
+        const  healPerLife = val.healPerLife;
+        const blockDamagePerLife = val.blockDamagePerLife;
+        const lastHitPerLife = val.lastHitPerLife;
+        const damageToHeroPerLife = val.damageToHeroPerLife;
+        const damageToShieldPerLife = val.damageToShieldPerLife;
+        const index1 = val.index1;
+        const index2 = val.index2;
+        const index3 = val.index3;
+        const index4 = val.index4;
+        const index5 = val.index5;
+        hero.roles.push({heroNameKR: heroNameKR, playTime: playTime});
 
-    $.each(heroList, function(i, hero){
-       const heroName = hero;
-       const heroNameKR = heroListKR[i];
-
-       console.log(heroName, heroNameKR);
-       // {heroName: heroName, heroNameKR: heroNameKR, }
     });
+    console.log(heroList);
 
-
-    const item = template(data);
+    const item = template(hero);
     $('.player-competitive-point').append(item);
-</script>
+</script> -->
 <script src="/js/app/hangbok-detail.js"></script>
 
 </body>

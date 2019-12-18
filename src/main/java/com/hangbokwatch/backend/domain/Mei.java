@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="doomfist")
+@Entity(name="mei")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doomfist {
+public class Mei {  // 0x02E000000000013E
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -47,6 +47,9 @@ public class Doomfist {
     @Column(name = "death_avg")
     private String deathAvg;
 
+    @Column(name = "block_damage_per_life")
+    private String blockDamagePerLife;
+
     @Column(name = "last_hit_per_life")
     private String lastHitPerLife;
 
@@ -57,14 +60,11 @@ public class Doomfist {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "skill_damage_avg")
-    private String skillDamageAvg;
+    @Column(name = "blizzard_kill_avg")
+    private String blizzardKillAvg;
 
-    @Column(name = "create_shield_avg")
-    private String createShieldAvg;
-
-    @Column(name = "meteor_strike_kill_avg")
-    private String meteorStrikeKillAvg;
+    @Column(name = "freezing_enemy_avg")
+    private String freezingEnemyAvg;
 
     @Column(name = "solo_kill_avg")
     private String soloKillAvg;
@@ -81,7 +81,7 @@ public class Doomfist {
 
     @Override
     public String toString() {
-        return "Doomfist{" +
+        return "Mei{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -90,12 +90,12 @@ public class Doomfist {
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
+                ", blockDamage='" + blockDamagePerLife + '\'' +
                 ", lastHitPerLife='" + lastHitPerLife + '\'' +
-                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", skillDamageAvg='" + skillDamageAvg + '\'' +
-                ", createShieldAvg='" + createShieldAvg + '\'' +
-                ", meteorStrikeKillAvg='" + meteorStrikeKillAvg + '\'' +
+                ", damageToShield='" + damageToShieldPerLife + '\'' +
+                ", blizzardKillAvg='" + blizzardKillAvg + '\'' +
+                ", freezingEnemyAvg='" + freezingEnemyAvg + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
@@ -103,3 +103,5 @@ public class Doomfist {
                 '}';
     }
 }
+
+

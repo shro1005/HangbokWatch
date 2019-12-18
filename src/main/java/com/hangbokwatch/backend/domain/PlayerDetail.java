@@ -55,6 +55,9 @@ public class PlayerDetail {
     @Column(name = "block_damage_per_life")
     private String blockDamagePerLife;
 
+    @Column(name = "last_hit_per_life")
+    private String lastHitPerLife;
+
     @Column(name = "damage_to_hero_per_life")
     private String damageToHeroPerLife;
 
@@ -78,11 +81,11 @@ public class PlayerDetail {
 
     @Builder
     public PlayerDetail(Long id, Long season, Integer heroOrder, String heroName, String heroNameKR, String killPerDeath, String winRate,
-                  String playTime, String deathAvg, String spentOnFireAvg, String healPerLife, String blockDamagePerLife, String damageToHeroPerLife, String damageToShieldPerLife,
-                  String index1, String index2, String index3, String index4, String index5) {
+                  String playTime, String deathAvg, String spentOnFireAvg, String healPerLife, String blockDamagePerLife, String lastHitPerLife, String damageToHeroPerLife,
+                  String damageToShieldPerLife, String index1, String index2, String index3, String index4, String index5) {
         this.id = id ;this.season = season; this.heroOrder = heroOrder; this.heroName = heroName; this.heroNameKR = heroNameKR;
         this.killPerDeath = killPerDeath; this.winRate = winRate; this.playTime = playTime; this.deathAvg = deathAvg; this.spentOnFireAvg = spentOnFireAvg;
-        this.healPerLife = healPerLife; this.blockDamagePerLife = blockDamagePerLife; this.damageToHeroPerLife = damageToHeroPerLife;
+        this.healPerLife = healPerLife; this.blockDamagePerLife = blockDamagePerLife; this.damageToHeroPerLife = damageToHeroPerLife; this.lastHitPerLife = lastHitPerLife;
         this.damageToShieldPerLife = damageToShieldPerLife; this.index1 = index1; this.index2 = index2; this.index3 = index3; this.index4 = index4; this.index5 = index5;
     }
 }

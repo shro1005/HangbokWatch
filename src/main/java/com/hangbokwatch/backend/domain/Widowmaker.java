@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="doomfist")
+@Entity(name="widowmaker")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doomfist {
+public class Widowmaker {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -57,14 +57,11 @@ public class Doomfist {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "skill_damage_avg")
-    private String skillDamageAvg;
+    @Column(name = "scope_hit_rate")
+    private String scopeHitRate;
 
-    @Column(name = "create_shield_avg")
-    private String createShieldAvg;
-
-    @Column(name = "meteor_strike_kill_avg")
-    private String meteorStrikeKillAvg;
+    @Column(name = "scope_critical_hit_rate")
+    private String scopeCriticalHitRate;
 
     @Column(name = "solo_kill_avg")
     private String soloKillAvg;
@@ -81,7 +78,7 @@ public class Doomfist {
 
     @Override
     public String toString() {
-        return "Doomfist{" +
+        return "Widowmaker{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -91,11 +88,10 @@ public class Doomfist {
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
                 ", lastHitPerLife='" + lastHitPerLife + '\'' +
-                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", skillDamageAvg='" + skillDamageAvg + '\'' +
-                ", createShieldAvg='" + createShieldAvg + '\'' +
-                ", meteorStrikeKillAvg='" + meteorStrikeKillAvg + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", scopeHitRate='" + scopeHitRate + '\'' +
+                ", scopeCriticalHitRate='" + scopeCriticalHitRate + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +

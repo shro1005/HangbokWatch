@@ -9516,7 +9516,7 @@ h1, h2, p, a, span{
 /******************************************** LEFT CONTAINER *****************************************/
 .left-container {}
 .menu-box {
-  height: 360px;
+  height: auto;
 }
 .menu-box .titular {
   background: #11a8ab;
@@ -9701,6 +9701,15 @@ h1, h2, p, a, span{
 .left-container .social .mailbox .number {
   background: #363f61;
   border-bottom-right-radius: 5px;
+}
+
+.hero-round-img {
+  border-radius: 100%;
+  width: 45px;
+  height: 45px;
+  margin-right: 10px;
+  margin-left: 10px;
+  background-color: white;
 }
 /************************************************** MIDDLE CONTAINER **********************************/
 .middle-container {

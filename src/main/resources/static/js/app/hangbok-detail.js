@@ -26,8 +26,12 @@ const main = {
             }
         });
 
-        setContainerHeingt();
+        getDetailData();
+
+
         drawProgressBar();
+        setContainerHeingt();
+
     },
     search : function () {
         // alert('main search 호출');
@@ -55,6 +59,52 @@ const setContainerHeingt = () => {
     const objTarHeight = document.getElementsByClassName("player-detail-layout")[0].offsetHeight;
     // console.log(objTarHeight);
     objSet.style.height = objTarHeight + "px";
+};
+
+const getDetailData = () => {
+    let hero_list = $("#hero-list").html();
+    let template = Handlebars.compile(hero_list);
+
+    const hero = {
+        heros:[]
+    };
+
+    const id = $('.user-name').attr("id");
+    const input = {id : id};
+
+    $.ajax({
+        type: 'POST',
+        url: '/getDetailData',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(input),
+        async : false
+    }).done(function (datas) {
+        $.each(datas, function (i, val) {
+            const heroNameKR = val.heroNameKR;
+            const heroName = val.heroName;
+            const winRate = val.winRate;
+            const playTime = val.playTime;
+            const deathAvg = val.deathAvg;
+            const spentOnFireAvg = val.spentOnFireAvg;
+            const  healPerLife = val.healPerLife;
+            const blockDamagePerLife = val.blockDamagePerLife;
+            const lastHitPerLife = val.lastHitPerLife;
+            const damageToHeroPerLife = val.damageToHeroPerLife;
+            const damageToShieldPerLife = val.damageToShieldPerLife;
+            const index1 = val.index1;
+            const index2 = val.index2;
+            const index3 = val.index3;
+            const index4 = val.index4;
+            const index5 = val.index5;
+            console.log(val);
+            hero.heros.push({heroName: heroName, heroNameKR: heroNameKR, playTime: playTime, src: "/HWimages/hero/"+heroName+"_s.png"});
+
+        });
+        const item = template(hero);
+        $('.menu-box-menu').append(item);
+
+    });
 };
 
 const drawProgressBar = () => {

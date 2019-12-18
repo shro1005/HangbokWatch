@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PlayerDetailRepository extends JpaRepository<PlayerDetail, Long> {
     List<PlayerDetail> findByIdAndSeasonOrderByHeroOrderAsc(Long id, Long season);
+    Long countByIdAndSeason(Long id, Long season);
 }

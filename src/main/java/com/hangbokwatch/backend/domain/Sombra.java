@@ -7,11 +7,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="doomfist")
+@Entity(name="sombra")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doomfist {
+public class Sombra {
     /**공통 데이터*/
     @Id
     @Column(name = "id", nullable = false)
@@ -57,14 +57,14 @@ public class Doomfist {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
-    @Column(name = "skill_damage_avg")
-    private String skillDamageAvg;
+    @Column(name = "hacking_enemy_avg")
+    private String hackingEnemyAvg;
 
-    @Column(name = "create_shield_avg")
-    private String createShieldAvg;
+    @Column(name = "emp_enemy_avg")
+    private String EMPEnemyAvg;
 
-    @Column(name = "meteor_strike_kill_avg")
-    private String meteorStrikeKillAvg;
+    @Column(name = "critical_hit_rate")
+    private String criticalHitRate;
 
     @Column(name = "solo_kill_avg")
     private String soloKillAvg;
@@ -81,7 +81,7 @@ public class Doomfist {
 
     @Override
     public String toString() {
-        return "Doomfist{" +
+        return "Sombra{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -91,11 +91,11 @@ public class Doomfist {
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
                 ", lastHitPerLife='" + lastHitPerLife + '\'' +
-                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", skillDamageAvg='" + skillDamageAvg + '\'' +
-                ", createShieldAvg='" + createShieldAvg + '\'' +
-                ", meteorStrikeKillAvg='" + meteorStrikeKillAvg + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", hackingEnemyAvg='" + hackingEnemyAvg + '\'' +
+                ", EMPEnemyAvg='" + EMPEnemyAvg + '\'' +
+                ", criticalHitRate='" + criticalHitRate + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +

@@ -7,12 +7,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Getter
-@Entity(name="doomfist")
+@Entity(name="torbjorn")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Doomfist {
-    /**공통 데이터*/
+public class Torbjorn {
+    /**
+     * 공통 데이터
+     */
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
@@ -56,20 +58,24 @@ public class Doomfist {
     @Column(name = "damage_to_shield_per_life")
     private String damageToShieldPerLife;
 
-    /**영웅별 특수 데이터*/
-    @Column(name = "skill_damage_avg")
-    private String skillDamageAvg;
+    /**
+     * 영웅별 특수 데이터
+     */
+    @Column(name = "molten_core_kill_avg")
+    private String moltenCoreKillAvg;
 
-    @Column(name = "create_shield_avg")
-    private String createShieldAvg;
+    @Column(name = "torbjorn_direct_kill_avg")
+    private String torbjornDirectKillAvg;
 
-    @Column(name = "meteor_strike_kill_avg")
-    private String meteorStrikeKillAvg;
+    @Column(name = "turret_kill_avg")
+    private String turretKillAvg;
 
     @Column(name = "solo_kill_avg")
     private String soloKillAvg;
 
-    /**메달 데이터*/
+    /**
+     * 메달 데이터
+     */
     @Column(name = "gold_medal")
     private String goldMedal;
 
@@ -81,7 +87,7 @@ public class Doomfist {
 
     @Override
     public String toString() {
-        return "Doomfist{" +
+        return "Torbjorn{" +
                 "id=" + id +
                 ", winGame=" + winGame +
                 ", loseGame=" + loseGame +
@@ -91,11 +97,11 @@ public class Doomfist {
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
                 ", lastHitPerLife='" + lastHitPerLife + '\'' +
-                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
-                ", skillDamageAvg='" + skillDamageAvg + '\'' +
-                ", createShieldAvg='" + createShieldAvg + '\'' +
-                ", meteorStrikeKillAvg='" + meteorStrikeKillAvg + '\'' +
+                ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", moltenCoreKillAvg='" + moltenCoreKillAvg + '\'' +
+                ", torbjornDirectKillAvg='" + torbjornDirectKillAvg + '\'' +
+                ", turretKillAvg='" + turretKillAvg + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +

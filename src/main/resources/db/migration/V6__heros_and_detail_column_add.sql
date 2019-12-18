@@ -1,0 +1,3 @@
+-- ALTER TABLE playerdetail ADD COLUMN spent_on_fire_avg varchar(10);
+-- ALTER TABLE playerdetail ADD COLUMN last_hit_per_life varchar(10);
+-- ALTER TABLE moira add COLUMN coalescence_heal_avg varchar(10) ;

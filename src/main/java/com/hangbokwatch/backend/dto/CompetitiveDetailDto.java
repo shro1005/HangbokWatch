@@ -28,4 +28,5 @@ public class CompetitiveDetailDto {
     private Mercy mercy;
     private Moira moira;
     private Zenyatta zenyatta;
+    private int count;
 }

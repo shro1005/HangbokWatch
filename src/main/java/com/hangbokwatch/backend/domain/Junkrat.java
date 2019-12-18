@@ -47,6 +47,9 @@ public class Junkrat {
     @Column(name = "death_avg")
     private String deathAvg;
 
+    @Column(name = "last_hit_per_life")
+    private String lastHitPerLife;
+
     @Column(name = "damage_to_hero_per_life")
     private String damageToHeroPerLife;
 
@@ -57,11 +60,14 @@ public class Junkrat {
     @Column(name = "steel_trap_enemy_avg")
     private String steelTrapEnemyAvg;
 
-    @Column(name = "concusiion_mine_avg")
-    private String concusiionMineAvg;
+    @Column(name = "concussion_mine_avg")
+    private String concussionMineAvg;
 
     @Column(name = "rip_tire_kill_avg")
     private String ripTireKillAvg;
+
+    @Column(name = "solo_kill_avg")
+    private String soloKillAvg;
 
     /**메달 데이터*/
     @Column(name = "gold_medal")
@@ -84,11 +90,13 @@ public class Junkrat {
                 ", killPerDeath='" + killPerDeath + '\'' +
                 ", spentOnFireAvg='" + spentOnFireAvg + '\'' +
                 ", deathAvg='" + deathAvg + '\'' +
+                ", lastHitPerLife='" + lastHitPerLife + '\'' +
                 ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
                 ", steelTrapEnemyAvg='" + steelTrapEnemyAvg + '\'' +
-                ", concusiionMineAvg='" + concusiionMineAvg + '\'' +
+                ", concussionMineAvg='" + concussionMineAvg + '\'' +
                 ", ripTireKillAvg='" + ripTireKillAvg + '\'' +
+                ", soloKillAvg='" + soloKillAvg + '\'' +
                 ", goldMedal='" + goldMedal + '\'' +
                 ", silverMedal='" + silverMedal + '\'' +
                 ", bronzeMedal='" + bronzeMedal + '\'' +
