@@ -62,7 +62,7 @@ const main = {
     search : function (userInput) {
         // alert('main search 호출');
         playerData = [];
-        $("#search-result").remove();
+        $(".notice_playerList").remove();
         $(".grid-header").remove();
         $(".more_btn_div").remove();
         let playerName = $('input[id="playerName"]').val();
@@ -111,7 +111,7 @@ const main = {
                         const noticeDiv = $('<div class="player notice_playerList"> 행복워치에 등록된 유저가 아닙니다.<br>' +
                             '행복워치에서 최초 검색 시 배틀태그(플레이어명#00000)를 정확하게 입력해야 합니다.</div>');
                         //const testDiv = $('<div></div>');
-                        $("#search-result").append(noticeDiv);
+                        $(".player-list-container").append(noticeDiv);
                     }else {
                         $.each(crawlingResult, function(i, player){
                             // console.log(player.battleTag, player.playerName);

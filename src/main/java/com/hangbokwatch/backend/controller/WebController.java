@@ -37,13 +37,6 @@ public class WebController {
 
             model.addAttribute("tag", tag);
             model.addAttribute("player", cdDto.getPlayer());
-            model.addAttribute("dva", cdDto.getDva());
-            model.addAttribute("reinhardt", cdDto.getReinhardt());
-            model.addAttribute("roadHog", cdDto.getRoadHog());
-            model.addAttribute("orisa", cdDto.getOrisa());
-            model.addAttribute("winston", cdDto.getWinston());
-            model.addAttribute("zarya", cdDto.getZarya());
-            model.addAttribute("sigma", cdDto.getSigma());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("count", cdDto.getCount());
 
@@ -61,5 +54,21 @@ public class WebController {
         model.addAttribute("isFromDetail", "Y");
         model.addAttribute("userInput", userInput);
         return "index";
+    }
+
+    @GetMapping("/refreshPlayerDetail/{forUrl}")
+    public String refreshPlayerDetail(@PathVariable String forUrl, Model model) {
+        System.out.println("getPlayerDetail -> forUrl : " + forUrl);
+        CompetitiveDetailDto cdDto = spd.refreshPlayerDetail(forUrl);
+
+        if(cdDto.getPlayer() != null) {
+            String battleTag = cdDto.getPlayer().getBattleTag();
+            String tag = battleTag.substring(battleTag.indexOf("#"));
+
+            model.addAttribute("tag", tag);
+            model.addAttribute("player", cdDto.getPlayer());
+            model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
+        }
+        return "playerDetail-test";
     }
 }

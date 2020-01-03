@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,38 +17,7 @@ import java.util.List;
 public class ShowPlayerDetailService {
     @Autowired PlayerRepository playerRepository;
     @Autowired PlayerDetailRepository playerDetailRepository;
-    @Autowired DvaRepositroy dvaRepositroy;
-    @Autowired OrisaRepository orisaRepository;
-    @Autowired ReinhardtRepository reinhardtRepository;
-    @Autowired ZaryaRepository zaryaRepository;
-    @Autowired RoadHogRepository roadhogRepository;
-    @Autowired WinstonRepository winstonRepository;
-    @Autowired SigmaRepository sigmaRepository;
-    @Autowired WreckingBallRepository wreckingBallRepository;
-    @Autowired AnaRepository anaRepository;
-    @Autowired BaptisteRepository baptisteRepository;
-    @Autowired BrigitteRepository brigitteRepository;
-    @Autowired LucioRepository lucioRepository;
-    @Autowired MercyRepository mercyRepository;
-    @Autowired MoiraRepository moiraRepository;
-    @Autowired ZenyattaRepository zenyattaRepository;
-    @Autowired JunkratRepository junkratRepository;
-    @Autowired GenjiRepository genjiRepository;
-    @Autowired DoomfistRepository doomfistRepository;
-    @Autowired ReaperRepository reaperRepository;
-    @Autowired MccreeRepository mccreeRepository;
-    @Autowired MeiRepository meiRepository;
-    @Autowired BastionRepository bastionRepository;
-    @Autowired Soldier76Repository soldier76Repository;
-    @Autowired SombraRepository sombraRepository;
-    @Autowired SymmetraRepository symmetraRepository;
-    @Autowired AsheRepository asheRepository;
-    @Autowired WidowmakerRepository widowmakerRepository;
-    @Autowired TorbjornRepository torbjornRepository;
-    @Autowired TracerRepository tracerRepository;
-    @Autowired PharahRepository pharahRepository;
-    @Autowired HanzoRepository hanzoRepository;
-
+    @Autowired SeasonRepository seasonRepository;
     @Autowired CrawlingPlayerDataService cpd;
 
     public CompetitiveDetailDto showPlayerExample(String forUrl) {
@@ -84,20 +54,52 @@ public class ShowPlayerDetailService {
         return cdDto;
     }
 
+    public CompetitiveDetailDto refreshPlayerDetail(String forUrl) {
+        CompetitiveDetailDto cdDto = new CompetitiveDetailDto();
+        StopWatch stopWatch = new StopWatch();
+        if(forUrl.indexOf("-") != -1 ) {
+            forUrl = forUrl.replace("-", "#");
+
+            stopWatch.start("API를 통한 플레이어 기본 정보 추출");
+            List<PlayerListDto> playerListDtos = cpd.crawlingPlayerList(forUrl);
+            stopWatch.stop();
+            for (PlayerListDto playerListDto : playerListDtos) {
+                if ("Y".equals(playerListDto.getIsPublic())) {
+                    stopWatch.start("경쟁정 디테일 크롤링 및 데이터 저장 까지 총 시간");
+                    //
+                    cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto);
+//                        cdDto = selectPlayerHeroDetail(playerListDto.getId(), cdDto);
+                    // 시간 확인
+                    stopWatch.stop();
+                    System.out.println(stopWatch.prettyPrint());
+                }
+            }
+        }
+        System.out.println("refreshPlayerDetail("+forUrl+") 종료");
+
+        return cdDto;
+    }
+
     public List<PlayerDetailDto> selectPlayerHeroDetail(Long playerId) {
         List<PlayerDetailDto> list = new ArrayList<PlayerDetailDto>();
-        List<PlayerDetail> playerDetailList = playerDetailRepository.findByIdAndSeasonOrderByHeroOrderAsc(playerId,19l);
+        Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
+        System.out.println("========== current season : "+season + " ===========");
+        List<PlayerDetail> playerDetailList = playerDetailRepository.findByIdAndSeasonOrderByHeroOrderAsc(playerId,season);
+        if(playerDetailList.size() == 0) {
+            System.out.println("========== " + season + "시즌 데이터가 없어 "+ (season-1) + "시즌 데이터를 조회합니다. ===========");
+            playerDetailList = playerDetailRepository.findByIdAndSeasonOrderByHeroOrderAsc(playerId, season-1);
+        }
         for(PlayerDetail playerDetail : playerDetailList) {
             PlayerDetailDto playerDetailDto = new PlayerDetailDto(playerDetail.getId(), playerDetail.getSeason(), playerDetail.getHeroOrder(), playerDetail.getHeroName()
             , playerDetail.getHeroNameKR(), playerDetail.getKillPerDeath(), playerDetail.getWinRate(), playerDetail.getPlayTime()
             , playerDetail.getDeathAvg(), playerDetail.getSpentOnFireAvg(), playerDetail.getHealPerLife(), playerDetail.getBlockDamagePerLife(), playerDetail.getLastHitPerLife()
-            , playerDetail.getDamageToHeroPerLife(), playerDetail.getDamageToShieldPerLife(), playerDetail.getIndex1(), playerDetail.getIndex2()
-            , playerDetail.getIndex3(), playerDetail.getIndex4(), playerDetail.getIndex5());
+            , playerDetail.getDamageToHeroPerLife(), playerDetail.getDamageToShieldPerLife()
+            , playerDetail.getIndex1(), playerDetail.getIndex2(), playerDetail.getIndex3(), playerDetail.getIndex4(), playerDetail.getIndex5()
+            , playerDetail.getTitle1(), playerDetail.getTitle2(), playerDetail.getTitle3(), playerDetail.getTitle4(), playerDetail.getTitle5());
 
 //            System.out.println(playerDetailDto);
             list.add(playerDetailDto);
         }
-
         return list;
     }
 }

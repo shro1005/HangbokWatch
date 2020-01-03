@@ -23,6 +23,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +67,7 @@ public class CrawlingPlayerDataService {
     @Autowired TracerRepository tracerRepository;
     @Autowired PharahRepository pharahRepository;
     @Autowired HanzoRepository hanzoRepository;
+    @Autowired SeasonRepository seasonRepository;
 
     @Value("${spring.HWresource.HWimages}")
     private String portraitPath;
@@ -94,6 +96,12 @@ public class CrawlingPlayerDataService {
 
             //위에 크롤링결과 dto를 반환활 playerListDto에 넣어주는 for 문
             for(PlayerCrawlingResultDto dto : playerCrawlingResultDtoList) {
+                String isPublic = "N";
+                if(dto.getIsPublic()) {
+                    isPublic = "Y";
+                }else {
+                    return playerList;
+                }
                 String battleTag = dto.getName();
                 String pName = battleTag;
                 if(dto.getPlatform().equals("pc")) {
@@ -102,11 +110,9 @@ public class CrawlingPlayerDataService {
                 String forUrl = dto.getUrlName();
                 String portrait = "https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/" + dto.getPortrait() + ".png";  //d1u1mce87gyfbn.cloudfront.net
 
-                String isPublic = "N"; Integer tankratingPoint = 0; Integer dealRatingPoint = 0; Integer healRatingPoint = 0;
+                Integer tankratingPoint = 0; Integer dealRatingPoint = 0; Integer healRatingPoint = 0;
                 PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint);
-                if(dto.getIsPublic()) {
-                    playerListDto.setIsPublic("Y");
-                }
+
                 playerListDto.setCnt(3);
                 System.out.println(playerListDto.toString());
                 playerList.add(playerListDto);
@@ -307,12 +313,18 @@ public class CrawlingPlayerDataService {
             for(Element mostHero : mostHeros) {
                 PlayerDetailDto pdDto = new PlayerDetailDto();
                 pdDto.setId(playerListDto.getId());
-                pdDto.setSeason(19l);
+
+                Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
+                pdDto.setSeason(season);
 
                 count++;
                 String hero = mostHero.text().trim();
                 pdDto.setOrder(count);
-                pdDto.setHeroNameKR(hero);
+                if("D.Va".equals(hero)) {
+                    pdDto.setHeroNameKR("디바");
+                }else {
+                    pdDto.setHeroNameKR(hero);
+                }
                 System.out.println(mostHero.text());
                 List<Integer> winLoseGame;
 
@@ -492,16 +504,7 @@ public class CrawlingPlayerDataService {
                             break;
                         case "0x08600000000004DB":                  // 불탄 시간
                             td = tr.select("td");
-                            spentOnFireAvg = td.last().text().substring(0, 2);
-                            if (td.last().text().length() == 8) {
-                                spentOnFireAvg += "시간";
-                            } else {
-                                if ("00".equals(spentOnFireAvg)) {
-                                    spentOnFireAvg = td.last().text().substring(3) + "초";
-                                } else {
-                                    spentOnFireAvg += "분";
-                                }
-                            }
+                            spentOnFireAvg = td.last().text();
                             break;
                         case "0x086000000000002A":                  // 죽음
                             td = tr.select("td");
@@ -588,7 +591,7 @@ public class CrawlingPlayerDataService {
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            mechaSuicideKillAvg, mechaCallAvg, "", "", "");
+                            mechaSuicideKillAvg, mechaCallAvg, "", "", "", "평균 자폭 킬", "평균 메카호출", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================ dva data save success =======================================");
@@ -632,7 +635,7 @@ public class CrawlingPlayerDataService {
                     orisaRepository.save(orisa);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            damageAmpAvg, "", "", "", "");
+                            damageAmpAvg, "", "", "", "" , "평균 공격력 증폭", "", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     pdDto.setBlockDamagePerLife(blockDamagePerLife.toString());
@@ -696,7 +699,7 @@ public class CrawlingPlayerDataService {
                     reinhardtRepository.save(reinhardt);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, "", "");
+                            earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, "", "", "평균 대지분쇄 킬", "평균 돌진 킬", "평균 화염강타 킬", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================reinhardt data save success===================================");
@@ -755,7 +758,7 @@ public class CrawlingPlayerDataService {
                     zaryaRepository.save(zarya);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            energyAvg, highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, "");
+                            energyAvg, highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, "", "평균 에너지", "평균 고에너지 킬", "평균 주는방벽", "평균 중력자탄 킬", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("===============================zarya data save success====================================");
@@ -815,7 +818,7 @@ public class CrawlingPlayerDataService {
                     roadhogRepository.save(roadhog);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "", "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            wholeHogKillAvg, chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), soloKillAvg);
+                            wholeHogKillAvg, chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), soloKillAvg, "평균 돼재앙 킬", "갈고리 명중률", "평균 끈 적", "목숭당 자힐량", "평균 단독처치");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================roadhog data save success=====================================");
@@ -869,7 +872,7 @@ public class CrawlingPlayerDataService {
                     winstonRepository.save(winston);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            jumpPackKillAvg, primalRageKillAvg, pushEnmeyAvg, "", "");
+                            jumpPackKillAvg, primalRageKillAvg, pushEnmeyAvg, "", "", "평균 점프팩 킬", "평균 원시의분노 킬", "평균 밀친 적", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================winston data save success+====================================");
@@ -924,7 +927,7 @@ public class CrawlingPlayerDataService {
                     sigmaRepository.save(sigma);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            absorptionDamagePerLife.toString(), graviticFluxKillAvg, accretionKillAvg, "", "");
+                            absorptionDamagePerLife.toString(), graviticFluxKillAvg, accretionKillAvg, "", "", "목숨당 흡수한 피해", "평균 중력붕괴 킬", "평균 강착 킬", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================sigma data save success=======================================");
@@ -978,7 +981,7 @@ public class CrawlingPlayerDataService {
                     wreckingBallRepository.save(wreckingBall);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            grapplingClawKillAvg, piledriverKillAvg, minefieldKillAvg, "", "");
+                            grapplingClawKillAvg, piledriverKillAvg, minefieldKillAvg, "", "", "평균 갈고리 킬", "평균 파일드라이버 킬", "평균 지뢰밭 킬", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================wreckingBall data save success================================");
@@ -1028,7 +1031,7 @@ public class CrawlingPlayerDataService {
                     anaRepository.save(ana);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString(), "", "");
+                            nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString(), "", "", "평균 나노강화제 주입", "평균 생체수류탄 킬", "평균 재운적", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================ana data save success================================");
@@ -1073,7 +1076,7 @@ public class CrawlingPlayerDataService {
                     baptisteRepository.save(baptiste);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            immortalityFieldSaveAvg, amplificationMatrixAvg, "", "", "");
+                            immortalityFieldSaveAvg, amplificationMatrixAvg, "", "", "", "평균 불사장치 세이브", "평균 강화메트릭스 사용", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================baptiste data save success================================");
@@ -1118,7 +1121,7 @@ public class CrawlingPlayerDataService {
                     brigitteRepository.save(brigitte);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            armorPerLife.toString(), inspireActiveRate, "", "", "");
+                            armorPerLife.toString(), inspireActiveRate, "", "", "", "목숨당 방어력 제공", "격려(패시브) 지속률", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================brigitte data save success================================");
@@ -1156,7 +1159,7 @@ public class CrawlingPlayerDataService {
                     lucioRepository.save(lucio);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            soundwaveAvg, "", "", "", "");
+                            soundwaveAvg, "", "", "", "", "평균 소리방벽 사용", "", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================lucio data save success================================");
@@ -1199,7 +1202,7 @@ public class CrawlingPlayerDataService {
                     mercyRepository.save(mercy);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            resurrectAvg, damageAmpAvg, "", "", "");
+                            resurrectAvg, damageAmpAvg, "", "", "", "평균 부활", "평균 공격력 증폭", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================mercy data save success================================");
@@ -1247,7 +1250,7 @@ public class CrawlingPlayerDataService {
                     moiraRepository.save(moira);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), "", "");
+                            coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), "", "", "평균 융화 킬", "평균 융화 힐", "목숭당 자힐량", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================moira data save success================================");
@@ -1285,7 +1288,7 @@ public class CrawlingPlayerDataService {
                     zenyattaRepository.save(zenyatta);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            transcendenceHealAvg, "", "", "", "");
+                            transcendenceHealAvg, "", "", "", "", "평균 초월 힐", "", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================zenyatta data save success================================");
@@ -1338,7 +1341,7 @@ public class CrawlingPlayerDataService {
                     junkratRepository.save(junkrat);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, "", "");
+                            steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, "", "", "평균 덫으로 묶은 적", "평균 충격 지뢰 킬", "평균 죽이는 타이어 킬", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================junkrat data save success================================");
@@ -1386,7 +1389,7 @@ public class CrawlingPlayerDataService {
                     genjiRepository.save(genji);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, "", "");
+                            dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, "", "", "평균 용검 킬", "평균 튕겨낸 피해량", "평균 단독처치", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================gneji data save success================================");
@@ -1439,7 +1442,7 @@ public class CrawlingPlayerDataService {
                     doomfistRepository.save(doomfist);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, "");
+                            skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, "", "평균 기술로 준 피해", "평균 보호막 생성량", "평균 파멸의 일격 킬", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================doomfist data save success================================");
@@ -1482,7 +1485,7 @@ public class CrawlingPlayerDataService {
                     reaperRepository.save(reaper);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            deathBlossomKillAvg, soloKillAvg, "", "", "");
+                            deathBlossomKillAvg, soloKillAvg, "", "", "", "평균 죽음의꽃 킬", "평균 단독처치", "", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================reaper data save success================================");
@@ -1533,7 +1536,7 @@ public class CrawlingPlayerDataService {
                     mccreeRepository.save(mccree);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, "");
+                            peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, "", "평균 난사 킬", "평균 황야의 무법자 킬", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================mccree data save success================================");
@@ -1585,7 +1588,7 @@ public class CrawlingPlayerDataService {
                     meiRepository.save(mei);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            blizzardKillAvg, freezingEnemyAvg, soloKillAvg, "", "");
+                            blizzardKillAvg, freezingEnemyAvg, soloKillAvg, "", "", "평균 눈보라 킬", "평균 얼린적", "평균 단독처치", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================mei data save success================================");
@@ -1636,7 +1639,7 @@ public class CrawlingPlayerDataService {
                     bastionRepository.save(bastion);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "");
+                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 킬", "평균 수색모드 처치", "평균 전차모드 처치", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================bastion data save success================================");
@@ -1688,7 +1691,7 @@ public class CrawlingPlayerDataService {
                     soldier76Repository.save(soldier76);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,healPerLife.toString(), "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, "");
+                            helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, "", "평균 나선 로켓 킬", "평균 전술조준경 킬", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================soldier76 data save success================================");
@@ -1739,7 +1742,7 @@ public class CrawlingPlayerDataService {
                     sombraRepository.save(sombra);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            hackingEnemyAvg, EMPEnemyAvg, criticalHitRate, soloKillAvg, "");
+                            hackingEnemyAvg, EMPEnemyAvg, criticalHitRate, soloKillAvg, "", "평균 해킹한 적", "평균 EMP맞춘 적", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================sombra data save success================================");
@@ -1791,7 +1794,7 @@ public class CrawlingPlayerDataService {
                     symmetraRepository.save(symmetra);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            turretKillAvg, teleportUsingAvg, soloKillAvg, "", "");
+                            turretKillAvg, teleportUsingAvg, soloKillAvg, "", "", "평균 감시포탑 킬", "평균 순간이동한 아군", "평균 단독처치", "", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================symmetra data save success================================");
@@ -1846,7 +1849,7 @@ public class CrawlingPlayerDataService {
                     asheRepository.save(ashe);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg);
+                            coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, "평균 충격샷건 킬", "평균 다이너마이트 킬","평균 BOB 킳", "저격 치명타 명중률", "평균 단독처치");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================ashe data save success================================");
@@ -1862,11 +1865,15 @@ public class CrawlingPlayerDataService {
                     /**위도우메이커 시작*/
                 }else if("0x02E000000000000A".equals(heroDetails.attr("data-category-id"))){
                     //위도우메이커 영웅 특별 데이터
-                    String scopeHitRate = "0%"; String scopeCriticalHitRate = "0%";
+                    String scopeHitRate = "0%"; String scopeCriticalHitRate = "0%"; String sightSupportAvg = "0";
 
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
+                            case "0x08600000000004F9":                  // 평균 처치시야 지원
+                                td = tr.select("td");
+                                sightSupportAvg = td.last().text();
+                                break;
                             case "0x086000000000066D":                  // 저격 명중률
                                 td = tr.select("td");
                                 scopeHitRate = td.last().text();
@@ -1888,12 +1895,12 @@ public class CrawlingPlayerDataService {
                     Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
 
                     Widowmaker widowmaker = new Widowmaker(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
-                            damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), scopeHitRate, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
+                            damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), sightSupportAvg, scopeHitRate, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
                     widowmakerRepository.save(widowmaker);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            scopeHitRate, scopeCriticalHitRate, soloKillAvg, "", "");
+                            sightSupportAvg, scopeHitRate, scopeCriticalHitRate, soloKillAvg, "", "평균 처치시야 지원", "저격 명중률", "저격 치명타 명중률", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================widowmaker data save success================================");
@@ -1944,7 +1951,7 @@ public class CrawlingPlayerDataService {
                     torbjornRepository.save(torbjorn);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            moltenCoreKillAvg, torbjornDirectKillAvg, turretKillAvg, soloKillAvg, "");
+                            moltenCoreKillAvg, torbjornDirectKillAvg, turretKillAvg, soloKillAvg, "", "평균 초고열 용광로 처치", "평균 직접 처치", "평균 포탑 처치", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================torbjorn data save success================================");
@@ -2000,7 +2007,7 @@ public class CrawlingPlayerDataService {
                     tracerRepository.save(tracer);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg);
+                            pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg, "평균 펄스폭탄 부착", "평균 펄스폭탄 킬", "치명타 명중률", "목숨당 자힐량", "평균 단독처치");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================tracer data save success================================");
@@ -2051,7 +2058,7 @@ public class CrawlingPlayerDataService {
                     pharahRepository.save(pharah);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, "");
+                            rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, "", "평균 로켓 명중", "직격률", "평균 포화 킿", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================pharah data save success================================");
@@ -2102,7 +2109,7 @@ public class CrawlingPlayerDataService {
                     hanzoRepository.save(hanzo);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, "");
+                            dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, "", "평균 용의 일격 킬", "평균 폭풍 화살 킬", "평균 처치시야 지원", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================hanzo data save success================================");

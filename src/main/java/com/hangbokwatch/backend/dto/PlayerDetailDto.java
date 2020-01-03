@@ -10,7 +10,7 @@ import lombok.*;
 public class PlayerDetailDto {
     private Long id;
     private Long season;
-    private Integer Order;
+    private Integer order;
     private String heroName;
     private String heroNameKR;
     private String killPerDeath;
@@ -28,12 +28,17 @@ public class PlayerDetailDto {
     private String index3;
     private String index4;
     private String index5;
+    private String title1;
+    private String title2;
+    private String title3;
+    private String title4;
+    private String title5;
 
     public String toString() {
         return "Detail{" +
                 "id=" + id +
                 ", season=" + season +
-                ", Order=" + Order +
+                ", order=" + order +
                 ", heroName='" + heroName + '\'' +
                 ", heroNameKR='" + heroNameKR + '\'' +
                 ", winRate='" + winRate + '\'' +
@@ -50,6 +55,11 @@ public class PlayerDetailDto {
                 ", index3='" + index3 + '\'' +
                 ", index4='" + index4 + '\'' +
                 ", index5='" + index5 + '\'' +
+                ", index1='" + title1 + '\'' +
+                ", index2='" + title2 + '\'' +
+                ", index3='" + title3 + '\'' +
+                ", index4='" + title4 + '\'' +
+                ", index5='" + title5 + '\'' +
                 '}';
     }
 

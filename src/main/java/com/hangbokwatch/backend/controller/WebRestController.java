@@ -26,8 +26,8 @@ public class WebRestController {
     ShowPlayerDetailService spd;
 
     @PostMapping("/showUserList")
-    public List<PlayerListDto> getPlayerList(@RequestBody PlayerSearchDto playerDto) {
-        System.out.println("WebRestController - getPlayerList 호출됨!");
+    public List<PlayerListDto> showUserList(@RequestBody PlayerSearchDto playerDto) {
+        System.out.println("WebRestController - showUserList 호출됨!");
         String playerName = playerDto.getPlayerName();
         System.out.println("playerName : " + playerName);
         List<PlayerListDto> playerList = cpl.crawlingPlayerList(playerName);
@@ -62,6 +62,7 @@ public class WebRestController {
 
     @PostMapping("/getDetailData")
     public List<PlayerDetailDto> getDetailData(@RequestBody PlayerSearchDto playerSearchDto) {
+        System.out.println("WebRestController - getDetailData 호출됨!");
         Long id = playerSearchDto.getId();
         List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id);
         return playerDetailList;

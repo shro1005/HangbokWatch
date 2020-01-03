@@ -47,6 +47,79 @@
       @include box-shadow($btn-focus-box-shadow, $btn-active-box-shadow);
     }
   }
+
+  &.action-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    height: 40px;
+    width: 40px;
+
+    i {
+      font-size: 1.25rem;
+      width: 26px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      line-height: 23px;
+      vertical-align: middle;
+
+      &:before {
+        width: inherit;
+        height: inherit;
+        line-height: inherit;
+        font-size: inherit;
+      }
+
+      @include font-size(20);
+    }
+
+    &.btn-xs {
+      height: 30px;
+      width: 30px;
+    }
+
+    &.btn-sm {
+      height: 35px;
+      width: 35px;
+    }
+
+    &.btn-lg {
+      height: 50px;
+      width: 50px;
+
+      i {
+        @include font-size(30);
+        line-height: 24px;
+      }
+    }
+
+    &.btn-refresh {
+      &.clicked {
+        i {
+          color: theme-color(primary);
+          animation: rotate360 0.8s linear infinite;
+        }
+      }
+    }
+
+    &.btn-like {
+      &.clicked {
+
+        i {
+          color: theme-color(danger);
+          animation: bounceIn 0.8s linear 1;
+        }
+
+        &:hover {
+          i {
+            color: $body-text-inverse-color;
+          }
+        }
+      }
+    }
+  }
 }
 
 // Future-proof disabling of clicks on `<a>` elements

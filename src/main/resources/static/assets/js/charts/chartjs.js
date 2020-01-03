@@ -50,7 +50,6 @@ $(function () {
             fill: false,
             backgroundColor: chartColors[0],
             borderColor: chartColors[0],
-            borderWidth: 0
           },
           {
             label: '# of Points',
@@ -59,7 +58,6 @@ $(function () {
             fill: false,
             backgroundColor: chartColors[1],
             borderColor: chartColors[1],
-            borderWidth: 0
           }
         ]
       },

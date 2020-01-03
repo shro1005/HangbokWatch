@@ -57,6 +57,9 @@ public class Widowmaker {
     private String damageToShieldPerLife;
 
     /**영웅별 특수 데이터*/
+    @Column(name = "sight_support_avg")
+    private String sightSupportAvg;
+
     @Column(name = "scope_hit_rate")
     private String scopeHitRate;
 
@@ -90,6 +93,7 @@ public class Widowmaker {
                 ", lastHitPerLife='" + lastHitPerLife + '\'' +
                 ", damageToHero='" + damageToHeroPerLife + '\'' +
                 ", damageToShieldPerLife='" + damageToShieldPerLife + '\'' +
+                ", sightSupportAvg='" + sightSupportAvg + '\'' +
                 ", scopeHitRate='" + scopeHitRate + '\'' +
                 ", scopeCriticalHitRate='" + scopeCriticalHitRate + '\'' +
                 ", soloKillAvg='" + soloKillAvg + '\'' +
