@@ -106,56 +106,23 @@
                             <div class="player-level">LV. {{player.playerLevel}}</div>
                         </div>
                         <div class="profile-details">
-                            <!-- js로 영웅 경쟁전 프로필 상세정보 채워 넣는 부분 -->
+                            <!-- js로 영웅 경쟁전 프로필 채워 넣는 부분 -->
                         </div>
                     </div>
                 </div>
 
                 <div class="trendline block"> <!-- TRENDLINE  -->
                     <div class="inside-block">
-                        <h2 class="titular"><span class="icon entypo-location"></span><strong>CLUJ-NAPOCA</strong>/RO</h2>
-                        <div class="current-day">
-                            <p class="current-day-date">FRI 29/06</p>
-                            <p class="current-day-temperature">24º<span class="icon-cloudy"></span></p>
+                        <h2 class="titular">트렌드</h2>
+                        <div class="trendline-body">
+                            <!-- js로 추세선 채워 넣는 부분 -->
                         </div>
-                        <ul class="next-days">
-                            <li>
-                                <a href="#43">
-                                    <p class="next-days-date"><span class="day">SAT</span> <span class="scnd-font-color">29/06</span></p>
-                                    <p class="next-days-temperature">25º<span class="icon icon-cloudy scnd-font-color"></span></p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#44">
-                                    <p class="next-days-date"><span class="day">SUN</span> <span class="scnd-font-color">30/06</span></p>
-                                    <p class="next-days-temperature">22º<span class="icon icon-cloudy2 scnd-font-color"></span></p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#45">
-                                    <p class="next-days-date"><span class="day">MON</span> <span class="scnd-font-color">01/07</span></p>
-                                    <p class="next-days-temperature">24º<span class="icon icon-cloudy2 scnd-font-color"></span></p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#46">
-                                    <p class="next-days-date"><span class="day">TUE</span> <span class="scnd-font-color">02/07</span></p>
-                                    <p class="next-days-temperature">26º<span class="icon icon-cloudy scnd-font-color"></span></p>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="">
-                                    <p class="next-days-date"><span class="day">WED</span> <span class="scnd-font-color">03/07</span></p>
-                                    <p class="next-days-temperature">27º<span class="icon icon-sun scnd-font-color"></span></p>
-                                </a>
-                            </li>
-                        </ul>
                     </div>
                 </div>
 
                 <div class="detail-box block-big"> <!-- DETAIL BOX  -->
                     <div class="inside-block detail">
-
+                        <!-- js로 영웅별 상세 데이터 채워 넣는 부분-->
                     </div>
                 </div>
 
@@ -248,14 +215,16 @@
 <script src="/js/owl.carousel.min.js"></script>
 <script src="/js/jquery.magnific-popup.min.js"></script>
 <script src="/js/aos.js"></script>
-<script src="/js/jquery.animateNumber.min.js"></script>
-<script src="/js/bootstrap-datepicker.js"></script>
-<script src="/js/jquery.timepicker.min.js"></script>
+<!--<script src="/js/jquery.animateNumber.min.js"></script>-->
+<!--<script src="/js/bootstrap-datepicker.js"></script>-->
+<!--<script src="/js/jquery.timepicker.min.js"></script>-->
 <script src="/js/scrollax.min.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/progress.bar.js"></script>
 <script src="/js/Chart.min.js"></script>
 <script src="/js/chartjs.addon.js"></script>
+<script src="/js/moment.min.js"></script>
+<script src="/js/moment-with-locales.min.js"></script>
 <script src="/js/handlebars-v4.0.4.js"></script>
 
 
@@ -317,6 +286,16 @@
         <div class="index">\{{index}}</div>
     </div>
     \{{/detailText}}
+</script>
+
+<script id="trendline-body" type="text/x-handlebars-template">
+    \{{#role}}
+    <div class="\{{role}}-trendline">
+        <div class="rank-role2"><img src="\{{roleImgPath}}"></div>
+        <canvas id="\{{role}}-trendline-chart" style="display:block; width:100%; height: 100%"></canvas>
+    </div>
+    \{{/role}}
+<!--    <div style="height: 10px;"></div>-->
 </script>
 
 <script type="text/javascript">

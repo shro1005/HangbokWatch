@@ -62,6 +62,7 @@ const main = {
     search : function (userInput) {
         // alert('main search 호출');
         playerData = [];
+        $("#search-result").remove();
         $(".notice_playerList").remove();
         $(".grid-header").remove();
         $(".more_btn_div").remove();
@@ -214,9 +215,9 @@ function drawList(data) {
         alert(data.playerName);
         return false;
     }
-
+    console.log(data.udtDtm);
     return {portrait: data.portrait, battleTag: data.battleTag, playerLevel: data.playerLevel, platform: data.platform, tankRatingPoint: data.tankRatingPoint, dealRatingPoint: data.dealRatingPoint, healRatingPoint: data.healRatingPoint, winRate: data.winRate,
     mostHero1: "/HWimages/hero/"+data.mostHero1+"_s.png", mostHero2: "/HWimages/hero/"+data.mostHero2+"_s.png", mostHero3: "/HWimages/hero/"+data.mostHero3+"_s.png", isPublic: data.isPublic, forUrl: data.forUrl, tankRatingImg: data.tankRatingImg,
-    dealRatingImg: data.dealRatingImg, healRatingImg: data.healRatingImg, wingame: data.winGame, losegame: data.loseGame};
+    dealRatingImg: data.dealRatingImg, healRatingImg: data.healRatingImg, wingame: data.winGame, losegame: data.loseGame, udtDtm: data.udtDtm};
 }
 

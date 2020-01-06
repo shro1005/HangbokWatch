@@ -1,6 +1,7 @@
 package com.hangbokwatch.backend.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,9 @@ public class Season {
 
     @Column(name = "end_date")
     private String endDate;
+
+    @Builder
+    public Season(Long season, String startDate, String endDate) {
+        this.season = season; this.startDate = startDate; this.endDate = endDate;
+    }
 }

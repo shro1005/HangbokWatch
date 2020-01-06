@@ -3,8 +3,18 @@ let detailList = [];
 let cnt = 0;
 let before_order = 1;
 let now_order = 1;
-const radar_label = [];
-const radar_data = [];
+const trend_tank_point = [];
+const trend_deal_point = [];
+const trend_heal_point = [];
+const trend_tank_wingame = [];
+const trend_deal_wingame = [];
+const trend_heal_wingame = [];
+const trend_tank_losegame = [];
+const trend_deal_losegame = [];
+const trend_heal_losegame = [];
+const trend_udt_dtm = [];
+let radar_label = [];
+let radar_data = [];
 const chartColors = ['#fcb150', '#11a8ab' ,'#e64c65'];
 const heal_hero = "/아나/바티스트/브리기테/루시우/메르시/모이라/젠야타";
 const deal_hero = "/애쉬/바스티온/둠피스트/겐지/한조/정크랫/맥크리/메이/파라/리퍼/솔저: 76/솜브라/시메트라/토르비욘/트레이서/위도우메이커";
@@ -20,7 +30,7 @@ $(window).resize(function () {
 
 const main = {
     init : function(){
-        console.log("main.init 호출");
+        // console.log("main.init 호출");
         const _this = this;
         $('#btn-search').on('click', function (event) {
             _this.search();
@@ -61,7 +71,7 @@ const main = {
 
     },
     doRefresh : function () {
-        console.log("doRefresh 호출");
+        // console.log("doRefresh 호출");
         $('.btn-refresh').addClass('clicked');
         // console.log($('.user-name').text());
         const forUrl = $('.user-name').text().replace(" #" , "-");
@@ -72,7 +82,7 @@ const main = {
 
     },
     doFavorite : function () {
-        console.log("doFavorite 호출");
+        // console.log("doFavorite 호출");
         if($('.btn-like').hasClass('clicked') === true) {
             $('.btn-like').removeClass('clicked');
             $('.mdi-heart').addClass('mdi-heart-outline');
@@ -87,7 +97,7 @@ const main = {
 };
 
 const getDetailData = () => {
-    console.log("getDetailData 호출");
+    // console.log("getDetailData 호출");
     let hero_list = $("#hero-list").html();
     let template = Handlebars.compile(hero_list);
 
@@ -106,8 +116,9 @@ const getDetailData = () => {
         data: JSON.stringify(input),
         async : false
     }).done(function (datas) {
-        count = datas.length;
-        $.each(datas, function (i, val) {
+        /* 영웅 상세정보 파싱*/
+        count = datas.detail.length;
+        $.each(datas.detail, function (i, val) {
             if (i <= 6) {
                 const heroNameKR = val.heroNameKR;
                 const heroName = val.heroName;
@@ -128,6 +139,18 @@ const getDetailData = () => {
             detailList.push(val);
             // console.log(val);
         });
+        /*추세선 파싱*/
+        console.log(datas.trendline);
+        $.each(datas.trendline, function (i, val) {
+            moment.locale('ko');
+            // console.log(val.udtDtm);
+            // console.log(moment(val.udtDtm).format('MMM Do(ddd)'));
+            trend_udt_dtm.push(moment(val.udtDtm).format('MMM Do(ddd)')); trend_tank_point.push(val.tankRatingPoint);
+            trend_deal_point.push(val.dealRatingPoint); trend_heal_point.push(val.healRatingPoint);
+            trend_tank_wingame.push(val.tankWinGame); trend_tank_losegame.push(val.tankLoseGame);
+            trend_deal_wingame.push(val.dealWinGame); trend_deal_losegame.push(val.dealLoseGame);
+            trend_heal_wingame.push(val.healWinGame); trend_heal_losegame.push(val.healLoseGame);
+        });
         const item = template(hero);
         $('.menu-box-menu').append(item);
     });
@@ -136,6 +159,7 @@ const getDetailData = () => {
         $('.menu-box-menu').append(moreButtonDiv);
     }
     drawDetail(1);
+    drawTrendline();
 };
 
 const moreHero = () => {
@@ -175,12 +199,15 @@ const drawDetail = (order) => {
     // }
     before_order = now_order;
     now_order = order;
-    console.log(before_order, now_order);
+    // console.log(before_order, now_order);
     $(`#order-${before_order}`).removeClass('clicked');
     $(`#order-${now_order}`).addClass('clicked');
 
     $('.detail-header').remove();
     $('.detail-body').remove();
+
+    radar_data = [];
+    radar_label = [];
 
     const hero = detailList[order-1];
     // detail 부분
@@ -213,27 +240,19 @@ const drawDetail = (order) => {
 
 const checkHero = (hero, detail, text) => {
     const heroNameKR = hero.heroNameKR;
-    const deathAvg = hero.deathAvg;
+    let deathAvg = parseFloat(hero.deathAvg);
     const spentOnFireAvg = hero.spentOnFireAvg;
-    const healPerLife = hero.healPerLife;
+    let healPerLife = parseFloat(hero.healPerLife);
     const heroName = hero.heroName;
     const winRate = hero.winRate;
     const playTime = hero.playTime;
-    const killPerDeath = hero.killPerDeath;
-    const blockDamagePerLife = hero.blockDamagePerLife;
-    const lastHitPerLife = hero.lastHitPerLife;
-    const damageToHeroPerLife = hero.damageToHeroPerLife;
-    const damageToShieldPerLife = hero.damageToShieldPerLife;
+    let killPerDeath = parseFloat(hero.killPerDeath);
+    let blockDamagePerLife = parseFloat(hero.blockDamagePerLife);
+    let lastHitPerLife = parseFloat(hero.lastHitPerLife);
+    let damageToHeroPerLife = parseFloat(hero.damageToHeroPerLife);
+    let damageToShieldPerLife = parseFloat(hero.damageToShieldPerLife);
     const index = [hero.index1, hero.index2, hero.index3, hero.index4, hero.index5];
-    // const index2 = hero.index2;
-    // const index3 = hero.index3;
-    // const index4 = hero.index4;
-    // const index5 = hero.index5;
     const title = [hero.title1, hero.title2 ,hero.title3, hero.title4, hero.title5];
-    // const title2 = hero.title2;
-    // const title3 = hero.title3;
-    // const title4 = hero.title4;
-    // const title5 = hero.title5;
 
     detail.detail.push({
         heroName: heroName,
@@ -245,41 +264,68 @@ const checkHero = (hero, detail, text) => {
         spentOnFireAvg: spentOnFireAvg
     });
     // console.log(heroNameKR);
+    text.detailText.push({title: "평균 죽음", index: deathAvg});
+    text.detailText.push({title: "목숨당 처치", index: killPerDeath});
+    text.detailText.push({title: "목숨당 영웅 피해량", index: damageToHeroPerLife});
+    radar_label.push("평균 죽음"); radar_label.push("목숨당 처치"); radar_label.push("목숨당 영웅 딜량");
+    if (deathAvg >= 10) { deathAvg = 10;} else {deathAvg = 110 - deathAvg*10; }
+    if (killPerDeath >= 8) { killPerDeath = 100;} else { killPerDeath = 8*killPerDeath + 32; }
+    radar_data.push(deathAvg); radar_data.push(killPerDeath);
+
     if(heal_hero.indexOf(heroNameKR) > 0){          // 힐러 영웅일 시
-        text.detailText.push({title: "평균 죽음", index: deathAvg});
+        if(damageToHeroPerLife >= 1800) { damageToHeroPerLife= 100;} else {damageToHeroPerLife = 0.033*damageToHeroPerLife ;}
+        radar_data.push(damageToHeroPerLife);
         text.detailText.push({title: "목숨당 힐량", index: healPerLife});
-        text.detailText.push({title: "목숨당 영웅 피해량", index: damageToHeroPerLife});
-        radar_label.push("평균 죽음"); radar_label.push("목숨당 힐량"); radar_label.push("목숨당 영웅 딜량");
-        radar_data.push(deathAvg); radar_data.push(healPerLife); radar_data.push(damageToHeroPerLife);
+        radar_label.push("목숨당 힐량");
+        if(healPerLife >= 2500) { healPerLife= 100;} else {healPerLife = 0.033*healPerLife ;}
+        radar_data.push(healPerLife);
         if("바티스트" == heroNameKR) {
             text.detailText.push({title: "목숨당 방벽 피해량", index: damageToShieldPerLife});
-            radar_label.push("목숨당 방벽 피해량"); radar_data.push(damageToShieldPerLife);
+            radar_label.push("목숨당 방벽 피해량");
+            if(damageToShieldPerLife >= 1800) { damageToShieldPerLife= 100;} else {damageToShieldPerLife = 0.033*damageToShieldPerLife ;}
+            radar_data.push(damageToShieldPerLife);
         }
     }else if(deal_hero.indexOf(heroNameKR) > 0) {   // 딜러 영웅일 시
-        text.detailText.push({title: "평균 죽음", index: deathAvg});
-        text.detailText.push({title: "목숨당 영웅 피해량", index: damageToHeroPerLife});
+        if(damageToHeroPerLife >= 3000) { damageToHeroPerLife= 100;} else {damageToHeroPerLife = 0.033*damageToHeroPerLife;}
+        radar_data.push(damageToHeroPerLife);
         text.detailText.push({title: "목숨당 방벽 피해량", index: damageToShieldPerLife});
         text.detailText.push({title: "목숨당 결정타(킬캐치)", index: lastHitPerLife});
-        radar_label.push("평균 죽음");radar_label.push("목숨당 영웅 딜량"); radar_label.push("목숨당 방벽 피해량"); radar_data.push("목숨당 결정타(킬캐치)")
-        radar_data.push(deathAvg); radar_data.push(damageToHeroPerLife); radar_data.push(damageToShieldPerLife); radar_data.push(lastHitPerLife);
+        radar_label.push("목숨당 방벽 피해량"); radar_label.push("목숨당 결정타(킬캐치)")
+        if(damageToShieldPerLife >= 3000) { damageToShieldPerLife= 100;} else {damageToShieldPerLife = 0.033*damageToShieldPerLife;}
+        radar_data.push(damageToShieldPerLife);
+        if (lastHitPerLife >= 8) { lastHitPerLife = 100;} else { lastHitPerLife = 8*lastHitPerLife + 32; }
+        radar_data.push(lastHitPerLife);
         if("/메이/시메트라".indexOf(heroNameKR) > 0 ) {
             text.detailText.push({title: "목숨당 막은피해", index: blockDamagePerLife});
-            radar_label.push("목숨당 막은피해"); radar_data.push(blockDamagePerLife);
+            radar_label.push("목숨당 막은피해");
+            if(blockDamagePerLife >= 2000) { blockDamagePerLife= 100;} else {blockDamagePerLife = 0.033*blockDamagePerLife ;}
+            radar_data.push(blockDamagePerLife);
         }
     }else if(tank_hero.indexOf(heroNameKR) > 0) {   // 탱커 영웅일 시
-        text.detailText.push({title: "평균 죽음", index: deathAvg});
-        text.detailText.push({title: "목숨당 영웅 피해량", index: damageToHeroPerLife});
+        if(damageToHeroPerLife >= 3000) { damageToHeroPerLife= 100;} else {damageToHeroPerLife = 0.033*damageToHeroPerLife ;}
+        radar_data.push(damageToHeroPerLife);
         text.detailText.push({title: "목숨당 방벽 피해량", index: damageToShieldPerLife});
+        radar_label.push("목숨당 방벽 피해량");
+        if(damageToShieldPerLife >= 3000) { damageToShieldPerLife= 100;} else {damageToShieldPerLife = 0.033*damageToShieldPerLife ;}
+        radar_data.push(damageToShieldPerLife);
         if("/로드호그".indexOf(heroNameKR) <= 0 ) {
             text.detailText.push({title: "목숨당 막은피해", index: blockDamagePerLife});
-            radar_label.push("목숨당 막은피해"); radar_data.push(blockDamagePerLife);
+            radar_label.push("목숨당 막은피해");
+            if(blockDamagePerLife >= 5000) { blockDamagePerLife= 100;} else {blockDamagePerLife = 0.033*blockDamagePerLife ;}
+            radar_data.push(blockDamagePerLife);
         }
     }
-
     $.each(index, function (i, idx) {
         if(idx != "") {
+            let index_val = parseFloat(index[i]);
             text.detailText.push({title: title[i], index: index[i]});
-            radar_label.push(title[i]); radar_data.push(index[i]);
+            radar_label.push(title[i]);
+            if (index_val <= 50) {
+                if (index_val >= 8) { index_val = 100;} else { index_val = 8*index_val + 32; }
+            }else {
+                if(index_val >= 3000) { index_val= 100;} else {index_val = 0.033*index_val ;}
+            }
+            radar_data.push(index_val);
         }else {
             return;
         }
@@ -290,26 +336,26 @@ const checkHero = (hero, detail, text) => {
 const drawRadarChart = () => {
     const marksCanvas = document.getElementById("chartjs-radar-chart");
     const marksData = {
-        labels: ["English", "Maths", "Physics", "Chemistry", "Biology", "History"],
+        labels: radar_label,
         datasets: [{
-            label: "Student A",
-            data: [24, 55, 30, 56, 60, 68],
+            label: "플레이어",
+            data: radar_data,
             backgroundColor: chartColors[0],
             borderColor: chartColors[0],
             borderWidth: 3,
             pointRadius: 0,
             fill: false
         }, {
-            label: "Student B",
-            data: [54, 65, 60, 70, 70, 75],
+            label: "속한 티어 평균",
+            data: radar_data,
             backgroundColor: chartColors[1],
             borderColor: chartColors[1],
             borderWidth: 3,
             pointRadius: 0,
             fill: false
         },  {
-            label: "Student c",
-            data: [43, 13, 33, 57, 50, 75],
+            label: "상위권 평균",
+            data: radar_data,
             backgroundColor: chartColors[2],
             borderColor: chartColors[2],
             borderWidth: 3,
@@ -330,8 +376,8 @@ const drawRadarChart = () => {
             ticks: {
                 maxTicksLimit: 5,
                 minTicksLimit: 5,
-                display: false
-                // beginAtZero: true,
+                display: false,
+                beginAtZero: true,
                 // fontColor: 'white', // labels such as 10, 20, etc
                 // showLabelBackdrop: false // hide square behind text
             },
@@ -348,13 +394,218 @@ const drawRadarChart = () => {
                 display: false
                 // color: 'rgba(255, 255, 255, 0.2)' // lines radiating from the center
             }
-        }
+        },
+        // tooltips: {
+        //     // display: false
+        // }
     };
 
     const radarChart = new Chart(marksCanvas, {
         type: 'radar',
         data: marksData,
         options: marksOption
+    });
+};
+
+const drawTrendline = () => {
+    const target_html = $('#trendline-body').html();
+    const trendline_template = Handlebars.compile(target_html);
+
+    const roles = {
+        role: [{role: "tank", roleImgPath: "/HWimages/role/icon-tank-8a52daaf01.png"},
+                {role: "deal", roleImgPath: "/HWimages/role/icon-offense-6267addd52.png"},
+                {role: "heal", roleImgPath: "/HWimages/role/icon-support-46311a4210.png"}]
+    };
+
+    const item = trendline_template(roles);
+    $('.trendline-body').append(item);
+
+    const tank_canvas = document.getElementById("tank-trendline-chart");
+    const deal_canvas = document.getElementById("deal-trendline-chart");
+    const heal_canvas = document.getElementById("heal-trendline-chart");
+
+    const tank_data = {
+        labels: trend_udt_dtm,
+        datasets: [{
+            label: '경쟁전 점수',
+            data: trend_tank_point,
+            backgroundColor: chartColors[0],
+            borderColor: chartColors[0],
+            fill: false,
+            type: 'line',
+            lineTension: 0,
+            yAxisID: 'first-y-axis'
+        }, {
+            label: '승리 판수',
+            data: trend_tank_wingame,
+            backgroundColor: 'rgba(104,113,149,0.7)',
+            borderColor: 'rgba(104,113,149,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }, {
+            label: '패배 판수',
+            data: trend_tank_losegame,
+            backgroundColor: 'rgba(32,41,61,0.7)',
+            borderColor: 'rgba(32,41,61,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }]
+    };
+
+    const deal_data = {
+        labels: trend_udt_dtm,
+        datasets: [{
+            label: '경쟁전 점수',
+            data: trend_deal_point,
+            backgroundColor: chartColors[1],
+            borderColor: chartColors[1],
+            fill: false,
+            type: 'line',
+            lineTension: 0,
+            yAxisID: 'first-y-axis'
+        }, {
+            label: '승리 판수',
+            data: trend_deal_wingame,
+            backgroundColor: 'rgba(104,113,149,0.7)',
+            borderColor: 'rgba(104,113,149,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }, {
+            label: '패배 판수',
+            data: trend_deal_losegame,
+            backgroundColor: 'rgba(32,41,61,0.7)',
+            borderColor: 'rgba(32,41,61,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }]
+    };
+
+    const heal_data = {
+        labels: trend_udt_dtm,
+        datasets: [{
+            label: '경쟁전 점수',
+            data: trend_heal_point,
+            backgroundColor: chartColors[2],
+            borderColor: chartColors[2],
+            fill: false,
+            type: 'line',
+            lineTension: 0,
+            yAxisID: 'first-y-axis'
+        }, {
+            label: '승리 판수',
+            data: trend_heal_wingame,
+            backgroundColor: 'rgba(104,113,149,0.7)',
+            borderColor: 'rgba(104,113,149,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }, {
+            label: '패배 판수',
+            data: trend_heal_losegame,
+            backgroundColor: 'rgba(32,41,61,0.7)',
+            borderColor: 'rgba(32,41,61,0.7)',
+            type: 'bar',
+            yAxisID: 'second-y-axis'
+        }]
+    };
+
+    const option_sample = {
+        maintainAspectRatio: false,
+        responsive: true,
+        tooltips: {
+            mode: 'label',
+            intersect: true
+        },
+        legend: {
+            display: false
+        },
+        scales: {
+            xAxes: [{
+                display: true,
+                gridLines: {
+                    color: 'rgba(255, 255, 255, 0.2)',
+                },
+                ticks: {
+                    color: 'rgba(255, 255, 255, 0.2)',
+                    fontColor: 'white'
+                }
+            }],
+            yAxes: [{
+                type: "linear",
+                display: true,
+                position: "left",
+                id: "first-y-axis",
+                color: 'rgba(255, 255, 255, 0.2)',
+                gridLines:{
+                    display: true,
+                    color: 'rgba(255, 255, 255, 0.2)'
+                },
+                ticks: {
+                    beginAtZero: true,
+                    maxTicksLimit: 3,
+                    fontColor : 'white',
+                    display: false
+                }
+            }, {
+                type: "linear",
+                display: false,
+                position: "right",
+                id: "second-y-axis",
+                gridLines:{
+                    display: false
+                },
+                ticks: {
+                    beginAtZero: true,
+                    maxTicksLimit: 3,
+                    display: false
+                }
+            }]
+        },
+        animation: {
+            duration: 1,
+            onComplete: function () {
+                const chartInstance = this.chart,
+                    ctx = chartInstance.ctx;
+                ctx.font = Chart.helpers.fontString(15/*Chart.defaults.global.defaultFontSize*/, 600/*Chart.defaults.global.defaultFontStyle*/, Chart.defaults.global.defaultFontFamily);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                // console.log(this.options.tooltips);
+                this.data.datasets.forEach(function (dataset, i) {
+                    if(i == 0) {
+                        const meta = chartInstance.controller.getDatasetMeta(i);
+                        meta.data.forEach(function (bar, index) {
+                            let data = dataset.data[index];
+                            if (data == 0) {
+                                data = "(배치중)";
+                            }
+                            // console.log(bar._model.y);
+                            if (bar._model.y < 20) {
+                                ctx.fillText(data, bar._model.x, bar._model.y + 21);
+                            }else {
+                                ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    };
+
+    const tankTrendlineChart = new Chart(tank_canvas, {
+        type: 'bar',
+        data: tank_data,
+        options: option_sample
+    });
+
+    const dealTrendlineChart = new Chart(deal_canvas, {
+        type: 'bar',
+        data: deal_data,
+        options: option_sample
+    });
+
+    const healTrendlineChart = new Chart(heal_canvas, {
+        type: 'bar',
+        data: heal_data,
+        options: option_sample
     });
 };
 
@@ -434,7 +685,7 @@ const setContainerHeight = (set, target) => {
         profile.style.top = second_row_height + "px";
         profile.style.left = second_row_left + "px";
         // second_row_height += profile.offsetHeight + 20;
-        second_row_height += 506 + 20;
+        second_row_height += 510 + 20;
 
         trendline.style.top = third_row_height + "px";
         trendline.style.left = third_row_left + "px";
@@ -448,17 +699,17 @@ const setContainerHeight = (set, target) => {
     }else if(window_width >= 768 && window_width < 1200) {
         second_row_left = resultContainer_width/2;
 
+        profile.style.top = first_row_height + "px";
+        profile.style.left = first_row_left + "px";
+        first_row_height += 510 + 20;
+
+        trendline.style.top = second_row_height + "px";
+        trendline.style.left = second_row_left + "px";
+        second_row_height += 510 + 20;
+
         menu_box.style.top = first_row_height + "px";
         menu_box.style.left = first_row_left + "px";
         first_row_height += menu_box.offsetHeight + 20;
-
-        profile.style.top = second_row_height + "px";
-        profile.style.left = second_row_left + "px";
-        second_row_height += profile.offsetHeight + 20;
-
-        trendline.style.top = first_row_height + "px";
-        trendline.style.left = first_row_left + "px";
-        first_row_height += trendline.offsetHeight + 20;
 
         detail_box.style.top = second_row_height + "px";
         detail_box.style.left = second_row_left + "px";
@@ -466,7 +717,11 @@ const setContainerHeight = (set, target) => {
     }else {
         profile.style.top = first_row_height + "px";
         profile.style.left = first_row_left + "px";
-        first_row_height += profile.offsetHeight + 20;
+        first_row_height += 510 + 20;
+
+        trendline.style.top = first_row_height + "px";
+        trendline.style.left = first_row_left + "px";
+        first_row_height += trendline.offsetHeight + 20;
 
         menu_box.style.top = first_row_height + "px";
         menu_box.style.left = first_row_left + "px";
@@ -475,10 +730,6 @@ const setContainerHeight = (set, target) => {
         detail_box.style.top = first_row_height + "px";
         detail_box.style.left = first_row_left + "px";
         first_row_height += detail_box.offsetHeight + 20;
-
-        trendline.style.top = first_row_height + "px";
-        trendline.style.left = first_row_left + "px";
-        first_row_height += trendline.offsetHeight + 20;
     }
     // console.log(second_row_left, third_row_left);
     const objTarHeight = document.getElementsByClassName("player-detail-layout")[0].offsetHeight;

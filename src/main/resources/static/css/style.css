@@ -9317,9 +9317,9 @@ a:hover {
   /*text-decoration: underline*/;
 }
 
-h1, h2, p, a, span{
-  color: #fff;
-}
+/*h1, h2, p, a, span{*/
+/*  color: #fff;*/
+/*}*/
 .scnd-font-color {
   color: #9099b7;
 }
@@ -9515,6 +9515,8 @@ h1, h2, p, a, span{
 }
 .menu-box .titular {
   background: #11a8ab;
+  color: white;
+  font-weight: bold;
 }
 .menu-box-menu .icon {
   display: inline-block;
@@ -9555,6 +9557,7 @@ h1, h2, p, a, span{
   transition: background .2s;
   font-size: 15px;
   font-weight: bold;
+  color: white;
 }
 .menu-box-tab:hover {
   background: #50597b;
@@ -9567,6 +9570,7 @@ h1, h2, p, a, span{
 /*}*/
 .menu-box-tab:hover .menu-box-number {
   background: rgba(232,110,208,1);
+  color: white;
 }
 .menu-box-tab.clicked{
   background: #50597b;
@@ -9577,6 +9581,7 @@ h1, h2, p, a, span{
 }
 .clicked .menu-box-number {
   background: rgba(232,110,208,1);
+  color: white;
 }
 
 .more-button {
@@ -9590,6 +9595,8 @@ h1, h2, p, a, span{
   text-align: center;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+  font-weight: bold;
+  color: white;
 }
 .more-button:hover {
   background-color: #0F9295;
@@ -9682,7 +9689,6 @@ h1, h2, p, a, span{
 
 .detail-body {
   border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
   border-bottom-right-radius: 5px;
 
   display: -webkit-box;
@@ -9908,7 +9914,7 @@ h1, h2, p, a, span{
   } }
 
 .user-name {
-  margin-top: 15px;
+  margin-top: 19px;
   overflow: hidden;
   white-space: nowrap;
   font-size: 25px;
@@ -10021,61 +10027,47 @@ h1, h2, p, a, span{
 .trendline {
 }
 .trendline .titular {
-  background: #cc324b;
+  background: #e64c65;
+  color: white;
+  font-weight: bold;
 }
 .trendline .titular .icon {
   padding-right: 15px;
   font-size: 26px;
 }
-.trendline .current-day {
-  height: 135px;
-  background: #e64c65;
+
+#tank-trendline-chart, #deal-trendline-chart, #heal-trendline-chart {
+  padding-left: 30px;
 }
-.trendline .current-day p {
-  margin: 0;
-  padding-left: 50px;
+.tank-trendline, .deal-trendline, .heal-trendline{
+  height: 150px;
+  padding : 10px 0 0 10px;
 }
-.current-day-date {
-  font-size: 16px;
-  padding-top: 16px;
-}
-.current-day-temperature {
-  font-size: 70px;
-}
-.current-day-temperature .icon-cloudy {
-  padding-left: 20px;
-}
-.trendline .next-days{}
-.trendline .next-days p {
-  margin: 0;
-  display: inline-block;
-  font-size: 16px;
-}
-.trendline .next-days a {
-  display: block;
-  line-height: 58px;
+.tank-trendline, .deal-trendline{
   border-bottom: 1px solid #1f253d;
-  -webkit-transition: background .3s;
-  transition: background .3s;
 }
-.trendline .next-days a:hover {
+.rank-role2 {
+  position: absolute;
+  width: 30px;
+  height: 149px;
   background: #50597b;
+  margin-top: -10px;
+  margin-left: -10px;
+  line-height: 150px;
 }
-.trendline .next-days a:hover .day {
-  color: #e64c65;
+/*.tank-trendline .rank-role2{*/
+/*  background-color: #fcb150;*/
+/*}*/
+/*.deal-trendline .rank-role2{*/
+/*  background-color: #11a8ab;*/
+/*}*/
+.heal-trendline .rank-role2{
+  height: 150px;
+  border-bottom-left-radius: 5px;
 }
-.trendline .next-days-date {
-  padding-left: 20px;
+.rank-role2 img{
+  vertical-align: middle;
 }
-.trendline .next-days-temperature {
-  float: right;
-  padding-right: 20px;
-}
-.trendline .next-days-temperature .icon {
-  padding-left: 10px;
-}
-
-
 
 
 

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -32,13 +33,14 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private String mostHero2;
     private String mostHero3;
     private Integer cnt;
+    private String udtDtm;
     private List<PlayerListDto> list;
 
     @Builder
     public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
                          String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
                          String tankRatingImg, String dealRatingImg, String healRatingImg, Integer winGame, Integer loseGame,
-                         Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3){ //) {
+                         Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3, String udtDtm){ //) {
         this.id = id;
         this.playerName = playerName;
         this.playerLevel = playerLevel;
@@ -60,12 +62,13 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         this.mostHero3 = mostHero3;
         this.battleTag = battleTag;
         this.forUrl = forUrl;
+        this.udtDtm = udtDtm;
 //        this.list = list;
     }
 
     @Builder
     public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
-                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint) {
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, String udtDtm) {
         this.id = id;
         this.playerName = playerName;
         this.playerLevel = playerLevel;
@@ -77,6 +80,7 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
         this.forUrl = forUrl;
         this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint;
+        this.udtDtm = udtDtm;
     }
 
     @Builder

@@ -3,7 +3,14 @@ package com.hangbokwatch.backend.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hangbokwatch.backend.dao.*;
-import com.hangbokwatch.backend.domain.*;
+import com.hangbokwatch.backend.dao.hero.*;
+import com.hangbokwatch.backend.dao.player.PlayerDetailRepository;
+import com.hangbokwatch.backend.dao.player.PlayerRepository;
+import com.hangbokwatch.backend.dao.player.TrendlineRepository;
+import com.hangbokwatch.backend.domain.hero.*;
+import com.hangbokwatch.backend.domain.player.Player;
+import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
@@ -16,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import sun.security.krb5.internal.ccache.CredentialsCache;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
@@ -24,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +45,9 @@ public class CrawlingPlayerDataService {
 //    private List<PlayerListDto> playerList;
     @Autowired PlayerRepository playerRepository;
     @Autowired PlayerDetailRepository playerDetailRepository;
+    @Autowired TrendlineRepository trendlineRepository;
+    @Autowired SeasonRepository seasonRepository;
+
     @Autowired DvaRepositroy dvaRepositroy;
     @Autowired OrisaRepository orisaRepository;
     @Autowired ReinhardtRepository reinhardtRepository;
@@ -67,7 +79,6 @@ public class CrawlingPlayerDataService {
     @Autowired TracerRepository tracerRepository;
     @Autowired PharahRepository pharahRepository;
     @Autowired HanzoRepository hanzoRepository;
-    @Autowired SeasonRepository seasonRepository;
 
     @Value("${spring.HWresource.HWimages}")
     private String portraitPath;
@@ -111,7 +122,7 @@ public class CrawlingPlayerDataService {
                 String portrait = "https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/" + dto.getPortrait() + ".png";  //d1u1mce87gyfbn.cloudfront.net
 
                 Integer tankratingPoint = 0; Integer dealRatingPoint = 0; Integer healRatingPoint = 0;
-                PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint);
+                PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint, null);
 
                 playerListDto.setCnt(3);
                 System.out.println(playerListDto.toString());
@@ -120,15 +131,15 @@ public class CrawlingPlayerDataService {
             Collections.sort(playerList);
         } catch(Exception e) {
             if(e.getClass() == SocketException.class) {
-                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","", 0,0,0);
+                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","", 0,0,0, null);
                 playerList.add(playerListDto);
                 System.out.println("블리자드 내부 에러 발생");
             }else if(e.getClass() == UnknownHostException.class){
-                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.","",0,"","","",0,0,0);
+                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.","",0,"","","",0,0,0, null);
                 playerList.add(playerListDto);
                 System.out.println("블리자드 내부 에러 발생");
             }else if(e.getClass() == SocketTimeoutException.class){
-                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","",0,0,0);
+                PlayerListDto playerListDto = new PlayerListDto((long) 0,"message","현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.","",0,"","","",0,0,0, null);
                 playerList.add(playerListDto);
                 System.out.println("블리자드 내부 에러 발생");
             }
@@ -307,14 +318,15 @@ public class CrawlingPlayerDataService {
             Element progressData = competitiveDatas.selectFirst("div.progress-category");
             Elements mostHeros = progressData.select("div.ProgressBar-title");
 
+            Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
+
             int count = 0;
+            playerDetailRepository.deletePlayerDetailsByIdAndSeason(playerListDto.getId(), season);
 
             System.out.println(mostHeros.text());
             for(Element mostHero : mostHeros) {
                 PlayerDetailDto pdDto = new PlayerDetailDto();
                 pdDto.setId(playerListDto.getId());
-
-                Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
                 pdDto.setSeason(season);
 
                 count++;
@@ -381,6 +393,12 @@ public class CrawlingPlayerDataService {
                     , playerListDto.getTankRatingImg(), playerListDto.getDealRatingImg(), playerListDto.getHealRatingImg(), tankWinGame, tankLoseGame,dealWinGame,dealLoseGame,healWinGame,healLoseGame
                     , totalWinGame, totalLoseGame, playerListDto.getDrawGame(), playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());
             playerRepository.save(player);
+
+            Trendline trendline = new Trendline(playerListDto.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
+                                                ,playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
+                                                ,tankWinGame, tankLoseGame, dealWinGame, dealLoseGame, healWinGame, healLoseGame);
+
+            trendlineRepository.save(trendline);
             chdDto.setPlayer(player);
             stopWatch.stop();
         }catch(Exception e) {
@@ -579,9 +597,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1) ) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Dva dva = new Dva(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), mechaSuicideKillAvg,
@@ -624,9 +642,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Orisa orisa = new Orisa(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), damageAmpAvg, goldMedal,
@@ -688,9 +706,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Reinhardt reinhardt = new Reinhardt(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg,
                             deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
@@ -747,9 +765,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Zarya zarya = new Zarya(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), energyAvg,
@@ -807,9 +825,9 @@ public class CrawlingPlayerDataService {
                         }
                     }
 
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
-                    Double selfHealPerLife = Math.round((selfHeal / (double) death) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
+                    Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
                     RoadHog roadhog = new RoadHog(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             soloKillAvg, damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), wholeHogKillAvg,
@@ -861,9 +879,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Winston winston = new Winston(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), jumpPackKillAvg,
@@ -915,10 +933,10 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
-                    Double absorptionDamagePerLife = Math.round((absorptionDamage / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
+                    Double absorptionDamagePerLife = Math.round((absorptionDamage / ((double) death + 1)) * 100) / 100.0;
 
                     Sigma sigma = new Sigma(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), absorptionDamagePerLife.toString(),
@@ -941,7 +959,7 @@ public class CrawlingPlayerDataService {
                     return winLoseGame;
 
                     /**레킹볼 시작 */
-                } else if ("0x02E000000000023B".equals(heroDetails.attr("data-category-id"))) {
+                } else if ("0x02E00000000001CA".equals(heroDetails.attr("data-category-id"))) {
                     //레킹볼 영웅 특별 데이터
                     String grapplingClawKillAvg = "0";
                     String piledriverKillAvg = "0";
@@ -970,9 +988,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     WreckingBall wreckingBall = new WreckingBall(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), grapplingClawKillAvg,
@@ -1020,9 +1038,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double bioticGrenadeKillPerLife = Math.round((bioticGrenadeKill / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double bioticGrenadeKillPerLife = Math.round((bioticGrenadeKill / ((double) death + 1)) * 100) / 100.0;
 
                     Ana ana = new Ana(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString()
@@ -1065,9 +1083,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Baptiste baptiste = new Baptiste(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), immortalityFieldSaveAvg,
@@ -1110,9 +1128,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double armorPerLife = Math.round((armor / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double armorPerLife = Math.round((armor / ((double) death + 1)) * 100) / 100.0;
 
                     Brigitte brigitte = new Brigitte(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), armorPerLife.toString(), inspireActiveRate,
@@ -1150,8 +1168,8 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
                     Lucio lucio = new Lucio(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), soundwaveAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1193,8 +1211,8 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
                     Mercy mercy = new Mercy(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), resurrectAvg, damageAmpAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1240,9 +1258,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double selfHealPerLife = Math.round((selfHeal / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
                     Moira moira = new Moira(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
@@ -1279,8 +1297,8 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
                     Zenyatta zenyatta = new Zenyatta(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), transcendenceHealAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1331,9 +1349,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Junkrat junkrat = new Junkrat(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1379,9 +1397,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Genji genji = new Genji(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1432,9 +1450,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Doomfist doomfist = new Doomfist(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1475,9 +1493,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Reaper reaper = new Reaper(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), deathBlossomKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1526,9 +1544,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Mccree mccree = new Mccree(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1577,10 +1595,10 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Mei mei = new Mei(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), blizzardKillAvg, freezingEnemyAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1629,9 +1647,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Bastion bastion = new Bastion(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1639,7 +1657,7 @@ public class CrawlingPlayerDataService {
                     bastionRepository.save(bastion);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 킬", "평균 수색모드 처치", "평균 전차모드 처치", "평균 단독처치", "");
+                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 킬", "평균 수색모드 킬", "평균 전차모드 킬", "평균 단독처치", "");
 
                     playerDetailRepository.save(playerDetail);
                     System.out.println("============================bastion data save success================================");
@@ -1680,10 +1698,10 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double healPerLife = Math.round((heal / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Soldier76 soldier76 = new Soldier76(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, healPerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1732,9 +1750,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Sombra sombra = new Sombra(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), hackingEnemyAvg, EMPEnemyAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1783,10 +1801,10 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double blockDamagePerLife = Math.round((blockDamage / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double blockDamagePerLife = Math.round((blockDamage / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Symmetra symmetra = new Symmetra(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), turretKillAvg, teleportUsingAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1839,9 +1857,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Ashe ashe = new Ashe(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1890,9 +1908,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Widowmaker widowmaker = new Widowmaker(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), sightSupportAvg, scopeHitRate, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1941,9 +1959,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Torbjorn torbjorn = new Torbjorn(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), moltenCoreKillAvg, torbjornDirectKillAvg, turretKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -1996,10 +2014,10 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
-                    Double selfHealPerLife = Math.round((selfHeal / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
+                    Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
                     Tracer tracer = new Tracer(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -2048,9 +2066,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Pharah pharah = new Pharah(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
@@ -2099,9 +2117,9 @@ public class CrawlingPlayerDataService {
                                 break;
                         }
                     }
-                    Double lastHitPerLife = Math.round((lastHit / (double) death) * 100) / 100.0;
-                    Double damageToHeroPerLife = Math.round((damageToHero / (double) death) * 100) / 100.0;
-                    Double damageToShieldPerLife = Math.round((damageToShield / (double) death) * 100) / 100.0;
+                    Double lastHitPerLife = Math.round((lastHit / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
                     Hanzo hanzo = new Hanzo(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);

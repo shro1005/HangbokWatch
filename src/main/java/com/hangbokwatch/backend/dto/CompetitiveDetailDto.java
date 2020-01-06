@@ -1,10 +1,11 @@
 package com.hangbokwatch.backend.dto;
 
 
-import com.hangbokwatch.backend.domain.*;
+import com.hangbokwatch.backend.domain.hero.*;
+import com.hangbokwatch.backend.domain.player.Player;
+import com.hangbokwatch.backend.domain.player.PlayerDetail;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.ui.Model;
 
 import java.util.List;
 

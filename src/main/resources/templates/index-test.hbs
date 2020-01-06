@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>행복워치</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+      <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+
+      <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css">
+      <link rel="stylesheet" href="/css/animate.css">
+
+      <link rel="stylesheet" href="/css/owl.carousel.min.css">
+      <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+      <link rel="stylesheet" href="/css/magnific-popup.css">
+
+      <link rel="stylesheet" href="/css/aos.css">
+
+      <link rel="stylesheet" href="/css/ionicons.min.css">
+
+      <link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+      <link rel="stylesheet" href="/css/jquery.timepicker.css">
+
+
+      <link rel="stylesheet" href="/css/flaticon.css">
+      <link rel="stylesheet" href="/css/icomoon.css">
+      <link rel="stylesheet" href="/css/style.css">
+
+  </head>
+  <body>
+    
+	  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	    <div class="container">
+	      <a class="navbar-brand" href="/">행복옵치</a>
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="oi oi-menu"></span> Menu
+	      </button>
+
+	      <div class="collapse navbar-collapse" id="ftco-nav">
+              <form action="#" class="search-location-tap" style="display: none">
+                  <div class="row justify-content-center">
+                      <div class="col-lg-10 align-items-end">
+                          <div class="form-group-tap">
+                              <div class="form-field">
+                                  <input type="text" id="playerName-tap" class="form-control" placeholder="'플레이어명' 혹은 '배틀태그#0000'">
+                                  <button type="button" id="btn-search-tap"><span class="ion-ios-search"></span></button>  <!---->
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </form>
+	        <ul class="navbar-nav ml-auto">
+				<li class="nav-item active"><a href="/" class="nav-link">홈</a></li>  <!--home-->
+				<li class="nav-item"><a href="about.html" class="nav-link">찜</a></li>  <!--favorite-->
+				<li class="nav-item"><a href="agent.html" class="nav-link">순위표</a></li>   <!--leaderBoard-->
+				<li class="nav-item"><a href="services.html" class="nav-link">행복옵치</a></li>   <!--scream-->
+				<li class="nav-item"><a href="properties.html" class="nav-link">옵치소식</a></li>   <!--news-->
+				<li class="nav-item"><a href="blog.html" class="nav-link">Blog</a></li>   <!--home-->
+				<li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> <!--home-->
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+    <!-- END nav -->
+    <input type="hidden" class="fromDetail" style="display: none" id="{{isFromDetail}}" value="{{userInput}}"></input>
+    <div class="hero-wrap ftco-degree-bg" style="background-image: url('/images/bg_1.jpg');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row justify-content-center align-items-center no-gutters slider-text">
+          <div class="col-md-9 ftco-animate pb-5 text-center">   <!--class="col-lg-8 col-md-6 ftco-animate text-center"-->
+          	<div class="text text-center">
+	            <h1 class="mb-4">행복워치</h1>
+				<br style="font-size: 18px;">222패치에 맞게 돌격, 공격, 힐 경쟁전 점수 표시!   경쟁전에 지친 유저들을 위한 자체 스크림 매칭 시스템 도입!!</p>
+	            <form action="#" class="search-location mt-md-5">
+					<div class="row justify-content-center">
+						<div class="col-lg-10 align-items-end">
+							<div class="form-group">
+								<div class="form-field">
+									<input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '배틀태그#0000'를 입력해주세요">
+									<button type="button" id="btn-search"><span class="ion-ios-search"></span></button>  <!---->
+						  		</div>
+					  		</div>
+						</div>
+					</div>
+				</form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mouse">	<!---->
+				<a href="#" class="mouse-icon">	<!--mouse-icon 이 이동시키는 function 걸려있음-->
+					<div class="mouse-wheel"><span class="ion-ios-arrow-round-down"></span></div>	<!--mouse-wheel-->
+				</a>
+			</div>
+    </div>
+
+    <section class="ftco-section goto-here">
+    	<div class="resultContainer-s">	<!--container-->
+			<div style="width: 300px; height: 250px; position: absolute; left: -30px;">  <!--왼쪽 광고-->
+				<div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"-->
+					<iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
+				</div>
+			</div>
+			<div style="width: 300px; height: 250px; position: absolute; right: -30px;">  <!--오른쪽광고-->
+				<div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="1" id="59b00d8946e0fb0001722ff0-1"-->
+					<iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
+				</div>
+			</div>
+<!--    		<div class="row justify-content-center">-->
+<!--				<div class="col-md-12 heading-section text-center ftco-animate mb-5">-->
+<!--					<span class="subheading">플레이어 검색</span>-->
+<!--				</div>-->
+<!--        	</div>-->
+            <div class="player-list-container">
+
+            </div>
+            <div class="" id="more-button">
+            </div>
+    	</div>
+
+    </section>
+
+    <footer class="ftco-footer ftco-section">
+      <div class="container">
+        <div class="row mb-5">
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+              <h2 class="ftco-heading-2">행복워치</h2>
+              <p>오버워치 전적 검색 및 듀오 매칭 사이트입니다.</p>
+<!--              <ul class="ftco-footer-social list-unstyled mt-5">-->
+<!--                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>-->
+<!--                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>-->
+<!--                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>-->
+<!--              </ul>-->
+            </div>
+          </div>
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4 ml-md-4">
+              <h2 class="ftco-heading-2">목차</h2>
+              <ul class="list-unstyled">
+                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>홈</a></li>
+                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>즐겨찾기</a></li>
+                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>듀오찾기</a></li>
+                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>랭커보기</a></li>
+                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>소식보기</a></li>
+              </ul>
+            </div>
+          </div>
+<!--          <div class="col-md">-->
+<!--            <div class="ftco-footer-widget mb-4 ml-md-4">-->
+<!--              <h2 class="ftco-heading-2">About Us</h2>-->
+<!--              <ul class="list-unstyled">-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Our Story</a></li>-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Meet the team</a></li>-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Careers</a></li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="col-md">-->
+<!--             <div class="ftco-footer-widget mb-4">-->
+<!--              <h2 class="ftco-heading-2">Company</h2>-->
+<!--              <ul class="list-unstyled">-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>About Us</a></li>-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Press</a></li>-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Contact</a></li>-->
+<!--                <li><a href="#"><span class="icon-long-arrow-right mr-2"></span>Careers</a></li>-->
+<!--              </ul>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="col-md">
+            <div class="ftco-footer-widget mb-4">
+            	<h2 class="ftco-heading-2">문의/피드백</h2>
+            	<div class="block-23 mb-3">
+	              <ul>
+<!--	                <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>-->
+<!--	                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a></li>-->
+	                <li><a href="#"><span class="icon icon-envelope pr-4"></span><span class="text">행복옵치@google.com</span></a></li>
+	              </ul>
+	            </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-center">
+	
+            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+  Copyright &copy;<script>document.write(new Date().getFullYear());</script> 행복옵치 | Data based on Blizzard. | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+<!--  &lt;!&ndash; loader &ndash;&gt;-->
+<!--  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>-->
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="/js/popper.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/jquery.easing.1.3.js"></script>
+  <script src="/js/jquery.waypoints.min.js"></script>
+  <script src="/js/jquery.stellar.min.js"></script>
+  <script src="/js/owl.carousel.min.js"></script>
+  <script src="/js/jquery.magnific-popup.min.js"></script>
+  <script src="/js/aos.js"></script>
+  <script src="/js/jquery.animateNumber.min.js"></script>
+<!--  <script src="/js/jquery.timepicker.min.js"></script>-->
+  <script src="/js/scrollax.min.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/app/hangbok-home.js" charset="UTF-8"></script>
+
+  <script src="/js/handlebars-v4.0.4.js"></script>
+  <script id="player_list" type="text/x-handlebars-template" charset="UTF-8">
+      <p class="grid-header"></p>
+      <div class="row" id="search-result">
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <thead>
+                      <tr>
+                          <th>플레이어</th>
+                          <th>플랫폼</th>
+                          <th>돌격</th>
+                          <th>공격</th>
+                          <th>지원</th>
+                          <th>승률</th>
+                          <th>모스트</th>
+                          <th>최근전적갱신</th>
+                      </tr>
+                  </thead>
+                  <tbody class="tbody">
+                      \{{#players}}
+                      <tr>
+                          <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+                              <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <div class="player-platform">\{{platform}}</div>
+                          </td>
+
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{tankRatingPoint}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{dealRatingPoint}}</div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                              <div>\{{healRatingPoint}}</div>
+                          </td>
+            <!--              <td class="text-success"> 15.67% <i class="mdi mdi-arrow-up"></i>-->
+            <!--              </td>-->
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <div class="progress progress-slim">
+                                  <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                              </div>
+                              <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+                          </td>
+                          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                              <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                              <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                              <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                          </td>
+                          <td>\{{udtDtm}}</td>
+                      </tr>
+                      \{{/players}}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </script>
+
+  <script id="more_player_list" type="text/x-handlebars-template" charset="UTF-8">
+      \{{#players}}
+      <tr>
+          <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                  <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+                  <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+          </td>
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                  <div class="player-platform">\{{platform}}</div>
+          </td>
+
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                  <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                  <div>\{{tankRatingPoint}}</div>
+          </td>
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                  <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                  <div>\{{dealRatingPoint}}</div>
+          </td>
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                  <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                  <div>\{{healRatingPoint}}</div>
+          </td>
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <div class="progress progress-slim">
+              <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+              <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+          </td>
+          <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+              <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+              <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+              <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+          </td>
+          <td>\{{udtDtm}}</td>
+      </tr>
+       \{{/players}}
+  </script>
+    
+  </body>
+</html>

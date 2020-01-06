@@ -39,11 +39,9 @@ public class WebController {
             model.addAttribute("player", cdDto.getPlayer());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("count", cdDto.getCount());
-
-        }else {
-
         }
-        return "playerDetail-test";
+        //        return "playerDetail-test";
+        return "playerDetail";
     }
 
     @GetMapping("/showPlayerListFromDetail/{userInput}")
@@ -69,6 +67,7 @@ public class WebController {
             model.addAttribute("player", cdDto.getPlayer());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
         }
-        return "playerDetail-test";
+//        return "playerDetail-test";
+        return "playerDetail";
     }
 }

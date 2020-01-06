@@ -1,11 +1,12 @@
 package com.hangbokwatch.backend.service;
 
-import com.hangbokwatch.backend.dao.PlayerRepository;
-import com.hangbokwatch.backend.domain.Player;
+import com.hangbokwatch.backend.dao.player.PlayerRepository;
+import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class SearchPlayerListService {
             , player.getIsPublic(), player.getPlatform(), player.getPortrait(), player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
             , player.getTankRatingImg(), player.getDealRatingImg(), player.getHealRatingImg()
             , player.getWinGame(), player.getLoseGame(), player.getDrawGame(), Integer.toString(winRateInt)
-            , player.getMostHero1(), player.getMostHero2(), player.getMostHero3());
+            , player.getMostHero1(), player.getMostHero2(), player.getMostHero3(), player.getUdtDtm().format(DateTimeFormatter.ISO_DATE));
 
             playerListDtos.add(playerListDto);
         }

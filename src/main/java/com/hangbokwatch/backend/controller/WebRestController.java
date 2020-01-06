@@ -3,6 +3,7 @@ package com.hangbokwatch.backend.controller;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
 import com.hangbokwatch.backend.dto.PlayerSearchDto;
+import com.hangbokwatch.backend.dto.TrendlindDto;
 import com.hangbokwatch.backend.service.CrawlingPlayerDataService;
 import com.hangbokwatch.backend.service.SearchPlayerListService;
 import com.hangbokwatch.backend.service.ShowPlayerDetailService;
@@ -11,10 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 public class WebRestController {
@@ -60,11 +58,27 @@ public class WebRestController {
         return playerList;
     }
 
+//    @PostMapping("/getDetailData")
+//    public List<PlayerDetailDto> getDetailData(@RequestBody PlayerSearchDto playerSearchDto) {
+//        System.out.println("WebRestController - getDetailData 호출됨!");
+//        Long id = playerSearchDto.getId();
+//        List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id);
+//        List<TrendlindDto> trendlindList = spd.selectPlayerTrendline(id);
+//
+//        return playerDetailList;
+//    }
+
     @PostMapping("/getDetailData")
-    public List<PlayerDetailDto> getDetailData(@RequestBody PlayerSearchDto playerSearchDto) {
+    public Map<String, Object> getDetailData(@RequestBody PlayerSearchDto playerSearchDto) {
         System.out.println("WebRestController - getDetailData 호출됨!");
+        Map<String, Object> map = new HashMap<>();
         Long id = playerSearchDto.getId();
         List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id);
-        return playerDetailList;
+        List<TrendlindDto> trendlindList = spd.selectPlayerTrendline(id);
+
+        map.put("detail", playerDetailList);
+        map.put("trendline", trendlindList);
+
+        return map;
     }
 }

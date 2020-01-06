@@ -1,10 +1,16 @@
 package com.hangbokwatch.backend.service;
 
 import com.hangbokwatch.backend.dao.*;
-import com.hangbokwatch.backend.domain.*;
+import com.hangbokwatch.backend.dao.player.PlayerDetailRepository;
+import com.hangbokwatch.backend.dao.player.PlayerRepository;
+import com.hangbokwatch.backend.dao.player.TrendlineRepository;
+import com.hangbokwatch.backend.domain.player.Player;
+import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
+import com.hangbokwatch.backend.dto.TrendlindDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -18,6 +24,8 @@ public class ShowPlayerDetailService {
     @Autowired PlayerRepository playerRepository;
     @Autowired PlayerDetailRepository playerDetailRepository;
     @Autowired SeasonRepository seasonRepository;
+    @Autowired TrendlineRepository trendlineRepository;
+
     @Autowired CrawlingPlayerDataService cpd;
 
     public CompetitiveDetailDto showPlayerExample(String forUrl) {
@@ -36,7 +44,6 @@ public class ShowPlayerDetailService {
                         stopWatch.start("경쟁정 디테일 크롤링 및 데이터 저장 까지 총 시간");
                         //
                         cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto);
-//                        cdDto = selectPlayerHeroDetail(playerListDto.getId(), cdDto);
                         // 시간 확인
                         stopWatch.stop();
                         System.out.println(stopWatch.prettyPrint());
@@ -101,5 +108,52 @@ public class ShowPlayerDetailService {
             list.add(playerDetailDto);
         }
         return list;
+    }
+
+    public List<TrendlindDto> selectPlayerTrendline(Long playerId) {
+        List<TrendlindDto> list = new ArrayList<TrendlindDto>();
+        List<Trendline> trendlineList = trendlineRepository.findTrendlinesByIdOrderByUdtDtmAsc(playerId);
+
+        while (trendlineList.size() > 7) {
+            Trendline trendline = trendlineList.get(0);
+            trendlineRepository.deleteByIdAndUdtDtm(trendline.getId(), trendline.getUdtDtm());
+            trendlineList.remove(trendline);
+        }
+
+        for (int i = 0 ; i < trendlineList.size() ; i++ ) {
+            Trendline trendline = trendlineList.get(i);
+
+            if(i == 0) {
+                TrendlindDto trendlindDto = new TrendlindDto(trendline.getId(), trendline.getUdtDtm(), trendline.getTankRatingPoint()
+                        , trendline.getDealRatingPoint(), trendline.getHealRatingPoint()
+                        , trendline.getTankWinGame()
+                        , trendline.getTankLoseGame()
+                        , trendline.getDealWinGame()
+                        , trendline.getDealLoseGame()
+                        , trendline.getHealWinGame()
+                        , trendline.getHealLoseGame());
+                list.add(trendlindDto);
+            }else {
+                Trendline beforeTrend = trendlineList.get(i - 1);
+                TrendlindDto trendlindDto = new TrendlindDto(trendline.getId(), trendline.getUdtDtm(), trendline.getTankRatingPoint()
+                        , trendline.getDealRatingPoint(), trendline.getHealRatingPoint()
+                        , checkSum(trendline.getTankWinGame() , beforeTrend.getTankWinGame())
+                        , checkSum(trendline.getTankLoseGame() , beforeTrend.getTankLoseGame())
+                        , checkSum(trendline.getDealWinGame() , beforeTrend.getDealWinGame())
+                        , checkSum(trendline.getDealLoseGame() , beforeTrend.getDealLoseGame())
+                        , checkSum(trendline.getHealWinGame() , beforeTrend.getHealWinGame())
+                        , checkSum(trendline.getHealLoseGame() , beforeTrend.getHealLoseGame()));
+                list.add(trendlindDto);
+            }
+        }
+        return list;
+    }
+
+    public Integer checkSum (Integer now, Integer before) {
+        if(now - before < 0) {
+            return now;
+        }else {
+            return now - before;
+        }
     }
 }
