@@ -7,6 +7,7 @@ webtemplate/
 !**/src/test/**
 *.yml
 HangbokWatch_Resource/
+src/main/re/resources/*.yml
 
 ### STS ###
 .apt_generated

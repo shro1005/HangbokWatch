@@ -100,7 +100,7 @@ const main = {
             }else {
                 $.ajax({
                     type: 'POST',
-                    url: '/showUserList',
+                    url: '/crawlingPlayerList',
                     dataType: 'json',
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify(inputName),

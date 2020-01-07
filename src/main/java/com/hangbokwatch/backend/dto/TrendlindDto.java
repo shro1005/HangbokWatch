@@ -21,4 +21,21 @@ public class TrendlindDto {
     private Integer dealLoseGame;
     private Integer healWinGame;
     private Integer healLoseGame;
+
+    @Override
+    public String toString() {
+        return "Ana{" +
+                "id=" + id +
+                ", udtDtm=" + udtDtm +
+                ", tankRatingPoint=" + tankRatingPoint +
+                ", dealRatingPoint='" + dealRatingPoint + '\'' +
+                ", healRatingPoint='" + healRatingPoint + '\'' +
+                ", tankWinGame='" + tankWinGame + '\'' +
+                ", tankLoseGame='" + tankLoseGame + '\'' +
+                ", dealWinGame='" + dealWinGame + '\'' +
+                ", dealLoseGame='" + dealLoseGame + '\'' +
+                ", healWinGame='" + healWinGame + '\'' +
+                ", healLoseGame='" + healLoseGame + '\'' +
+                '}';
+    }
 }

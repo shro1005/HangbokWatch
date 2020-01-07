@@ -16,7 +16,7 @@ spring:
     username: kyun
     password: pass
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
     generate-ddl: false
@@ -25,3 +25,20 @@ spring:
       enabled: true
   HWresource:
     HWimages: /Users/kyun/workspace/HangbokWatch_Project/HangbokWatch_Resource/HWimages/
+
+logging:
+  file:
+    max-history: 5
+    name: /Users/kyun/workspace/HangbokWatch_Project/HangbokWatch_Resource/LOGS/spring.log
+  level:
+    root: info
+    com.hangbokwatch.backend.service: debug
+    org.hibernate: error
+    sql: error
+
+# 운영환경
+---
+spring:
+  profiles: production
+
+

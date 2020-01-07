@@ -57,4 +57,21 @@ public class Trendline {
         this.id = id ;this.udtDtm = udtDtm; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint; this.healRatingPoint = healRatingPoint;
         this.tankWinGame = tankWinGame; this.tankLoseGame = tankLoseGame; this.dealWinGame = dealWinGame; this.dealLoseGame = dealLoseGame; this.healWinGame = healWinGame; this.healLoseGame = healLoseGame;
     }
+
+    @Override
+    public String toString() {
+        return "Ana{" +
+                "id=" + id +
+                ", udtDtm=" + udtDtm +
+                ", tankRatingPoint=" + tankRatingPoint +
+                ", dealRatingPoint='" + dealRatingPoint + '\'' +
+                ", healRatingPoint='" + healRatingPoint + '\'' +
+                ", tankWinGame='" + tankWinGame + '\'' +
+                ", tankLoseGame='" + tankLoseGame + '\'' +
+                ", dealWinGame='" + dealWinGame + '\'' +
+                ", dealLoseGame='" + dealLoseGame + '\'' +
+                ", healWinGame='" + healWinGame + '\'' +
+                ", healLoseGame='" + healLoseGame + '\'' +
+                '}';
+    }
 }
