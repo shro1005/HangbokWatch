@@ -28,11 +28,11 @@ public class WebRestController {
     @PostMapping("/showPlayerList")
     public List<PlayerListDto> showPlayerList(@RequestBody PlayerSearchDto playerDto) {
         String playerName = playerDto.getPlayerName();
-        log.info("{} | showPlayerList 호출 | 검색값 : {}", "미로그인 유저", playerName);
+        log.info("{} >>>>>>>> showPlayerList 호출 | 검색값 : {}", "미로그인 유저", playerName);
 
         List<PlayerListDto> playerList = spl.searchPlayerList(playerName);
 
-        log.info("{} | showPlayerList 종료 | {}건의 데이터 DB조회 및 회신", "미로그인 유저", playerList.size());
+        log.info("{} >>>>>>>> showPlayerList 종료 | {}건의 데이터 DB조회 및 회신", "미로그인 유저", playerList.size());
         log.info("===================================================================");
         return playerList;
     }
@@ -40,11 +40,11 @@ public class WebRestController {
     @PostMapping("/crawlingPlayerList")
     public List<PlayerListDto> crawlingPlayerList(@RequestBody PlayerSearchDto playerDto) {
         String playerName = playerDto.getPlayerName();
-        log.info("{} | crawlingPlayerList 호출 | 검색한 값이 DB에 없어 크롤링합니다. 검색값 : {}", "미로그인 유저", playerName);
+        log.info("{} >>>>>>>> crawlingPlayerList 호출 | 검색한 값이 DB에 없어 크롤링합니다. 검색값 : {}", "미로그인 유저", playerName);
 
         List<PlayerListDto> playerList = cpl.crawlingPlayerList(playerName);
 
-        log.info("{} | crawlingPlayerList 종료 | {}건의 데이터 크롤링 및 회신", "미로그인 유저", playerList.size());
+        log.info("{} >>>>>>>> crawlingPlayerList 종료 | {}건의 데이터 크롤링 및 회신", "미로그인 유저", playerList.size());
         log.info("===================================================================");
         return playerList;
     }
@@ -54,14 +54,14 @@ public class WebRestController {
 
         Map<String, Object> map = new HashMap<>();
         Long id = playerSearchDto.getId();
-        log.info("{} | getDetailData 호출 | 플레이어의 상세 정보를 조회합니다. 검색값(id) : {}({})", "미로그인 유저", id, playerSearchDto.getBattleTag());
+        log.info("{} >>>>>>>> getDetailData 호출 | 플레이어의 상세 정보를 조회합니다. 검색값(id) : {}({})", "미로그인 유저", id, playerSearchDto.getBattleTag());
         List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id);
         List<TrendlindDto> trendlindList = spd.selectPlayerTrendline(id);
 
         map.put("detail", playerDetailList);
         map.put("trendline", trendlindList);
 
-        log.info("{} | getDetailData 종료 | detail {}건, trendline {}건 회신", "미로그인 유저", playerDetailList.size(), trendlindList.size());
+        log.info("{} >>>>>>>> getDetailData 종료 | detail {}건, trendline {}건 회신", "미로그인 유저", playerDetailList.size(), trendlindList.size());
         log.info("===================================================================");
         return map;
     }

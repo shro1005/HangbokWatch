@@ -1,21 +1,22 @@
 spring:
   profiles:
     active: local # 기본 환경 선택
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-        jdbc.lob.non_contextual_creation: true
 
 # local 환경
 ---
 spring:
   profiles: local
   datasource:
-    url: jdbc:postgresql://localhost:5432/hangbokwatch
-    username: kyun
-    password: pass
+    hikari:
+      jdbc-url: jdbc:postgresql://localhost:5432/hangbokwatch
+      username: kyun
+      password: pass
+      driver-class-name: org.postgresql.Driver
   jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        jdbc.lob.non_contextual_creation: true
     show-sql: false
     hibernate:
       ddl-auto: validate
@@ -33,8 +34,9 @@ logging:
   level:
     root: info
     com.hangbokwatch.backend.service: debug
+    com.hangbokwatch.backend.job: debug
     org.hibernate: error
-    sql: error
+    sql: info
 
 # 운영환경
 ---

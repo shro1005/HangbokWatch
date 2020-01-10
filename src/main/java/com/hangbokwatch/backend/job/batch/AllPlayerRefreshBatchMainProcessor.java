@@ -1,386 +1,208 @@
-package com.hangbokwatch.backend.service;
+package com.hangbokwatch.backend.job.batch;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hangbokwatch.backend.dao.*;
-import com.hangbokwatch.backend.dao.hero.*;
-import com.hangbokwatch.backend.dao.player.PlayerDetailRepository;
-import com.hangbokwatch.backend.dao.player.PlayerRepository;
-import com.hangbokwatch.backend.dao.player.TrendlineRepository;
+import com.hangbokwatch.backend.dao.SeasonRepository;
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
-import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
-import com.hangbokwatch.backend.dto.PlayerListDto;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StopWatch;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.IIOException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-@Service
-public class CrawlingPlayerDataService {
-    private static String GET_PLAYER_LIST_URL = "https://playoverwatch.com/ko-kr/search/account-by-name/";
-//    private static String GET_PLAYER_PROFILE_URL2 = "https://ow-api.com/v1/stats/pc/asia/";  //미사용
+@Component
+@StepScope
+public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player, CompetitiveDetailDto> {
+    public static final String JOB_NAME = "allPlayerRefreshBatch";
     private static String GET_PLAYER_PROFILE_URL = "https://playoverwatch.com/ko-kr/career/";
-//    private List<PlayerListDto> playerList;
-    @Autowired PlayerRepository playerRepository;
-    @Autowired PlayerDetailRepository playerDetailRepository;
-    @Autowired TrendlineRepository trendlineRepository;
-    @Autowired SeasonRepository seasonRepository;
-
-    @Autowired DvaRepositroy dvaRepositroy;
-    @Autowired OrisaRepository orisaRepository;
-    @Autowired ReinhardtRepository reinhardtRepository;
-    @Autowired ZaryaRepository zaryaRepository;
-    @Autowired RoadHogRepository roadhogRepository;
-    @Autowired WinstonRepository winstonRepository;
-    @Autowired SigmaRepository sigmaRepository;
-    @Autowired WreckingBallRepository wreckingBallRepository;
-    @Autowired AnaRepository anaRepository;
-    @Autowired BaptisteRepository baptisteRepository;
-    @Autowired BrigitteRepository brigitteRepository;
-    @Autowired LucioRepository lucioRepository;
-    @Autowired MercyRepository mercyRepository;
-    @Autowired MoiraRepository moiraRepository;
-    @Autowired ZenyattaRepository zenyattaRepository;
-    @Autowired JunkratRepository junkratRepository;
-    @Autowired GenjiRepository genjiRepository;
-    @Autowired DoomfistRepository doomfistRepository;
-    @Autowired ReaperRepository reaperRepository;
-    @Autowired MccreeRepository mccreeRepository;
-    @Autowired MeiRepository meiRepository;
-    @Autowired BastionRepository bastionRepository;
-    @Autowired Soldier76Repository soldier76Repository;
-    @Autowired SombraRepository sombraRepository;
-    @Autowired SymmetraRepository symmetraRepository;
-    @Autowired AsheRepository asheRepository;
-    @Autowired WidowmakerRepository widowmakerRepository;
-    @Autowired TorbjornRepository torbjornRepository;
-    @Autowired TracerRepository tracerRepository;
-    @Autowired PharahRepository pharahRepository;
-    @Autowired HanzoRepository hanzoRepository;
-
     @Value("${spring.HWresource.HWimages}")
     private String portraitPath;
+//    @Autowired
+//    SeasonRepository seasonRepository;
+    @Value("#{jobParameters[season]}") Long season;
 
-    public List<PlayerListDto> crawlingPlayerList(String playerName) {
-        log.info("{} >>>>>>>> crawlingPlayerList 호출 | 플레이어 리스트를 크롤링합니다. 검색값(플레이어명) : {}", "미로그인 유저", playerName);
+    @Override
+    public CompetitiveDetailDto process(Player player) throws Exception {
+        CompetitiveDetailDto competitiveDetailDto = new CompetitiveDetailDto();
+        List<PlayerDetail> playerDetailList = new ArrayList<PlayerDetail>();
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | ================================= new player start ================================", JOB_NAME);
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | 블리자드 크롤링 시작. 크롤링할 url : {}", JOB_NAME, GET_PLAYER_PROFILE_URL+player.getPlatform()+"/"+player.getForUrl());
+        Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+player.getPlatform()+"/"+player.getForUrl()).maxBodySize(Integer.MAX_VALUE).get();
 
-        List<PlayerListDto> playerList = new ArrayList<PlayerListDto>();    // 반환할 playerListDto 초기화
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 경쟁전 역할별 탱커 및 티어 이미지 추출", JOB_NAME, player.getBattleTag());
+        Elements competitiveRole = rawData.select("div.competitive-rank-role");
+        String tierUrl ="";
+        String substrTier = "";
 
-        if(playerName.indexOf("#") == -1) {  // 배틀태그로 입력하지 않았을 경우
-            log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 등록되지 않은 유저는 배틀태그로 조회해야합니다. 검색값(플레이어명) : {}", "미로그인 유저", playerName);
-            return playerList;
+        for (Element roleElement : competitiveRole) {
+            Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
+            if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
+                log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 탱커 탱커 및 티어 이미지 추출", JOB_NAME, player.getBattleTag());
+                player.setTankRatingPoint(Integer.parseInt(roleElement.text()));
+
+                //탱커 티어 이미지 추출
+                Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                tierUrl = tierIcon.attr("src");
+                substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+
+                //탱커 티어 이미지 저장
+                tierUrl = saveImg(tierUrl, substrTier, "tier");
+                player.setTankRatingImg(tierUrl);
+
+            }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
+                log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 딜러 탱커 및 티어 이미지 추출", JOB_NAME, player.getBattleTag());
+                player.setDealRatingPoint(Integer.parseInt(roleElement.text()));
+
+                //딜러 티어 이미지 추출
+                Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                tierUrl = tierIcon.attr("src");
+                substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+
+                //딜러 티어 이미지 저장
+                tierUrl = saveImg(tierUrl, substrTier, "tier");
+                player.setDealRatingImg(tierUrl);
+
+            }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
+                log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 힐러 탱커 및 티어 이미지 추출", JOB_NAME, player.getBattleTag());
+                player.setHealRatingPoint(Integer.parseInt(roleElement.text()));
+
+                //힐러 티어 이미지 추출
+                Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
+                tierUrl = tierIcon.attr("src");
+                substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
+
+                //힐러 티어 이미지 저장
+                tierUrl = saveImg(tierUrl, substrTier, "tier");
+                player.setHealRatingImg(tierUrl);
+
+            }
         }
 
-        playerName = playerName.replace("#", "%23");  // # -> %23 으로 파싱한 후에 검색
-
-        ObjectMapper mapper = new ObjectMapper();    //Json String을 Json객체로 바꾸기 위한 매퍼 초기화
-        try {
-            log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 블리자드 크롤링 시작", "미로그인 유저");
-
-            // Jsoup를 이용해 오버워치 웹크롤링 : 유저 리스트를 json String 형식으로 가져오는 부분
-            String json = Jsoup.connect(GET_PLAYER_LIST_URL+playerName)
-                    .ignoreContentType(true)
-                    .execute().body();
-
-            log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 크롤링한 json을 PlayerCrawlingResultDto로 저장", "미로그인 유저");
-
-            //위에 선언한 매퍼를 통해 크롤링결과dto에 맞게 파싱하여 list에 추가
-            List<PlayerCrawlingResultDto> playerCrawlingResultDtoList = mapper.readValue(json, new TypeReference<List<PlayerCrawlingResultDto>>(){});
-
-            log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | PlayerCrawlingResultDto를 View로 전달할 PlayerListDto로 파싱", "미로그인 유저");
-
-            //위에 크롤링결과 dto를 반환활 playerListDto에 넣어주는 for 문
-            for(PlayerCrawlingResultDto dto : playerCrawlingResultDtoList) {
-                String isPublic = "N";
-                String battleTag = dto.getName();
-                String pName = battleTag;
-                String forUrl = dto.getUrlName();
-                String portrait = "https://d1u1mce87gyfbn.cloudfront.net/game/unlocks/" + dto.getPortrait() + ".png";  //d1u1mce87gyfbn.cloudfront.net
-                Integer tankratingPoint = 0;
-                Integer dealRatingPoint = 0;
-                Integer healRatingPoint = 0;
-
-                if(dto.getIsPublic()) { isPublic = "Y"; } else { return playerList; }
-                if(dto.getPlatform().equals("pc")) {
-                    pName = battleTag.substring(0, battleTag.indexOf("#"));
-                }
-
-                PlayerListDto playerListDto = new PlayerListDto(dto.getId(), battleTag, pName, forUrl, dto.getPlayerLevel(), isPublic, dto.getPlatform(), portrait, tankratingPoint, dealRatingPoint, healRatingPoint, "", 3);
-
-                log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 크롤링결과 {}", "미로그인 유저", playerListDto.toString());
-                playerList.add(playerListDto);
-            }
-            Collections.sort(playerList);   // 경쟁전 점수 순서대로 정렬
-
-        } catch(Exception e) {
-            PlayerListDto playerListDto = new PlayerListDto();
-
-            if(e.getClass() == SocketException.class) {
-                playerListDto.setBattleTag("message");
-                playerListDto.setPlayerName("현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.");
-                playerList.add(playerListDto);
-                log.error("{} >>>>>>>> crawlingPlayerList 에러 발생 | 현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.");
-                log.error("====================================================\n" + e + "\n====================================================");
-
-            }else if(e.getClass() == UnknownHostException.class){
-                playerListDto.setBattleTag("message");
-                playerListDto.setPlayerName("연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.");
-                playerList.add(playerListDto);
-                log.error("{} >>>>>>>> crawlingPlayerList 에러 발생 | 연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.");
-                log.error("====================================================\n" + e + "\n====================================================");
-
-            }else if(e.getClass() == SocketTimeoutException.class){
-                playerListDto.setBattleTag("message");
-                playerListDto.setPlayerName("현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.");
-                playerList.add(playerListDto);
-                log.error("{} >>>>>>>> crawlingPlayerList 에러 발생 | 현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.");
-                log.error("====================================================\n" + e + "\n====================================================");
-            }
-            e.printStackTrace();
+        /** 프로필 정보 추출 */
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 프로필 사진 추출", JOB_NAME, player.getBattleTag());
+        Element portraitEl = rawData.selectFirst("img[class=player-portrait]");
+//        System.out.println(player.getBattleTag());
+        if(portraitEl == null) {
+            player.setIsPublic("N");
+            competitiveDetailDto.setPlayer(player);
+            return competitiveDetailDto;
         }
-        log.info("{} >>>>>>>> crawlingPlayerList 종료 | 검색값(플레이어명) : {}", "미로그인 유저", playerName);
-        return playerList;
+
+//        System.out.println(portraitEl);
+        String portrait = portraitEl.attr("src");
+        String substrPR = portrait.substring(portrait.indexOf("/overwatch/")+11, portrait.indexOf(".png"));
+        //프로필 사진 저장
+        portrait = saveImg(portrait, substrPR, "portrait");
+        player.setPortrait(portrait);
+
+        /** 영웅 상세정보 추출 */
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 영웅별 상세정보 파싱", JOB_NAME, player.getBattleTag());
+        Integer tankWinGame = 0; Integer tankLoseGame = 0; Integer dealWinGame = 0; Integer dealLoseGame = 0;
+        Integer healWinGame = 0; Integer healLoseGame = 0; Integer totalWinGame = 0; Integer totalLoseGame = 0;
+        Integer count = 0;
+
+        Element competitiveDatas = rawData.selectFirst("div#competitive");
+        if(competitiveDatas == null) {
+            player.setIsPublic("N");
+            competitiveDetailDto.setPlayer(player);
+            return competitiveDetailDto;
+        }
+        Element progressData = competitiveDatas.selectFirst("div.progress-category");
+        Elements playedHeros = progressData.select("div.ProgressBar-title");
+
+        for(Element playHero : playedHeros) {
+            List<Integer> winLoseGame;
+            PlayerDetailDto pdDto = new PlayerDetailDto();
+            pdDto.setId(player.getId());
+//            pdDto.setSeason(seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())));
+            pdDto.setSeason(season);
+            String hero = playHero.text().trim();
+            pdDto.setOrder(++count);
+            if("D.Va".equals(hero)) { pdDto.setHeroNameKR("디바"); }else { pdDto.setHeroNameKR(hero); }
+
+            log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 {} 상세정보 파싱시작", JOB_NAME, player.getBattleTag(), playHero.text());
+
+            switch (hero) {
+                case "솔저: 76":  hero = "soldier-76"; winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas,"0x02E000000000006E", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "리퍼":      hero = "reaper";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000002", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "정크랫":     hero = "junkrat";    winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000065", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "위도우메이커":  hero = "widowmaker"; winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas,"0x02E000000000000A", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "토르비욘":    hero = "torbjorn";   winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000006", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "트레이서":    hero = "tracer";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000003", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "파라":      hero = "pharah";      winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000008", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "한조":      hero = "hanzo";       winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000005", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "애쉬":      hero = "ashe";        winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000200", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "시메트라":    hero = "symmetra";   winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000016", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
+                case "솜브라":     hero = "sombra";      winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000012E", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "바스티온":    hero = "bastion";    winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000015", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
+                case "메이":      hero = "mei";         winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E00000000000DD", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "맥크리":     hero = "mccree";      winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000042", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "둠피스트":    hero = "doomfist";    winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000012F", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
+                case "겐지":      hero = "genji";       winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000029", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
+                case "오리사":     hero = "orisa";       winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000013E", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "시그마":     hero = "sigma";       winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000023B", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1);  break;
+                case "자리야":     hero = "zarya";       winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000068", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1);  break;
+                case "라인하르트":   hero = "reinhardt";  winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000007", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "D.Va":     hero = "D.Va";        winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000007A", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "윈스턴":     hero = "winston";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000009", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "로드호그":    hero = "roadhog";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000040", hero);  tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "레킹볼":     hero = "wreckingball"; winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E00000000001CA", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
+                case "모이라":     hero = "moira";        winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E00000000001A2", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
+                case "아나":      hero = "ana";          winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E000000000013B", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
+                case "브리기테":    hero = "brigitte";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000195", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
+                case "바티스트":    hero = "baptiste";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000221", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
+                case "젠야타":     hero = "zenyatta";     winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000020", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
+                case "루시우":     hero = "lucio";        winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000079", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
+                case "메르시":     hero = "mercy";        winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, pdDto, competitiveDatas, "0x02E0000000000004", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
+                default: break;
+            }
+
+            if(count == 1) {player.setMostHero1(hero);}
+            else if(count == 2) {player.setMostHero2(hero);}
+            else if(count == 3) {player.setMostHero3(hero);}
+
+        }
+
+        // 플레이어 전체 승수 및 패배수
+        List<Integer> winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, null, competitiveDatas,"0x02E00000FFFFFFFF", "");
+        totalWinGame = winLoseGame.get(0); totalLoseGame = winLoseGame.get(1);
+
+        log.debug("{} >>>>>>>> playerDetailItemProcessor 진행중 | {}플레이어 ({}) >>> player객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
+
+        competitiveDetailDto.setPlayer(player);
+
+        log.debug("{} >>>>>>>> playerDetailItemProcessor 진행중 | {}플레이어 ({}) >>> trendline객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
+        Trendline trendline = new Trendline(player.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
+                ,player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
+                ,tankWinGame, tankLoseGame, dealWinGame, dealLoseGame, healWinGame, healLoseGame);
+
+        competitiveDetailDto.setTrendline(trendline);
+        competitiveDetailDto.setPlayerDetailList(playerDetailList);
+
+        return competitiveDetailDto;
     }
 
-    public CompetitiveDetailDto crawlingPlayerDetail(PlayerListDto playerListDto, CompetitiveDetailDto chdDto) {
-        log.info("{} >>>>>>>> crawlingPlayerDetail 호출 | 플레이어 리스트를 크롤링합니다. 검색값(배틀태그) : {}", "미로그인 유저", playerListDto.getBattleTag());
-
-        // 시간 확인을 위한 스탑워치
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("jsoup을 이용한 블리자드 크롤링 및 경쟁전 엘레멘트 추출");
-
-        try {
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | 블리자드 크롤링 시작. 크롤링할 url : {}", "미로그인 유저", GET_PLAYER_PROFILE_URL+playerListDto.getPlatform()+"/"+playerListDto.getForUrl());
-            Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+playerListDto.getPlatform()+"/"+playerListDto.getForUrl()).maxBodySize(Integer.MAX_VALUE).get();
-
-            stopWatch.stop();
-
-//            //rawdata 추출
-//            File file = new File(portraitPath + "raw_"+playerListDto.getPlayerName()+".txt");
-//            try {
-//                //파일에 문자열을 쓴다.
-//                //하지만 이미 파일이 존재하면 모든 내용을 삭제하고 그위에 덮어쓴다
-//                //파일이 손산될 우려가 있다.
-//                FileWriter fw = new FileWriter(file);
-//                fw.write(rawData.html());
-//                fw.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-            /** 역할군별 티어 정보 추출 */
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 경쟁전 역할별 점수 및 티어 이미지 추출", "미로그인 유저", playerListDto.getBattleTag());
-            stopWatch.start("경쟁전 역할별 티어 이미지 추출");
-            Elements competitiveRole = rawData.select("div.competitive-rank-role");
-            String tierUrl ="";
-            String substrTier = "";
-
-            for (Element roleElement : competitiveRole) {
-                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
-                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
-                    log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 탱커 및 티어 이미지 추출", "미로그인 유저", playerListDto.getBattleTag());
-                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
-
-                    //탱커 티어 이미지 추출
-                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
-                    tierUrl = tierIcon.attr("src");
-                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
-
-                    //탱커 티어 이미지 저장
-                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
-                    playerListDto.setTankRatingImg(tierUrl);
-
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
-                    log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 딜러 탱커 및 티어 이미지 추출", "미로그인 유저", playerListDto.getBattleTag());
-                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
-
-                    //딜러 티어 이미지 추출
-                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
-                    tierUrl = tierIcon.attr("src");
-                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
-
-                    //딜러 티어 이미지 저장
-                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
-                    playerListDto.setDealRatingImg(tierUrl);
-
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
-                    log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 힐러 탱커 및 티어 이미지 추출", "미로그인 유저", playerListDto.getBattleTag());
-                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
-
-                    //힐러 티어 이미지 추출
-                    Element tierIcon = roleElement.selectFirst("img[class=competitive-rank-tier-icon]");
-                    tierUrl = tierIcon.attr("src");
-                    substrTier = tierUrl.substring(tierUrl.indexOf("rank-icons/")+11, tierUrl.indexOf(".png"));
-
-                    //힐러 티어 이미지 저장
-                    tierUrl = saveImg(stopWatch, tierUrl, substrTier, "tier");
-                    playerListDto.setHealRatingImg(tierUrl);
-
-                }
-            }
-
-            stopWatch.stop();
-
-            /** 프로필 정보 추출 */
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 프로필 사진 추출", "미로그인 유저", playerListDto.getBattleTag());
-            stopWatch.start("프로필 사진 추출");
-            Element portraitEl = rawData.selectFirst("img[class=player-portrait]");
-            String portrait = portraitEl.attr("src");
-            String substrPR = portrait.substring(portrait.indexOf("/overwatch/")+11, portrait.indexOf(".png"));
-            //프로필 사진 저장
-            portrait = saveImg(stopWatch, portrait, substrPR, "portrait");
-            playerListDto.setPortrait(portrait);
-
-            int cnt = 3;
-            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
-            if(cnt == 0 ) {cnt = 1;}
-            playerListDto.setCnt(cnt);
-
-            stopWatch.stop();
-
-            /** 영웅 상세정보 추출 */
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 영웅별 상세정보 파싱", "미로그인 유저", playerListDto.getBattleTag());
-            Integer tankWinGame = 0; Integer tankLoseGame = 0; Integer dealWinGame = 0; Integer dealLoseGame = 0;
-            Integer healWinGame = 0; Integer healLoseGame = 0; Integer totalWinGame = 0; Integer totalLoseGame = 0;
-            Integer count = 0;
-
-            Element competitiveDatas = rawData.selectFirst("div#competitive");
-            Element progressData = competitiveDatas.selectFirst("div.progress-category");
-            Elements playedHeros = progressData.select("div.ProgressBar-title");
-
-//            //competitiveDatas 추출
-//            file = new File(portraitPath + "competitiveData_html_"+playerListDto.getPlayerName()+".txt");
-//            try {
-//                //파일에 문자열을 쓴다.
-//                //하지만 이미 파일이 존재하면 모든 내용을 삭제하고 그위에 덮어쓴다
-//                //파일이 손산될 우려가 있다.
-//                FileWriter fw = new FileWriter(file);
-//                fw.write(competitiveDatas.html());
-//                fw.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-            Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
-            playerDetailRepository.deletePlayerDetailsByIdAndSeason(playerListDto.getId(), season);
-
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이한 영웅 : {}", "미로그인 유저", playerListDto.getBattleTag(), playedHeros.text());
-
-            for(Element playHero : playedHeros) {
-                List<Integer> winLoseGame;
-                PlayerDetailDto pdDto = new PlayerDetailDto();
-                pdDto.setId(playerListDto.getId());
-                pdDto.setSeason(season);
-                String hero = playHero.text().trim();
-                pdDto.setOrder(++count);
-                if("D.Va".equals(hero)) { pdDto.setHeroNameKR("디바"); }else { pdDto.setHeroNameKR(hero); }
-
-                log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 {} 상세정보 파싱시작", "미로그인 유저", playerListDto.getBattleTag(), playHero.text());
-
-                switch (hero) {
-                    case "솔저: 76":  hero = "soldier-76"; winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000006E", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "리퍼":      hero = "reaper";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000002", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "정크랫":     hero = "junkrat";    winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000065", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "위도우메이커":  hero = "widowmaker"; winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000000A", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "토르비욘":    hero = "torbjorn";   winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000006", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "트레이서":    hero = "tracer";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000003", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "파라":      hero = "pharah";      winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000008", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "한조":      hero = "hanzo";       winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000005", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "애쉬":      hero = "ashe";        winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000200", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "시메트라":    hero = "symmetra";   winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000016", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
-                    case "솜브라":     hero = "sombra";      winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000012E", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "바스티온":    hero = "bastion";    winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000015", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
-                    case "메이":      hero = "mei";         winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E00000000000DD", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "맥크리":     hero = "mccree";      winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000042", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "둠피스트":    hero = "doomfist";    winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000012F", hero); dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1);  break;
-                    case "겐지":      hero = "genji";       winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000029", hero);  dealWinGame += winLoseGame.get(0); dealLoseGame += winLoseGame.get(1); break;
-                    case "오리사":     hero = "orisa";       winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000013E", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "시그마":     hero = "sigma";       winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000023B", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1);  break;
-                    case "자리야":     hero = "zarya";       winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000068", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1);  break;
-                    case "라인하르트":   hero = "reinhardt";  winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000007", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "D.Va":     hero = "D.Va";        winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000007A", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "윈스턴":     hero = "winston";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000009", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "로드호그":    hero = "roadhog";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000040", hero);  tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "레킹볼":     hero = "wreckingball"; winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E00000000001CA", hero); tankWinGame += winLoseGame.get(0); tankLoseGame += winLoseGame.get(1); break;
-                    case "모이라":     hero = "moira";        winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E00000000001A2", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
-                    case "아나":      hero = "ana";          winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E000000000013B", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
-                    case "브리기테":    hero = "brigitte";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000195", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
-                    case "바티스트":    hero = "baptiste";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000221", hero); healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1);  break;
-                    case "젠야타":     hero = "zenyatta";     winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000020", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
-                    case "루시우":     hero = "lucio";        winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000079", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
-                    case "메르시":     hero = "mercy";        winLoseGame = heroDetailParsing(playerListDto, pdDto, competitiveDatas, stopWatch, "0x02E0000000000004", hero);  healWinGame += winLoseGame.get(0); healLoseGame += winLoseGame.get(1); break;
-                    default: break;
-                }
-
-                if(count == 1) {playerListDto.setMostHero1(hero);}
-                else if(count == 2) {playerListDto.setMostHero2(hero);}
-                else if(count == 3) {playerListDto.setMostHero3(hero);}
-
-                pdDto.setHeroName(hero);  //영어 이름 세팅
-
-            }
-
-            // 플레이어 전체 승수 및 패배수
-            List<Integer> winLoseGame = heroDetailParsing(playerListDto, null, competitiveDatas, stopWatch, "0x02E00000FFFFFFFF", "");
-            totalWinGame = winLoseGame.get(0); totalLoseGame = winLoseGame.get(1);
-
-            log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {}({}) 플레이어 player DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId());
-            stopWatch.start("player 테이블에 저장");
-            Player player = new Player(playerListDto.getId(), playerListDto.getBattleTag(), playerListDto.getPlayerName(), playerListDto.getPlayerLevel(), playerListDto.getForUrl(), playerListDto.getIsPublic(), playerListDto.getPlatform()
-                    , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
-                    , playerListDto.getTankRatingImg(), playerListDto.getDealRatingImg(), playerListDto.getHealRatingImg(), tankWinGame, tankLoseGame,dealWinGame,dealLoseGame,healWinGame,healLoseGame
-                    , totalWinGame, totalLoseGame, playerListDto.getDrawGame(), playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());
-            playerRepository.save(player);
-
-            log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 trendline DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId());
-            Trendline trendline = new Trendline(playerListDto.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
-                                                ,playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
-                                                ,tankWinGame, tankLoseGame, dealWinGame, dealLoseGame, healWinGame, healLoseGame);
-
-            trendlineRepository.save(trendline);
-            chdDto.setPlayer(player);
-
-            stopWatch.stop();
-        }catch(Exception e) {
-            log.error("{} | crawlingPlayerDetail 에러 발생 | {} 상세정보 크롤링 및 파싱 중 에러발생", "미로그인 유저" );
-            log.error("====================================================\n" + e + "\n====================================================");
-            e.printStackTrace();
-        }
-
-        log.info("{} | crawlingPlayerDetail 종료 | 검색값(배틀태그) : {}", "미로그인 유저", playerListDto.getBattleTag());
-        return chdDto;
-    }
-
-    public String saveImg(StopWatch stopWatch, String imgUrl, String imgName, String savePath) {
-        // 시간 확인
-        stopWatch.stop();
-
-        stopWatch.start(savePath+" 이미지 저장");
-
+    public String saveImg(String imgUrl, String imgName, String savePath) {
         String imgPath = "/HWimages/"+savePath+"/"+ imgName + ".png";
         File file = new File(portraitPath+ savePath + "/" +imgName + ".png");
 
@@ -392,24 +214,23 @@ public class CrawlingPlayerDataService {
             } catch (IIOException | MalformedURLException e) {
                 imgPath = "/HWimages/" + savePath + "/default.png";
             } catch (IOException e) {
-                log.error("{} | crawlingPlayerDetail 에러 발생 | 이미지 저장중 에러 발생", "미로그인 유저");
+                log.error("{} >>>>>>>> playerDetailItemProcessor 에러 발생 | 이미지 저장중 에러 발생", JOB_NAME);
                 log.error("====================================================\n" + e + "\n====================================================");
                 e.printStackTrace();
             }
         }else {
-            log.debug("{} | crawlingPlayerDetail 진행중 | 이미 존재하는 이미지입니다. ({})", "미로그인 유저", imgPath);
+            log.debug("{} >>>>>>>> playerDetailItemProcessor | 이미 존재하는 이미지입니다. ({})", JOB_NAME, imgPath);
         }
         return imgPath;
     }
 
-    public List<Integer> heroDetailParsing(PlayerListDto playerListDto, PlayerDetailDto pdDto, Element competitiveDatas
-            , StopWatch stopWatch, String tag, String hero ) {
+    public List<Integer> heroDetailParsing(CompetitiveDetailDto competitiveDetailDto, List<PlayerDetail> playerDetailList, Player player, PlayerDetailDto pdDto, Element competitiveDatas, String tag, String hero ) {
         /** 영웅별 경쟁전 상세정보 추출 */
         Element heroDetails = competitiveDatas.selectFirst("div[data-category-id="+tag+"]");
         List<Integer> winLoseGame = new ArrayList<Integer>();
 
         if(heroDetails != null) {
-            log.debug("{} | crawlingPlayerDetail 진행중 | {} : {}", "미로그인 유저", playerListDto.getBattleTag(), heroDetails.text() );
+            log.debug("{} >>>>>>>> playerDetailItemProcessor | {} >>> {} ", JOB_NAME, player.getBattleTag(), heroDetails.text() );
 
             // 영웅별 데이 저장을 위한 변수
             Integer winGame = 0;
@@ -454,8 +275,6 @@ public class CrawlingPlayerDataService {
                 winLoseGame.add(1, loseGame);
                 return winLoseGame;
             }else {
-                stopWatch.start(pdDto.getHeroNameKR() + " 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
-
                 /** 공통 데이터 파싱*/
                 Elements detailDatas = heroDetails.select("tr.DataTable-tableRow");
 
@@ -572,25 +391,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Dva dva = new Dva(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Dva dva = new Dva(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), mechaSuicideKillAvg,
                             mechaCallAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    dvaRepositroy.save(dva);
+                    competitiveDetailDto.setDva(dva);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             mechaSuicideKillAvg, mechaCallAvg, "", "", "", "평균 자폭 킬", "평균 메카호출", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), dva.toString());
-//                    System.out.println("============================ dva data save success =======================================");
-//                    System.out.println(dva.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), dva.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -620,17 +434,18 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Orisa orisa = new Orisa(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Orisa orisa = new Orisa(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), damageAmpAvg, goldMedal,
                             silverMedal, bronzeMedal);
 
-                    orisaRepository.save(orisa);
+                    competitiveDetailDto.setOrisa(orisa);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             damageAmpAvg, "", "", "", "" , "평균 공격력 증폭", "", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
+
                     pdDto.setBlockDamagePerLife(blockDamagePerLife.toString());
                     pdDto.setDamageToHeroPerLife(damageToHeroPerLife.toString());
                     pdDto.setDamageToShieldPerLife(damageToShieldPerLife.toString());
@@ -641,13 +456,8 @@ public class CrawlingPlayerDataService {
                     pdDto.setPlayTime(playTime);
                     pdDto.setIndex1(damageAmpAvg);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), orisa.toString());
-//                    System.out.println("=============================orisa data save success======================================");
-//                    System.out.println(orisa.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), orisa.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -687,25 +497,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Reinhardt reinhardt = new Reinhardt(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg,
+                    Reinhardt reinhardt = new Reinhardt(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg,
                             deathAvg, blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    reinhardtRepository.save(reinhardt);
+                    competitiveDetailDto.setReinhardt(reinhardt);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, "", "", "평균 대지분쇄 킬", "평균 돌진 킬", "평균 화염강타 킬", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), reinhardt.toString());
-//                    System.out.println("============================reinhardt data save success===================================");
-//                    System.out.println(reinhardt.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reinhardt.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -750,25 +555,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Zarya zarya = new Zarya(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Zarya zarya = new Zarya(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), energyAvg,
                             highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    zaryaRepository.save(zarya);
+                    competitiveDetailDto.setZarya(zarya);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             energyAvg, highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, "", "평균 에너지", "평균 고에너지 킬", "평균 주는방벽", "평균 중력자탄 킬", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), zarya.toString());
-//                    System.out.println("===============================zarya data save success====================================");
-//                    System.out.println(zarya.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zarya.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -814,25 +614,20 @@ public class CrawlingPlayerDataService {
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
                     Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
-                    RoadHog roadhog = new RoadHog(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    RoadHog roadhog = new RoadHog(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             soloKillAvg, damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), wholeHogKillAvg,
                             chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
 
-                    roadhogRepository.save(roadhog);
+                    competitiveDetailDto.setRoadHog(roadhog);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "", "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             wholeHogKillAvg, chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), soloKillAvg, "평균 돼재앙 킬", "갈고리 명중률", "평균 끈 적", "목숭당 자힐량", "평균 단독처치");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), roadhog.toString());
-//                    System.out.println("============================roadhog data save success=====================================");
-//                    System.out.println(roadhog.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), roadhog.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -872,25 +667,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Winston winston = new Winston(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Winston winston = new Winston(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), jumpPackKillAvg,
                             primalRageKillAvg, pushEnmeyAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    winstonRepository.save(winston);
+                    competitiveDetailDto.setWinston(winston);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             jumpPackKillAvg, primalRageKillAvg, pushEnmeyAvg, "", "", "평균 점프팩 킬", "평균 원시의분노 킬", "평균 밀친 적", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), winston.toString());
-//                    System.out.println("============================winston data save success+====================================");
-//                    System.out.println(winston.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), winston.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -931,25 +721,20 @@ public class CrawlingPlayerDataService {
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
                     Double absorptionDamagePerLife = Math.round((absorptionDamage / ((double) death + 1)) * 100) / 100.0;
 
-                    Sigma sigma = new Sigma(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Sigma sigma = new Sigma(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), absorptionDamagePerLife.toString(),
                             graviticFluxKillAvg, accretionKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    sigmaRepository.save(sigma);
+                    competitiveDetailDto.setSigma(sigma);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             absorptionDamagePerLife.toString(), graviticFluxKillAvg, accretionKillAvg, "", "", "목숨당 흡수한 피해", "평균 중력붕괴 킬", "평균 강착 킬", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), sigma.toString());
-//                    System.out.println("============================sigma data save success=======================================");
-//                    System.out.println(sigma.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sigma.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -989,25 +774,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    WreckingBall wreckingBall = new WreckingBall(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    WreckingBall wreckingBall = new WreckingBall(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), grapplingClawKillAvg,
                             piledriverKillAvg, minefieldKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    wreckingBallRepository.save(wreckingBall);
+                    competitiveDetailDto.setWreckingBall(wreckingBall);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             grapplingClawKillAvg, piledriverKillAvg, minefieldKillAvg, "", "", "평균 갈고리 킬", "평균 파일드라이버 킬", "평균 지뢰밭 킬", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), wreckingBall.toString());
-//                    System.out.println("============================wreckingBall data save success================================");
-//                    System.out.println(wreckingBall.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), wreckingBall.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1043,25 +823,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double bioticGrenadeKillPerLife = Math.round((bioticGrenadeKill / ((double) death + 1)) * 100) / 100.0;
 
-                    Ana ana = new Ana(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Ana ana = new Ana(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString()
                             , goldMedal, silverMedal, bronzeMedal);
 
-                    anaRepository.save(ana);
+                    competitiveDetailDto.setAna(ana);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString(), "", "", "평균 나노강화제 주입", "평균 생체수류탄 킬", "평균 재운적", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), ana.toString());
-//                    System.out.println("============================ana data save success================================");
-//                    System.out.println(ana.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ana.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1092,25 +867,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Baptiste baptiste = new Baptiste(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Baptiste baptiste = new Baptiste(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), immortalityFieldSaveAvg,
                             amplificationMatrixAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    baptisteRepository.save(baptiste);
+                    competitiveDetailDto.setBaptiste(baptiste);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             immortalityFieldSaveAvg, amplificationMatrixAvg, "", "", "", "평균 불사장치 세이브", "평균 강화메트릭스 사용", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), baptiste.toString());
-//                    System.out.println("============================baptiste data save success================================");
-//                    System.out.println(baptiste.toString());
-//                    System.out.println("==========================================================================================");
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), baptiste.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1141,22 +911,20 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double armorPerLife = Math.round((armor / ((double) death + 1)) * 100) / 100.0;
 
-                    Brigitte brigitte = new Brigitte(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Brigitte brigitte = new Brigitte(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), armorPerLife.toString(), inspireActiveRate,
                             goldMedal, silverMedal, bronzeMedal);
 
-                    brigitteRepository.save(brigitte);
+                    competitiveDetailDto.setBrigitte(brigitte);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             armorPerLife.toString(), inspireActiveRate, "", "", "", "목숨당 방어력 제공", "격려(패시브) 지속률", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), brigitte.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), brigitte.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1182,21 +950,19 @@ public class CrawlingPlayerDataService {
                     Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
-                    Lucio lucio = new Lucio(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Lucio lucio = new Lucio(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), soundwaveAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    lucioRepository.save(lucio);
+                    competitiveDetailDto.setLucio(lucio);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             soundwaveAvg, "", "", "", "", "평균 소리방벽 사용", "", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), lucio.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), lucio.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1227,21 +993,19 @@ public class CrawlingPlayerDataService {
                     Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
-                    Mercy mercy = new Mercy(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Mercy mercy = new Mercy(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), resurrectAvg, damageAmpAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    mercyRepository.save(mercy);
+                    competitiveDetailDto.setMercy(mercy);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             resurrectAvg, damageAmpAvg, "", "", "", "평균 부활", "평균 공격력 증폭", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), mercy.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mercy.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1277,21 +1041,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
-                    Moira moira = new Moira(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Moira moira = new Moira(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), goldMedal, silverMedal, bronzeMedal);
 
-                    moiraRepository.save(moira);
+                    competitiveDetailDto.setMoira(moira);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), "", "", "평균 융화 킬", "평균 융화 힐", "목숭당 자힐량", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), moira.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), moira.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1317,20 +1079,18 @@ public class CrawlingPlayerDataService {
                     Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
 
-                    Zenyatta zenyatta = new Zenyatta(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
+                    Zenyatta zenyatta = new Zenyatta(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             healPerLife.toString(), damageToHeroPerLife.toString(), transcendenceHealAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    zenyattaRepository.save(zenyatta);
+                    competitiveDetailDto.setZenyatta(zenyatta);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
                             transcendenceHealAvg, "", "", "", "", "평균 초월 힐", "", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), zenyatta.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zenyatta.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1371,21 +1131,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Junkrat junkrat = new Junkrat(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Junkrat junkrat = new Junkrat(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    junkratRepository.save(junkrat);
+                    competitiveDetailDto.setJunkrat(junkrat);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, "", "", "평균 덫으로 묶은 적", "평균 충격 지뢰 킬", "평균 죽이는 타이어 킬", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), junkrat.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), junkrat.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1421,21 +1179,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Genji genji = new Genji(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,lastHitPerLife.toString(),
+                    Genji genji = new Genji(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    genjiRepository.save(genji);
+                    competitiveDetailDto.setGenji(genji);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, "", "", "평균 용검 킬", "평균 튕겨낸 피해량", "평균 단독처치", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), genji.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), genji.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1476,21 +1232,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Doomfist doomfist = new Doomfist(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Doomfist doomfist = new Doomfist(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    doomfistRepository.save(doomfist);
+                    competitiveDetailDto.setDoomfist(doomfist);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, "", "평균 기술로 준 피해", "평균 보호막 생성량", "평균 파멸의 일격 킬", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), doomfist.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), doomfist.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1521,21 +1275,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Reaper reaper = new Reaper(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Reaper reaper = new Reaper(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), deathBlossomKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    reaperRepository.save(reaper);
+                    competitiveDetailDto.setReaper(reaper);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             deathBlossomKillAvg, soloKillAvg, "", "", "", "평균 죽음의꽃 킬", "평균 단독처치", "", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), reaper.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reaper.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1574,21 +1326,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Mccree mccree = new Mccree(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Mccree mccree = new Mccree(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    mccreeRepository.save(mccree);
+                    competitiveDetailDto.setMccree(mccree);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, "", "평균 난사 킬", "평균 황야의 무법자 킬", "치명타 명중률", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), mccree.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mccree.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1628,21 +1378,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Mei mei = new Mei(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
+                    Mei mei = new Mei(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), blizzardKillAvg, freezingEnemyAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    meiRepository.save(mei);
+                    competitiveDetailDto.setMei(mei);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             blizzardKillAvg, freezingEnemyAvg, soloKillAvg, "", "", "평균 눈보라 킬", "평균 얼린적", "평균 단독처치", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), mei.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mei.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1681,21 +1429,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Bastion bastion = new Bastion(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Bastion bastion = new Bastion(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    bastionRepository.save(bastion);
+                    competitiveDetailDto.setBastion(bastion);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 킬", "평균 수색모드 킬", "평균 전차모드 킬", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), bastion.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), bastion.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1735,21 +1481,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Soldier76 soldier76 = new Soldier76(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, healPerLife.toString(), lastHitPerLife.toString(),
+                    Soldier76 soldier76 = new Soldier76(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, healPerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    soldier76Repository.save(soldier76);
+                    competitiveDetailDto.setSoldier76(soldier76);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,healPerLife.toString(), "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, "", "평균 나선 로켓 킬", "평균 전술조준경 킬", "치명타 명중률", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), soldier76.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), soldier76.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1788,21 +1532,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Sombra sombra = new Sombra(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Sombra sombra = new Sombra(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), hackingEnemyAvg, EMPEnemyAvg, criticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    sombraRepository.save(sombra);
+                    competitiveDetailDto.setSombra(sombra);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             hackingEnemyAvg, EMPEnemyAvg, criticalHitRate, soloKillAvg, "", "평균 해킹한 적", "평균 EMP맞춘 적", "치명타 명중률", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), sombra.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sombra.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1842,21 +1584,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Symmetra symmetra = new Symmetra(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
+                    Symmetra symmetra = new Symmetra(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, blockDamagePerLife.toString(), lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), turretKillAvg, teleportUsingAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    symmetraRepository.save(symmetra);
+                    competitiveDetailDto.setSymmetra(symmetra);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             turretKillAvg, teleportUsingAvg, soloKillAvg, "", "", "평균 감시포탑 킬", "평균 순간이동한 아군", "평균 단독처치", "", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), symmetra.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), symmetra.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1899,21 +1639,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Ashe ashe = new Ashe(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Ashe ashe = new Ashe(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    asheRepository.save(ashe);
+                    competitiveDetailDto.setAshe(ashe);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, "평균 충격샷건 킬", "평균 다이너마이트 킬","평균 BOB 킳", "저격 치명타 명중률", "평균 단독처치");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), ashe.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ashe.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1951,21 +1689,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Widowmaker widowmaker = new Widowmaker(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Widowmaker widowmaker = new Widowmaker(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), sightSupportAvg, scopeHitRate, scopeCriticalHitRate, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    widowmakerRepository.save(widowmaker);
+                    competitiveDetailDto.setWidowmaker(widowmaker);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             sightSupportAvg, scopeHitRate, scopeCriticalHitRate, soloKillAvg, "", "평균 처치시야 지원", "저격 명중률", "저격 치명타 명중률", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), widowmaker.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), widowmaker.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -2004,21 +1740,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Torbjorn torbjorn = new Torbjorn(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Torbjorn torbjorn = new Torbjorn(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), moltenCoreKillAvg, torbjornDirectKillAvg, turretKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    torbjornRepository.save(torbjorn);
+                    competitiveDetailDto.setTorbjorn(torbjorn);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             moltenCoreKillAvg, torbjornDirectKillAvg, turretKillAvg, soloKillAvg, "", "평균 초고열 용광로 처치", "평균 직접 처치", "평균 포탑 처치", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), torbjorn.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), torbjorn.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -2061,21 +1795,19 @@ public class CrawlingPlayerDataService {
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
                     Double selfHealPerLife = Math.round((selfHeal / ((double) death + 1)) * 100) / 100.0;
 
-                    Tracer tracer = new Tracer(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Tracer tracer = new Tracer(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    tracerRepository.save(tracer);
+                    competitiveDetailDto.setTracer(tracer);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg, "평균 펄스폭탄 부착", "평균 펄스폭탄 킬", "치명타 명중률", "목숨당 자힐량", "평균 단독처치");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), tracer.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), tracer.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -2113,21 +1845,19 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Pharah pharah = new Pharah(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Pharah pharah = new Pharah(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    pharahRepository.save(pharah);
+                    competitiveDetailDto.setPharah(pharah);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, "", "평균 로켓 명중", "직격률", "평균 포화 킿", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), pharah.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), pharah.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -2165,28 +1895,24 @@ public class CrawlingPlayerDataService {
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
                     Double damageToShieldPerLife = Math.round((damageToShield / ((double) death + 1)) * 100) / 100.0;
 
-                    Hanzo hanzo = new Hanzo(playerListDto.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
+                    Hanzo hanzo = new Hanzo(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg, lastHitPerLife.toString(),
                             damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, goldMedal, silverMedal, bronzeMedal);
 
-                    hanzoRepository.save(hanzo);
+                    competitiveDetailDto.setHanzo(hanzo);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
                             dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, "", "평균 용의 일격 킬", "평균 폭풍 화살 킬", "평균 처치시야 지원", "평균 단독처치", "");
 
-                    playerDetailRepository.save(playerDetail);
+                    playerDetailList.add(playerDetail);
 
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 {}, 상세정보 DB저장 완료", "미로그인 유저" , playerListDto.getBattleTag(), playerListDto.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) : {}", "미로그인 유저", playerListDto.getBattleTag(), playerListDto.getId(), hanzo.toString());
-
-                    stopWatch.stop();
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), hanzo.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
 
                     return winLoseGame;
-                }else{
-                    stopWatch.stop();
                 }
             }
         }
@@ -2194,100 +1920,4 @@ public class CrawlingPlayerDataService {
         winLoseGame.add(1, 0);
         return winLoseGame;
     }
-
-    /** (현재 미사용) 블리자드 오버워치 공식 홈페이지에서 웹크롤링 - 경쟁전 점수만 */
-    public PlayerListDto crawlingPlayerProfile(PlayerListDto playerListDto) {
-        ObjectMapper mapper = new ObjectMapper();
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("jsoup을 이용한 프로필 row data 추출");
-//        playerList = new ArrayList<PlayerListDto>();
-        try {
-            Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+playerListDto.getPlatform()+"/"+playerListDto.getForUrl())
-                    .get();
-            stopWatch.stop();
-            // rawData 추출
-
-            stopWatch.start("경쟁전 점수 추출");
-            Elements elements = rawData.select("div.competitive-rank-role");
-            for (Element roleElement : elements) {
-                Element roleIcon = roleElement.selectFirst("img[class=competitive-rank-role-icon]");
-                if("https://static.playoverwatch.com/img/pages/career/icon-tank-8a52daaf01.png".equals(roleIcon.attr("src"))){
-//                    System.out.println(roleElement.text());
-                    playerListDto.setTankRatingPoint(Integer.parseInt(roleElement.text()));
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-offense-6267addd52.png".equals(roleIcon.attr("src"))){
-                    playerListDto.setDealRatingPoint(Integer.parseInt(roleElement.text()));
-                }else if("https://static.playoverwatch.com/img/pages/career/icon-support-46311a4210.png".equals(roleIcon.attr("src"))){
-                    playerListDto.setHealRatingPoint(Integer.parseInt(roleElement.text()));
-                }
-            }
-            stopWatch.stop();
-            stopWatch.start("프로필 사진 추출");
-            Element portraitEl = rawData.selectFirst("img[class=player-portrait]");
-            String portrait = portraitEl.attr("src");
-            String substrPR = portrait.substring(portrait.indexOf("/overwatch/")+11, portrait.indexOf(".png"));
-
-//            System.out.println("++++++++++++" + substrPR);
-            stopWatch.stop();
-            stopWatch.start("프로필 이미지 저장");
-            /** 이미지 저장*/
-            try {
-                URL url = new URL(portrait);
-                portrait = "/HWimages/portrait/"+ substrPR + ".png";
-                BufferedImage bi = ImageIO.read(url);
-                ImageIO.write(bi, "png", new File(portraitPath+"portrait/"+ substrPR + ".png"));
-            }catch (IIOException e) {
-                portrait = "/HWimages/portrait/0x02500000000002F7.png";
-            }
-            playerListDto.setPortrait(portrait);
-            stopWatch.stop();
-
-            int cnt = 3;
-            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
-            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
-            if(cnt == 0 ) {cnt = 1;}
-            playerListDto.setCnt(cnt);
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println(stopWatch.prettyPrint());
-        return playerListDto;
-    }
-
-//    /** (현재 미사용) 사설 오버워치 api (ow-api.com) 에서 데이터 받아옴   */
-//    public PlayerListDto crawlingPlayerProfile2(PlayerListDto playerListDto) {
-//        ObjectMapper mapper = new ObjectMapper();
-////        playerList = new ArrayList<PlayerListDto>();
-//        try {
-//            System.out.println("crawlingPlayerProfile working -> battleTag : " + playerListDto.getForUrl());
-//            // Jsoup를 이용해 오버워치 웹크롤링 : 유저 프로필을 json String 형식으로 가져오는 부분
-//            String json = Jsoup.connect(GET_PLAYER_PROFILE_URL2+playerListDto.getForUrl()+"/profile")
-//                    .ignoreContentType(true)
-//                    .execute().body();
-//            JsonNode jsonNode = mapper.readTree(json);
-//            if (jsonNode.isObject()) {
-//                ObjectNode obj = (ObjectNode) jsonNode;
-//                if(obj.has("ratings")){
-//                    JsonNode ratings = obj.get("ratings");
-//                    Iterator itr = ratings.elements();
-//
-//                    while (itr.hasNext()) {
-//                        JsonNode rating = (JsonNode) itr.next();
-//                        ObjectNode ratingObj = (ObjectNode) rating;
-//                        if("tank".equals(ratingObj.get("role").asText())){
-//                            playerListDto.setTankRatingPoint(ratingObj.get("level").asInt());
-//                        }else if("damage".equals(ratingObj.get("role").asText())){
-//                            playerListDto.setDealRatingPoint(ratingObj.get("level").asInt());
-//                        }else if("support".equals(ratingObj.get("role").asText())){
-//                            playerListDto.setHealRatingPoint(ratingObj.get("level").asInt());
-//                        }
-//                    }
-//                }
-//            }
-//        }catch(Exception e) {
-//            e.printStackTrace();
-//        }
-//        return playerListDto;
-//    }
 }

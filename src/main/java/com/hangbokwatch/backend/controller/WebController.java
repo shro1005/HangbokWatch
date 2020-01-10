@@ -30,7 +30,7 @@ public class WebController {
 
     @GetMapping("/showPlayerDetail/{forUrl}")
     public String showPlayerDetail(@PathVariable String forUrl, Model model) {
-        log.info("{} | showPlayerDetail 호출 | 조회 url : {}", "미로그인 유저", forUrl);
+        log.info("{} >>>>>>>> showPlayerDetail 호출 | 조회 url : {}", "미로그인 유저", forUrl);
         CompetitiveDetailDto cdDto = spd.showPlayerDetailService(forUrl);
 
         if(cdDto.getPlayer() != null) {
@@ -43,27 +43,27 @@ public class WebController {
             model.addAttribute("count", cdDto.getCount());
         }
 
-        log.info("{} | showPlayerDetail 종료 | playerDetail.html 화면 이동", "미로그인 유저");
+        log.info("{} >>>>>>>> showPlayerDetail 종료 | playerDetail.html 화면 이동", "미로그인 유저");
         log.info("===================================================================");
         return "playerDetail";
     }
 
     @GetMapping("/showPlayerListFromDetail/{userInput}")
     public String showPlayerListFromDetail(@PathVariable String userInput, Model model) {
-        log.info("{} | showPlayerListFromDetail 호출 | 검색값 : {}", "미로그인 유저", userInput);
+        log.info("{} >>>>>>>> showPlayerListFromDetail 호출 | 검색값 : {}", "미로그인 유저", userInput);
         if(userInput.indexOf("-") != -1) {
             userInput = userInput.replace("-", "#");
         }
         model.addAttribute("isFromDetail", "Y");
         model.addAttribute("userInput", userInput);
-        log.info("{} | showPlayerListFromDetail 종료 | index.html 화면 이동", "미로그인 유저");
+        log.info("{} >>>>>>>> showPlayerListFromDetail 종료 | index.html 화면 이동", "미로그인 유저");
         log.info("===================================================================");
         return "index";
     }
 
     @GetMapping("/refreshPlayerDetail/{forUrl}")
     public String refreshPlayerDetail(@PathVariable String forUrl, Model model) {
-        log.info("{} | refreshPlayerDetail 호출 | 조회 url : {}", "미로그인 유저", forUrl);
+        log.info("{} >>>>>>>> refreshPlayerDetail 호출 | 조회 url : {}", "미로그인 유저", forUrl);
         CompetitiveDetailDto cdDto = spd.refreshPlayerDetail(forUrl);
 
         if(cdDto.getPlayer() != null) {
@@ -74,7 +74,7 @@ public class WebController {
             model.addAttribute("player", cdDto.getPlayer());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
         }
-        log.info("{} | refreshPlayerDetail 종료 | playerDetail.html 화면 이동", "미로그인 유저");
+        log.info("{} >>>>>>>> refreshPlayerDetail 종료 | playerDetail.html 화면 이동", "미로그인 유저");
         log.info("===================================================================");
         return "playerDetail";
     }

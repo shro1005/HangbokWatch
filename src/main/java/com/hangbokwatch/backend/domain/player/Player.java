@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 
+@Setter
 @Getter
 @Entity(name="player")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
