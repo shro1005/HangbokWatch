@@ -28,6 +28,14 @@ $(window).resize(function () {
     // }
 });
 
+Handlebars.registerHelper('isLike',function (like_or_not, options) {
+    if(like_or_not === 'Y') {
+        return options.fn(this);
+    }else {
+        return options.reverse(this);
+    }
+});
+
 const main = {
     init : function(){
         // console.log("main.init 호출");
@@ -83,16 +91,30 @@ const main = {
     },
     doFavorite : function () {
         // console.log("doFavorite 호출");
+        const id = $('.user-name').attr('id');
+        let input = {
+            id : id,
+            playerName : 'N'
+        }
         if($('.btn-like').hasClass('clicked') === true) {
+            input.playerName = 'N';
             $('.btn-like').removeClass('clicked');
             $('.mdi-heart').addClass('mdi-heart-outline');
             $('.mdi-heart-outline').removeClass('mdi-heart');
         }else {
+            input.playerName = 'Y';
             $('.btn-like').addClass('clicked');
             $('.mdi-heart-outline').addClass('mdi-heart');
             $('.mdi-heart').removeClass('mdi-heart-outline');
         }
 
+        $.ajax({
+            type: 'POST',
+            url: '/refreshFavorite',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(input)
+        });
     }
 };
 
@@ -575,7 +597,7 @@ const drawTrendline = () => {
                         meta.data.forEach(function (bar, index) {
                             let data = dataset.data[index];
                             if (data == 0) {
-                                data = "(배치중)";
+                                data = "(배치)";
                             }
                             // console.log(bar._model.y);
                             if (bar._model.y < 20) {

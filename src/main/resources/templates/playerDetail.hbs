@@ -52,9 +52,8 @@
                                     <button class="btn action-btn btn-refresh btn-outline-primary btn-rounded component-flat">
                                         <i class="mdi mdi-autorenew"></i>
                                     </button>
-                                    <button class="btn action-btn btn-like btn-outline-danger btn-rounded">
-                                        <i class="mdi mdi-heart-outline"></i>
-                                    </button>
+
+
                                 </div>
                                 <div class="profile-picture big-profile-picture clear">
                                     <img class="player-portrait" src="{{player.portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="" >
@@ -96,6 +95,18 @@
         <script src="/js/chartjs.addon.js"></script>
         <script src="/js/moment.min.js"></script>
         <script src="/js/moment-with-locales.min.js"></script>
+
+        <script id="favorite-button-check" type="text/x-handlebars-template">
+            \{{#isLike}}
+                <button class="btn action-btn btn-like btn-outline-danger btn-rounded clicked">
+                    <i class="mdi mdi-heart"></i>
+                </button>
+            \{{else}}
+                <button class="btn action-btn btn-like btn-outline-danger btn-rounded">
+                    <i class="mdi mdi-heart-outline"></i>
+                </button>
+            \{{/isLike}}
+        </script>
 
         <script id="competitive-points" type="text/x-handlebars-template">
             \{{#roles}}
@@ -168,8 +179,9 @@
         </script>
 
         <script type="text/javascript">
-            let competitive_points = $("#competitive-points").html();
-            let template = Handlebars.compile(competitive_points);
+            const competitive_points = $("#competitive-points").html();
+            const template = Handlebars.compile(competitive_points);
+
 
             let ratingPoint = ["{{player.tankRatingPoint}}","{{player.dealRatingPoint}}", "{{player.healRatingPoint}}"];
             $.each(ratingPoint, function (i, point) {
@@ -185,6 +197,21 @@
             };
             const item = template(data);
             $('.profile-details').append(item);
+
+            Handlebars.registerHelper('isLike',function (options) {
+                console.log('즐겨찾기 여부 : {{favorite}}');
+                const like_or_not = '{{favorite}}';
+                if(like_or_not === 'Y') {
+                    return options.fn(this);
+                }else {
+                    return options.inverse(this);
+                }
+            });
+
+            const favorite_button_check = $("#favorite-button-check").html();
+            const template_favorite_button = Handlebars.compile(favorite_button_check);
+            const favorite_button = template_favorite_button();
+            $('.profile-buttons').append(favorite_button);
         </script>
 
         <script src="/js/app/hangbok-header.js"></script>

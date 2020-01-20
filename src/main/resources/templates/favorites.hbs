@@ -1,25 +1,25 @@
-{{!-- index page => index.hbs --}}
+{{!-- playerDeatil page => playerDetail.hbs --}}
 
-{{#> layouts/base}}
-    {{!--=================== head content ======================--}}
+{{#> layouts/base title="전적 검색"}}
+{{!--=================== head content ======================--}}
+    {{#*inline "head-block"}}
+        <link rel="stylesheet" href="/fonts/iconfonts/mdi/css/materialdesignicons.css">
+    {{/inline}}
 
     {{!--=================== Main content ======================--}}
     {{#*inline "content-block"}}
-        <input type="hidden" class="fromDetail" style="display: none" id="{{isFromDetail}}" value="{{userInput}}"></input>
-        <div class="hero-wrap ftco-degree-bg" style="background-image: url('/images/bg_1.jpg');" data-stellar-background-ratio="0.5">
+        <div class="hero-wrap-s" style="background-image: url('/images/bg_1.jpg');" data-stellar-background-ratio="0.5">
             <div class="overlay"></div>
             <div class="container">
-                <div class="row justify-content-center align-items-center no-gutters slider-text">
+                <div class="row justify-content-center align-items-center no-gutters slider-text-s">
                     <div class="col-md-9 ftco-animate pb-5 text-center">   <!--class="col-lg-8 col-md-6 ftco-animate text-center"-->
                         <div class="text text-center">
-                            <h1 class="mb-4">옵치하기</h1>
-                            <br style="font-size: 18px;">222패치에 맞게 돌격, 공격, 힐 경쟁전 점수 표시!   경쟁전에 지친 유저들을 위한 자체 스크림 매칭 시스템 도입!!</p>
-                            <form action="#" class="search-location mt-md-5">
+                            <form action="#" class="search-location-s mt-md-5">
                                 <div class="row justify-content-center">
                                     <div class="col-lg-10 align-items-end">
                                         <div class="form-group">
                                             <div class="form-field">
-                                                <input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '배틀태그#0000'를 입력해주세요">
+                                                <input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '플레이어명#배틀태그'를 입력해주세요">
                                                 <button type="button" id="btn-search"><span class="ion-ios-search"></span></button>  <!---->
                                             </div>
                                         </div>
@@ -29,11 +29,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="mouse">	<!---->
-                <a href="#" class="mouse-icon">	<!--mouse-icon 이 이동시키는 function 걸려있음-->
-                    <div class="mouse-wheel"><span class="ion-ios-arrow-round-down"></span></div>	<!--mouse-wheel-->
-                </a>
             </div>
         </div>
 
@@ -66,7 +61,7 @@
 
     {{!--=================== scripts content ======================--}}
     {{#*inline "scripts-blick"}}
-        <script src="/js/app/hangbok-home.js" charset="UTF-8"></script>
+        <script src="/js/app/hangbok-favorite.js"></script>
 
         <script id="player_list" type="text/x-handlebars-template" charset="UTF-8">
             <p class="grid-header"></p>

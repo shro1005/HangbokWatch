@@ -25,7 +25,12 @@
                 <li class="nav-item"><a href="/about.html" class="nav-link">즐겨찾기</a></li>  <!--favorite-->
                 <li class="nav-item"><a href="/agent.html" class="nav-link">듀오찾기</a></li>   <!--leaderBoard-->
                 <li class="nav-item"><a href="/services.html" class="nav-link">랭커보기</a></li>   <!--scream-->
-                <li class="nav-item"><a href="/properties.html" class="nav-link">소식보기</a></li>   <!--news-->
+                <li class="nav-item"><a href="/news.html" class="nav-link">소식보기</a></li>   <!--news-->
+                {{#if isLogin}}
+                    <li class="nav-item"><a href="/logout" class="nav-link">로그아웃</a></li>
+                {{else}}
+                    <li class="nav-item"><a href="/oauth2/authorization/blizzard" class="nav-link">배틀넷 연동</a></li>
+                {{/if}}
 <!--                <li class="nav-item"><a href="/blog.html" class="nav-link">Blog</a></li>   &lt;!&ndash;home&ndash;&gt;-->
 <!--                <li class="nav-item"><a href="/contact.html" class="nav-link">Contact</a></li> &lt;!&ndash;home&ndash;&gt;-->
             </ul>

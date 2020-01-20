@@ -45,7 +45,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
     public CompetitiveDetailDto process(Player player) throws Exception {
         CompetitiveDetailDto competitiveDetailDto = new CompetitiveDetailDto();
         List<PlayerDetail> playerDetailList = new ArrayList<PlayerDetail>();
-        log.debug("{} >>>>>>>> playerDetailItemProcessor | ================================= new player start ================================", JOB_NAME);
+        log.debug("{} ============================================= new player start ======================================", JOB_NAME);
         log.debug("{} >>>>>>>> playerDetailItemProcessor | 블리자드 크롤링 시작. 크롤링할 url : {}", JOB_NAME, GET_PLAYER_PROFILE_URL+player.getPlatform()+"/"+player.getForUrl());
         Document rawData = Jsoup.connect(GET_PLAYER_PROFILE_URL+player.getPlatform()+"/"+player.getForUrl()).maxBodySize(Integer.MAX_VALUE).get();
 
@@ -187,11 +187,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
         List<Integer> winLoseGame = heroDetailParsing(competitiveDetailDto, playerDetailList, player, null, competitiveDatas,"0x02E00000FFFFFFFF", "");
         totalWinGame = winLoseGame.get(0); totalLoseGame = winLoseGame.get(1);
 
-        log.debug("{} >>>>>>>> playerDetailItemProcessor 진행중 | {}플레이어 ({}) >>> player객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> player객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
 
         competitiveDetailDto.setPlayer(player);
 
-        log.debug("{} >>>>>>>> playerDetailItemProcessor 진행중 | {}플레이어 ({}) >>> trendline객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> trendline객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
         Trendline trendline = new Trendline(player.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
                 ,player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
                 ,tankWinGame, tankLoseGame, dealWinGame, dealLoseGame, healWinGame, healLoseGame);
@@ -403,8 +403,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), dva.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), dva.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -456,8 +456,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     pdDto.setPlayTime(playTime);
                     pdDto.setIndex1(damageAmpAvg);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), orisa.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), orisa.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -509,8 +509,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reinhardt.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reinhardt.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -567,8 +567,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zarya.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zarya.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -626,8 +626,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), roadhog.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), roadhog.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -679,8 +679,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), winston.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), winston.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -733,8 +733,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sigma.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sigma.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -786,8 +786,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), wreckingBall.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), wreckingBall.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -835,8 +835,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ana.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ana.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -879,8 +879,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), baptiste.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), baptiste.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -923,8 +923,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), brigitte.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), brigitte.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -961,8 +961,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), lucio.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), lucio.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1004,8 +1004,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mercy.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mercy.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1052,8 +1052,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), moira.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), moira.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1089,8 +1089,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zenyatta.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), zenyatta.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1142,8 +1142,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), junkrat.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), junkrat.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1190,8 +1190,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), genji.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), genji.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1243,8 +1243,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), doomfist.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), doomfist.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1286,8 +1286,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reaper.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), reaper.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1337,8 +1337,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mccree.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mccree.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1389,8 +1389,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mei.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), mei.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1440,8 +1440,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), bastion.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), bastion.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1492,8 +1492,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), soldier76.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), soldier76.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1543,8 +1543,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sombra.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), sombra.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1595,8 +1595,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), symmetra.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), symmetra.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1650,8 +1650,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ashe.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), ashe.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1700,8 +1700,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), widowmaker.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), widowmaker.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1751,8 +1751,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), torbjorn.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), torbjorn.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1806,8 +1806,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), tracer.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), tracer.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1856,8 +1856,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), pharah.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), pharah.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);
@@ -1906,8 +1906,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     playerDetailList.add(playerDetail);
 
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
-                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {}플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), hanzo.toString());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}, playerDetail객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId(), pdDto.getHeroNameKR());
+                    log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> {}", JOB_NAME, player.getBattleTag(), player.getId(), hanzo.toString());
 
                     winLoseGame.add(0, winGame);
                     winLoseGame.add(1, loseGame);

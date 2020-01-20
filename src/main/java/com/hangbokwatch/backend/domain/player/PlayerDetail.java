@@ -25,7 +25,7 @@ public class PlayerDetail {
     private Long season;
 
     @Id
-    @Column(name = "hero_order")
+    @Column(name = "hero_order", nullable = false)
     private Integer heroOrder;
 
     @Column(name = "hero_name")

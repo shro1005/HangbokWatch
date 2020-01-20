@@ -5,6 +5,7 @@ import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
 import com.hangbokwatch.backend.domain.player.Trendline;
+import com.hangbokwatch.backend.domain.user.Favorite;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,4 +49,5 @@ public class CompetitiveDetailDto {
     private Ashe ashe;
     private Trendline trendline;
     private int count;
+    private String favorite;
 }
