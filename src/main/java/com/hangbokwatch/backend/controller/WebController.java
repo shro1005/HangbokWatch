@@ -56,7 +56,7 @@ public class WebController {
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("count", cdDto.getCount());
             model.addAttribute("favorite", cdDto.getFavorite());
-            log.info("like or not : " + cdDto.getFavorite());
+//            log.info("like or not : " + cdDto.getFavorite());
         }
 
         log.info("{} >>>>>>>> showPlayerDetail 종료 | playerDetail.html 화면 이동", sessionBattleTag);
@@ -96,12 +96,26 @@ public class WebController {
             model.addAttribute("player", cdDto.getPlayer());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("favorite", cdDto.getFavorite());
-            log.debug("like or not : " + cdDto.getFavorite());
+//            log.debug("like or not : " + cdDto.getFavorite());
         }
         log.info("{} >>>>>>>> refreshPlayerDetail 종료 | playerDetail.html 화면 이동", sessionBattleTag);
         log.info("===================================================================");
         return "playerDetail";
     }
+
+    @GetMapping("/myFavorite")
+    public String myFavorite(Model model) {
+        Map<String, Object> sessionItems = sessionCheck(model);
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> myFavorite 호출 | 즐겨찾기 페이지 이동을 위해 연관된 데이터를 조회합니다.", sessionBattleTag);
+
+
+        log.info("{} >>>>>>>> myFavorite 종료 | 즐겨찾기 페이지(favorite.html)로 이동", sessionBattleTag);
+        log.info("===================================================================");
+        return "favorites";
+    }
+
 
     private Map<String, Object> sessionCheck(Model model) {
         // CustomOAuth2UserService에서 로그인 성공시 세션에 SessionUser를 저장하도록 구성했으므로

@@ -87,7 +87,7 @@ public class ShowPlayerDetailService {
                 }else {
                     log.debug("{} >>>>>>>> showPlayerDetailService 진행중 | DB에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
                     try {
-                        favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), player.getId()).getLikeOrNot();
+                        favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), player.getId()).getLikeornot();
                     }catch (NullPointerException e) {
                         favorite = "N";
                     }
@@ -141,7 +141,7 @@ public class ShowPlayerDetailService {
                     }else {
                         log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | DB에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
                         try {
-                            favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), playerListDto.getId()).getLikeOrNot();
+                            favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), playerListDto.getId()).getLikeornot();
                         }catch (NullPointerException e) {
                             favorite = "N";
                         }

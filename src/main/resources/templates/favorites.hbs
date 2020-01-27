@@ -34,25 +34,44 @@
 
         <section class="ftco-section goto-here">
             <div class="resultContainer-s">	<!--container-->
-                <div style="width: 300px; height: 250px; position: absolute; left: -30px;">  <!--왼쪽 광고-->
-                    <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"-->
-                        <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
+<!--                <div style="width: 300px; height: 250px; position: absolute; left: -30px;">  &lt;!&ndash;왼쪽 광고&ndash;&gt;-->
+<!--                    <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 &lt;!&ndash;data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="0" id="59b00d8946e0fb0001722ff0-0"&ndash;&gt;-->
+<!--                        <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div style="width: 300px; height: 250px; position: absolute; right: -30px;">  &lt;!&ndash;오른쪽광고&ndash;&gt;-->
+<!--                    <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 &lt;!&ndash;data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="1" id="59b00d8946e0fb0001722ff0-1"&ndash;&gt;-->
+<!--                        <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <!--나를 즐겨찾기한 플레이어-->
+
+                <div class="row justify-content-center">
+                    <div class="col-md-12 heading-section text-center mb-5">
+                        <span class="subheading">나를 즐겨찾기한 플레이어</span>
                     </div>
                 </div>
-                <div style="width: 300px; height: 250px; position: absolute; right: -30px;">  <!--오른쪽광고-->
-                    <div class="ad-placement"  style="background: none; border: none; position: relative; margin: 0px auto; overflow: hidden; max-width: 300px;">광고 <!--data-id="59b00d8946e0fb0001722ff0" data-reg="true" data-pos="1" id="59b00d8946e0fb0001722ff0-1"-->
-                        <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
+                <div class="player-list-container mb-5">
+                    {{#if isLogin}}
+
+                    {{else}}
+                        <div class="not-fount-base row"><div class="not-found-player col-md-12">
+                            배틀넷 연동한 플레이어만 확인할 수 있습니다.
+                        </div></div>
+                    {{/if}}
+                </div>
+                <div class="" id="player-list-container-more-button">
+                </div>
+                <!--내가 즐겨찾기한 플레이어-->
+                <div class="row justify-content-center">
+                    <div class="col-md-12 heading-section text-center mb-5">
+                        <span class="subheading">내가 즐겨찾기한 플레이어</span>
                     </div>
                 </div>
-                <!--    		<div class="row justify-content-center">-->
-                <!--				<div class="col-md-12 heading-section text-center ftco-animate mb-5">-->
-                <!--					<span class="subheading">플레이어 검색</span>-->
-                <!--				</div>-->
-                <!--        	</div>-->
-                <div class="player-list-container">
+                <div class="favorite-player-list-container">
 
                 </div>
-                <div class="" id="more-button">
+                <div class="" id="favorite-player-list-container-more-button">
                 </div>
             </div>
 
@@ -61,9 +80,7 @@
 
     {{!--=================== scripts content ======================--}}
     {{#*inline "scripts-blick"}}
-        <script src="/js/app/hangbok-favorite.js"></script>
-
-        <script id="player_list" type="text/x-handlebars-template" charset="UTF-8">
+        <script id="favorite_player_list" type="text/x-handlebars-template" charset="UTF-8">
             <p class="grid-header"></p>
             <div class="row" id="search-result">
                 <div class="table-responsive">
@@ -83,7 +100,7 @@
                         <tbody class="tbody">
                         \{{#players}}
                         <tr>
-                            <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                            <td class="align-items-left" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;">
                                 <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
                                 <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
                             </td>
@@ -128,7 +145,7 @@
         <script id="more_player_list" type="text/x-handlebars-template" charset="UTF-8">
             \{{#players}}
             <tr>
-                <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                <td class="align-items-left" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;">
                     <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
                     <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
                 </td>
@@ -163,6 +180,8 @@
             </tr>
             \{{/players}}
         </script>
+        <script src="/js/app/hangbok-header.js"></script>
+        <script src="/js/app/hangbok-favorite.js"></script>
     {{/inline}}
 
 {{/layouts/base}}

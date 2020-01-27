@@ -8,6 +8,7 @@ import com.hangbokwatch.backend.dto.auth.SessionUser;
 import com.hangbokwatch.backend.service.CrawlingPlayerDataService;
 import com.hangbokwatch.backend.service.SearchPlayerListService;
 import com.hangbokwatch.backend.service.ShowPlayerDetailService;
+import com.hangbokwatch.backend.service.ShowUserFavoriteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class WebRestController {
     private final CrawlingPlayerDataService cpl;
     private final SearchPlayerListService spl;
     private final ShowPlayerDetailService spd;
+    private final ShowUserFavoriteService suf;
     private final HttpSession httpSession;
 
     @PostMapping("/showPlayerList")
@@ -92,7 +94,45 @@ public class WebRestController {
         log.info("{} >>>>>>>> refreshFavorite 호출 | 즐겨찾기 버튼 클릭. 클릭한 유저 ID : {}, 좋아요 : {}", sessionBattleTag, clickedId, likeOrNot);
 
         spd.refreshFavorite(clickedId, likeOrNot, sessionItems);
+
+        log.info("{} >>>>>>>> refreshFavorite 호출 | 즐겨찾기 버튼 클릭 작업 완료", sessionBattleTag);
+        log.info("===================================================================");
         return "Success";
+    }
+
+    @PostMapping("getFavoriteData")
+    public Map<String, Object> getFavoriteData() {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getFavoriteData 호출 | 즐겨찾기 플레이어 리스트 조회", sessionBattleTag);
+
+        List<PlayerListDto> myFavoritePlayerList = suf.findMyFavoritePlayerList(sessionItems);
+        List<PlayerListDto> favoritingMePlayerList = suf.findFavoritingMePlayerList(sessionItems);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("myFavorite", myFavoritePlayerList);
+        map.put("favoritingMe", favoritingMePlayerList);
+
+        log.info("{} >>>>>>>> getFavoriteData 호출 | 즐겨찾기 플레이어 리스트 조회 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return map;
+    }
+
+    private Map<String, Object> sessionCheck() {
+        // CustomOAuth2UserService에서 로그인 성공시 세션에 SessionUser를 저장하도록 구성했으므로
+        // 세션에서 httpSession.getAttribute("user")를 통해 User 객체를 가져올 수 있다.
+        SessionUser user = (SessionUser) httpSession.getAttribute("user");
+        String battleTag = "미로그인 유저";
+        if (user != null) {
+            battleTag = user.getBattleTag();
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("loginUser", user);
+        map.put("sessionBattleTag", battleTag);
+        return map;
     }
 
     /**현재 미사용 2019.12.12 */
@@ -109,27 +149,5 @@ public class WebRestController {
         System.out.println("15개 조회 끝");
         Collections.sort(resultPlayerList);
         return resultPlayerList;
-    }
-
-    @RequestMapping("/user")
-    public Principal user(Principal principal) {
-        log.info(principal.toString());
-
-        return principal;
-    }
-
-    private Map<String, Object> sessionCheck() {
-        // CustomOAuth2UserService에서 로그인 성공시 세션에 SessionUser를 저장하도록 구성했으므로
-        // 세션에서 httpSession.getAttribute("user")를 통해 User 객체를 가져올 수 있다.
-        SessionUser user = (SessionUser) httpSession.getAttribute("user");
-        String battleTag = "미로그인 유저";
-        if (user != null) {
-            battleTag = user.getBattleTag();
-        }
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("loginUser", user);
-        map.put("sessionBattleTag", battleTag);
-        return map;
     }
 }

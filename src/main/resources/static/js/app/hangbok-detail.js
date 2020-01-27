@@ -162,7 +162,7 @@ const getDetailData = () => {
             // console.log(val);
         });
         /*추세선 파싱*/
-        console.log(datas.trendline);
+        // console.log(datas.trendline);
         $.each(datas.trendline, function (i, val) {
             moment.locale('ko');
             // console.log(val.udtDtm);

@@ -77,7 +77,7 @@ const main = {
         const inputName = {
             playerName: playerName
         };
-        console.log("playerName : " + playerName);
+        // console.log("playerName : " + playerName);
         $.ajax({
             type: 'POST',
             url: '/showPlayerList',
@@ -109,8 +109,8 @@ const main = {
                     // console.log("showUserList => " + crawlingResult);
                     // console.log("/showUserList => 결과 내역 사이즈 : " + crawlingResult.length);
                     if(crawlingResult.length == 0) {
-                        const noticeDiv = $('<div class="player notice_playerList"> 행복워치에 등록된 유저가 아닙니다.<br>' +
-                            '행복워치에서 최초 검색 시 배틀태그(플레이어명#00000)를 정확하게 입력해야 합니다.</div>');
+                        const noticeDiv = $('<div class="not-fount-base row"><div class="player not-found-player col-md-12"> 옵치하기에 등록된 유저가 아닙니다.<br>' +
+                            '옵치하기 최초 검색 시 배틀태그(플레이어명#00000)를 정확하게 입력해야 합니다.</div><div>');
                         //const testDiv = $('<div></div>');
                         $(".player-list-container").append(noticeDiv);
                     }else {
@@ -197,7 +197,7 @@ function morePlayers() {
 }
 
 function playerDetail(obj) {
-    console.log($(obj).attr('attr-p'), $(obj).attr('attr-u'));
+    // console.log($(obj).attr('attr-p'), $(obj).attr('attr-u'));
     const isPublic = $(obj).attr('attr-p');
     const forUrl = $(obj).attr('attr-u');
     if(isPublic == 'Y') {
@@ -215,7 +215,7 @@ function drawList(data) {
         alert(data.playerName);
         return false;
     }
-    console.log(data.udtDtm);
+    // console.log(data.udtDtm);
     return {portrait: data.portrait, battleTag: data.battleTag, playerLevel: data.playerLevel, platform: data.platform, tankRatingPoint: data.tankRatingPoint, dealRatingPoint: data.dealRatingPoint, healRatingPoint: data.healRatingPoint, winRate: data.winRate,
     mostHero1: "/HWimages/hero/"+data.mostHero1+"_s.png", mostHero2: "/HWimages/hero/"+data.mostHero2+"_s.png", mostHero3: "/HWimages/hero/"+data.mostHero3+"_s.png", isPublic: data.isPublic, forUrl: data.forUrl, tankRatingImg: data.tankRatingImg,
     dealRatingImg: data.dealRatingImg, healRatingImg: data.healRatingImg, wingame: data.winGame, losegame: data.loseGame, udtDtm: data.udtDtm};

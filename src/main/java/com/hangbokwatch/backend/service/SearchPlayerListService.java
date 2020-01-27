@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,17 @@ public class SearchPlayerListService {
             , player.getMostHero1(), player.getMostHero2(), player.getMostHero3(), player.getUdtDtm().format(DateTimeFormatter.ISO_DATE));
 
             log.debug("{} | searchPlayerList 진행 | {}에 해당하는 플레이어 데이터 : {}", sessionBattleTag, playerName, playerListDto.toString());
+
+            int cnt = 3;
+            if(playerListDto.getTankRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
+            if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
+            if(cnt == 0 ) {cnt = 1;}
+            playerListDto.setCnt(cnt);
             playerListDtos.add(playerListDto);
         }
+        Collections.sort(playerListDtos);
+
         log.info("{} | searchPlayerList 종료 | 검색값 : {}", sessionBattleTag, playerName);
         return playerListDtos;
     }

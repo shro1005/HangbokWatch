@@ -10069,6 +10069,51 @@ a:hover {
   vertical-align: middle;
 }
 
+.heading-section .subheading {
+  font-size: 22px;
+  display: inline-block;
+  margin-bottom: 0;
+  color: rgba(232,110,208,1);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+}
+.heading-section .subheading:after{
+   position: absolute;
+   top: 50%;
+   left: -60px;
+   content: '';
+   transform: translateY(-50%);
+   width: 50px;
+   height: 1px;
+   margin-top: -1px;
+   background: rgba(232,110,208,1);
+ }
+.heading-section .subheading:before{
+   position: absolute;
+   top: 50%;
+   right: -60px;
+   content: '';
+   transform: translateY(-50%);
+   width: 50px;
+   height: 1px;
+   margin-top: -1px;
+   background: rgba(232,110,208,1);
+ }
+
+.not-fount-base {
+  text-align: center;
+}
+.not-found-player {
+  padding: 20px 10px 20px 10px;
+  border-top: 1px solid #666666;
+  border-bottom: 1px solid #666666;
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1.8rem;
+}
+
 
 
 

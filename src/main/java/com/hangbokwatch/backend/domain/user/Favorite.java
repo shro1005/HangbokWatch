@@ -26,7 +26,7 @@ public class Favorite {
     private Long clickedId;
 
     @Column(name = "like_or_not")
-    private String likeOrNot;
+    private String likeornot;
 
     @CreationTimestamp
     @Column(name="rgt_dtm", nullable = true)
@@ -39,7 +39,7 @@ public class Favorite {
     public Favorite(Long id, Long clickedId, String likeOrNot) {
         this.id = id;
         this.clickedId = clickedId;
-        this.likeOrNot = likeOrNot;
+        this.likeornot = likeOrNot;
     }
 
 }

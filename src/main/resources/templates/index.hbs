@@ -49,11 +49,11 @@
                         <iframe width="300" height="600" allowtransparency="true" marginheight="0" marginwidth="0" scrolling="no" frameborder="0" src="javascript:'<html><body></body></html>'"></iframe>
                     </div>
                 </div>
-                <!--    		<div class="row justify-content-center">-->
-                <!--				<div class="col-md-12 heading-section text-center ftco-animate mb-5">-->
-                <!--					<span class="subheading">플레이어 검색</span>-->
-                <!--				</div>-->
-                <!--        	</div>-->
+                    		<div class="row justify-content-center">
+                				<div class="col-md-12 heading-section text-center ftco-animate mb-5">
+                					<span class="subheading">플레이어 검색</span>
+                				</div>
+                        	</div>
                 <div class="player-list-container">
 
                 </div>
@@ -88,7 +88,7 @@
                         <tbody class="tbody">
                         \{{#players}}
                         <tr>
-                            <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                            <td class="align-items-leftß" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;ß">
                                 <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
                                 <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
                             </td>
@@ -133,7 +133,7 @@
         <script id="more_player_list" type="text/x-handlebars-template" charset="UTF-8">
             \{{#players}}
             <tr>
-                <td class="align-items-center" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                <td class="align-items-left" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;">
                     <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
                     <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
                 </td>

@@ -17,4 +17,7 @@ public interface PlayerRepository extends JpaRepository<Player, String> {
     
     Player findPlayerByBattleTag(String BattleTag);
 
+    // id로 검색
+    Player findPlayerById(Long id);
+
 }
