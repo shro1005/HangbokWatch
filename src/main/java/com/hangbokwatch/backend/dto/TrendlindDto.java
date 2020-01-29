@@ -24,7 +24,7 @@ public class TrendlindDto {
 
     @Override
     public String toString() {
-        return "Ana{" +
+        return "Trendline{" +
                 "id=" + id +
                 ", udtDtm=" + udtDtm +
                 ", tankRatingPoint=" + tankRatingPoint +

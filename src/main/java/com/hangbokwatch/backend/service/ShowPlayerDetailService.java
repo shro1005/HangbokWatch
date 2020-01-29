@@ -70,6 +70,9 @@ public class ShowPlayerDetailService {
             }else {
                 log.debug("{} >>>>>>>> showPlayerDetailService 진행중 | {} : player DB에서 조회 성공", sessionBattleTag, forUrl);
                 Player player = playerRepository.findPlayerByBattleTag(forUrl);
+                if("N".equals(player.getIsPublic())) {
+                    return cdDto;
+                }
 
                 //로그인한 유저인지 확인하여 즐겨찾기를 조회
                 SessionUser sessionUser = (SessionUser)sessionItems.get("loginUser");
@@ -147,6 +150,8 @@ public class ShowPlayerDetailService {
                         }
                     }
                     cdDto.setFavorite(favorite);
+                }else {
+                    log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} 의 경우 프로필 비공개 유저로 검색화면을 반환합니다.", sessionBattleTag, forUrl);
                 }
             }
         }

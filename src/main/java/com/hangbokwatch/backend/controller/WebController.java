@@ -46,7 +46,7 @@ public class WebController {
 
         log.info("{} >>>>>>>> showPlayerDetail 호출 | 조회 url : {}", sessionBattleTag, forUrl);
         CompetitiveDetailDto cdDto = spd.showPlayerDetailService(forUrl, sessionItems);
-
+        String returnUrl = "playerDetail";
         if(cdDto.getPlayer() != null) {
             String battleTag = cdDto.getPlayer().getBattleTag();
             String tag = battleTag.substring(battleTag.indexOf("#"));
@@ -57,11 +57,18 @@ public class WebController {
             model.addAttribute("count", cdDto.getCount());
             model.addAttribute("favorite", cdDto.getFavorite());
 //            log.info("like or not : " + cdDto.getFavorite());
+        }else {
+            if(forUrl.indexOf("-") != -1) {
+                forUrl = forUrl.replace("-", "#");
+            }
+            model.addAttribute("isFromDetail", "Y");
+            model.addAttribute("userInput", forUrl);
+            returnUrl = "index";
         }
-
-        log.info("{} >>>>>>>> showPlayerDetail 종료 | playerDetail.html 화면 이동", sessionBattleTag);
+        log.info("{} >>>>>>>> showPlayerDetail 종료 | {}.html 화면 이동", sessionBattleTag, returnUrl);
         log.info("===================================================================");
-        return "playerDetail";
+
+        return returnUrl;
     }
 
     @GetMapping("/showPlayerListFromDetail/{userInput}")
@@ -87,7 +94,7 @@ public class WebController {
 
         log.info("{} >>>>>>>> refreshPlayerDetail 호출 | 조회 url : {}", sessionBattleTag, forUrl);
         CompetitiveDetailDto cdDto = spd.refreshPlayerDetail(forUrl, sessionItems);
-
+        String returnUrl = "playerDetail";
         if(cdDto.getPlayer() != null) {
             String battleTag = cdDto.getPlayer().getBattleTag();
             String tag = battleTag.substring(battleTag.indexOf("#"));
@@ -96,11 +103,20 @@ public class WebController {
             model.addAttribute("player", cdDto.getPlayer());
             model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("favorite", cdDto.getFavorite());
-//            log.debug("like or not : " + cdDto.getFavorite());
+
+        }else {
+            if(forUrl.indexOf("-") != -1) {
+                forUrl = forUrl.replace("-", "#");
+            }
+            model.addAttribute("isFromDetail", "Y");
+            model.addAttribute("userInput", forUrl);
+
+            returnUrl = "index";
         }
-        log.info("{} >>>>>>>> refreshPlayerDetail 종료 | playerDetail.html 화면 이동", sessionBattleTag);
+        log.info("{} >>>>>>>> refreshPlayerDetail 종료 | {}.html 화면 이동", sessionBattleTag, returnUrl);
         log.info("===================================================================");
-        return "playerDetail";
+
+        return returnUrl;
     }
 
     @GetMapping("/myFavorite")

@@ -86,6 +86,15 @@ public class Player {
     @Column(name="draw_game")
     private Integer drawGame;
 
+    @Column(name="play_time")
+    private Long playTime;
+
+    @Column(name = "spent_on_fire")
+    private Long spentOnFire;
+
+    @Column(name = "env_kill")
+    private Integer envKill;
+
     @Column(name="most_hero1")
     private String mostHero1;
 
@@ -103,21 +112,20 @@ public class Player {
     @Column(name="udt_dtm", nullable = true)
     private LocalDateTime udtDtm;
 
-    @Builder
     public Player(Long id, String battleTag, String playerName, Integer playerLevel, String forUrl, String isPublic, String platform,
                   String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
                   String tankRatingImg, String dealRatingImg, String healRatingImg,
                   Integer tankWinGame, Integer tankLoseGame, Integer dealWinGame, Integer dealLoseGame, Integer healWinGame, Integer healLoseGame,
-                  Integer winGame, Integer loseGame, Integer drawGame, String mostHero1, String mostHero2, String mostHero3) {
+                  Integer winGame, Integer loseGame, Integer drawGame, Long playTime, Long spentOnFire, Integer envKill,
+                  String mostHero1, String mostHero2, String mostHero3) {
         this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait; this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
         this.healRatingPoint = healRatingPoint; this.tankRatingImg = tankRatingImg; this.dealRatingImg = dealRatingImg; this.healRatingImg = healRatingImg;
         this.tankWinGame = tankWinGame; this.tankLoseGame = tankLoseGame; this.dealWinGame = dealWinGame; this.dealLoseGame = dealLoseGame; this.healWinGame = healWinGame; this.healLoseGame = healLoseGame;
-        this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame;
+        this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame; this.playTime = playTime; this.spentOnFire = spentOnFire; this.envKill = envKill;
         this.mostHero1 = mostHero1; this.mostHero2 = mostHero2; this.mostHero3 = mostHero3; this.forUrl = forUrl;
     }
 
-    @Builder
     public Player(Long id, String battleTag, String playerName, Integer playerLevel, String forUrl, String isPublic, String platform, String portrait) {
         this.id = id ;this.battleTag = battleTag; this.playerName = playerName; this.playerLevel = playerLevel; this.isPublic = isPublic;
         this.platform = platform; this.portrait = portrait; this.forUrl = forUrl;

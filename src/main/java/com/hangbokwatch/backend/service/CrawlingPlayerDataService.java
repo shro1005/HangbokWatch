@@ -269,7 +269,8 @@ public class CrawlingPlayerDataService {
             /** 영웅 상세정보 추출 */
             log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {} 플레이어 영웅별 상세정보 파싱", sessionBattleTag, playerListDto.getBattleTag());
             Integer tankWinGame = 0; Integer tankLoseGame = 0; Integer dealWinGame = 0; Integer dealLoseGame = 0;
-            Integer healWinGame = 0; Integer healLoseGame = 0; Integer totalWinGame = 0; Integer totalLoseGame = 0;
+            Integer healWinGame = 0; Integer healLoseGame = 0;
+
             Integer count = 0;
 
             Element competitiveDatas = rawData.selectFirst("div#competitive");
@@ -349,15 +350,15 @@ public class CrawlingPlayerDataService {
             }
 
             // 플레이어 전체 승수 및 패배수
-            List<Integer> winLoseGame = heroDetailParsing(playerListDto, null, competitiveDatas, stopWatch, "0x02E00000FFFFFFFF", "", sessionBattleTag);
-            totalWinGame = winLoseGame.get(0); totalLoseGame = winLoseGame.get(1);
+            heroDetailParsing(playerListDto, null, competitiveDatas, stopWatch, "0x02E00000FFFFFFFF", "", sessionBattleTag);
 
             log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {}({}) 플레이어 player DB저장 완료", sessionBattleTag , playerListDto.getBattleTag(), playerListDto.getId());
             stopWatch.start("player 테이블에 저장");
             Player player = new Player(playerListDto.getId(), playerListDto.getBattleTag(), playerListDto.getPlayerName(), playerListDto.getPlayerLevel(), playerListDto.getForUrl(), playerListDto.getIsPublic(), playerListDto.getPlatform()
                     , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
                     , playerListDto.getTankRatingImg(), playerListDto.getDealRatingImg(), playerListDto.getHealRatingImg(), tankWinGame, tankLoseGame,dealWinGame,dealLoseGame,healWinGame,healLoseGame
-                    , totalWinGame, totalLoseGame, playerListDto.getDrawGame(), playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());
+                    , playerListDto.getWinGame(), playerListDto.getLoseGame(), playerListDto.getDrawGame(), playerListDto.getPlayTime(), playerListDto.getSpentOnFire(), playerListDto.getEnvKill()
+                    , playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());
             playerRepository.save(player);
 
             log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 trendline DB저장 완료", sessionBattleTag , playerListDto.getBattleTag(), playerListDto.getId());
@@ -419,6 +420,7 @@ public class CrawlingPlayerDataService {
             Integer winGame = 0;
             String winRate = "0%";
             Integer loseGame = 0;
+            Integer drawGame = 0;
             String playTime = "00:00";
             String killPerDeath = "0";
             String spentOnFireAvg = "00:00";
@@ -434,6 +436,9 @@ public class CrawlingPlayerDataService {
             String soloKillAvg = "0";
             Long lastHit = 0l;
             Long heal = 0l;
+            Long time = 0l;
+            String spentOnFire = "00:00";
+            Integer envKill = 0;
 
             if ("0x02E00000FFFFFFFF".equals(heroDetails.attr("data-category-id"))) {
                 Elements totalDatas = heroDetails.select("tr.DataTable-tableRow");
@@ -444,18 +449,49 @@ public class CrawlingPlayerDataService {
                         case "0x08600000000003F5":
                             td = tr.select("td");
                             winGame = Integer.parseInt(td.last().text());
+                            playerListDto.setWinGame(winGame);
                             break;
                         case "0x086000000000042E":
                             td = tr.select("td");
                             loseGame = Integer.parseInt(td.last().text());
+                            playerListDto.setLoseGame(loseGame);
+                            break;
+                        case "0x086000000000042F":
+                            td = tr.select("td");
+                            drawGame = Integer.parseInt(td.last().text());
+                            playerListDto.setDrawGame(drawGame);
+                            break;
+                        case "0x0860000000000026" :  //플레이시간
+                            td = tr.select("td");
+                            playTime = td.last().text();
+                            time = 0l;
+                            if (td.last().text().length() >= 8) {
+                                time += Long.parseLong(playTime.substring(0, playTime.indexOf(":"))) * 60 * 60;
+                            }
+                            time += Long.parseLong(playTime.substring(playTime.lastIndexOf(":")-2, playTime.lastIndexOf(":"))) * 60;
+                            time += Long.parseLong(playTime.substring(playTime.lastIndexOf(":")+1));
+                            playerListDto.setPlayTime(time);
+                            break;
+                        case "0x08600000000003CD" :  //폭주시
+                            td = tr.select("td");
+                            spentOnFire = td.last().text();
+                            time = 0l;
+                            if (td.last().text().length() >= 8) {
+                                time += Long.parseLong(spentOnFire.substring(0, spentOnFire.indexOf(":"))) * 60 * 60;
+                            }
+                            time += Long.parseLong(spentOnFire.substring(spentOnFire.lastIndexOf(":")-2, spentOnFire.lastIndexOf(":"))) * 60;
+                            time += Long.parseLong(spentOnFire.substring(spentOnFire.lastIndexOf(":")+1));
+                            playerListDto.setSpentOnFire(time);
+                            break;
+                        case "0x0860000000000363" :   //환경요소 처치
+                            td = tr.select("td");
+                            envKill = Integer.parseInt(td.last().text());
+                            playerListDto.setEnvKill(envKill);
                             break;
                         default:
                             break;
                     }
                 }
-
-                winLoseGame.add(0, winGame);
-                winLoseGame.add(1, loseGame);
                 return winLoseGame;
             }else {
                 stopWatch.start(pdDto.getHeroNameKR() + " 엘레멘트에서 원하는 정보 추출 및 테이블 저장 시간");
@@ -480,8 +516,8 @@ public class CrawlingPlayerDataService {
                             break;
                         case "0x0860000000000021":                  // 플레이 시간
                             td = tr.select("td");
-                            playTime = td.last().text().substring(0, 2);
-                            if (td.last().text().length() == 8) {
+                            playTime = td.last().text().substring(0, td.last().text().indexOf(":"));
+                            if (td.last().text().length() >= 8) {
                                 playTime += "시간";
                             } else {
                                 if ("00".equals(playTime)) {

@@ -66,6 +66,11 @@ const main = {
         $(".notice_playerList").remove();
         $(".grid-header").remove();
         $(".more_btn_div").remove();
+        $(".not-fount-base").remove();
+        const noticeDiv = $('<div class="not-fount-base row"><div class="player not-found-player col-md-12">' +
+            '검색한 플레이어의 프로필을 조회중입니다.<br>잠시만 기다려 주세요.</div><div>');
+        $(".player-list-container").append(noticeDiv);
+
         let playerName = $('input[id="playerName"]').val();
         const playerName_tap = $('input[id="playerName-tap"]').val();
 
@@ -77,6 +82,7 @@ const main = {
         const inputName = {
             playerName: playerName
         };
+
         // console.log("playerName : " + playerName);
         $.ajax({
             type: 'POST',
@@ -109,6 +115,7 @@ const main = {
                     // console.log("showUserList => " + crawlingResult);
                     // console.log("/showUserList => 결과 내역 사이즈 : " + crawlingResult.length);
                     if(crawlingResult.length == 0) {
+                        $(".not-fount-base").remove();
                         const noticeDiv = $('<div class="not-fount-base row"><div class="player not-found-player col-md-12"> 옵치하기에 등록된 유저가 아닙니다.<br>' +
                             '옵치하기 최초 검색 시 배틀태그(플레이어명#00000)를 정확하게 입력해야 합니다.</div><div>');
                         //const testDiv = $('<div></div>');
@@ -129,7 +136,7 @@ const main = {
 main.init();
 
 function initPlayers(template) {
-
+    $(".not-fount-base").remove();
     $(".more_btn_div").remove();
     var cnt = 15;
     if (playerData.length < 15) {
