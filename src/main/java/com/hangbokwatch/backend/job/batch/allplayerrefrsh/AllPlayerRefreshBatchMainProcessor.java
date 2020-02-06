@@ -1,12 +1,14 @@
-package com.hangbokwatch.backend.job.batch;
+package com.hangbokwatch.backend.job.batch.allplayerrefrsh;
 
 import com.hangbokwatch.backend.dao.SeasonRepository;
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
+import com.hangbokwatch.backend.service.GetRankingDataService;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -40,6 +42,9 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 //    @Autowired
 //    SeasonRepository seasonRepository;
     @Value("#{jobParameters[season]}") Long season;
+
+    @Autowired
+    GetRankingDataService grd;
 
     @Override
     public CompetitiveDetailDto process(Player player) throws Exception {
@@ -188,7 +193,10 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
         log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> player객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
 
+        PlayerForRanking playerForRanking = grd.updateRankingData(JOB_NAME, player);
+
         competitiveDetailDto.setPlayer(player);
+        competitiveDetailDto.setPlayerForRanking(playerForRanking);
 
         log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> trendline객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
         Trendline trendline = new Trendline(player.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())

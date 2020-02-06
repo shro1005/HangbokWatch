@@ -4,6 +4,7 @@ package com.hangbokwatch.backend.dto;
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.domain.user.Favorite;
 import lombok.Getter;
@@ -50,4 +51,5 @@ public class CompetitiveDetailDto {
     private Trendline trendline;
     private int count;
     private String favorite;
+    private PlayerForRanking playerForRanking;
 }

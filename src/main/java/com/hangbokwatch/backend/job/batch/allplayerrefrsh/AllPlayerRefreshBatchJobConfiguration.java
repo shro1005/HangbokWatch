@@ -1,4 +1,4 @@
-package com.hangbokwatch.backend.job.batch;
+package com.hangbokwatch.backend.job.batch.allplayerrefrsh;
 
 import com.hangbokwatch.backend.dao.SeasonRepository;
 import com.hangbokwatch.backend.domain.player.Player;
@@ -6,7 +6,6 @@ import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.job.BatchSettingHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.DuplicateJobException;
@@ -63,8 +62,9 @@ public class AllPlayerRefreshBatchJobConfiguration {
     @Bean
     public CronTriggerFactoryBean allPlayerRefreshTrigger() throws DuplicateJobException {
         return BatchSettingHelper.cronTriggerFactoryBeanBuilder()
-                .cronExpression("0 0 * * * ?")
+                .cronExpression("0 24 * * * ?")
                 .jobDetailFactoryBean(allPlayerRefreshSchedule())
+                .name(JOB_NAME + "_trigger")
                 .build();
     }
 

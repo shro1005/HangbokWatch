@@ -16,6 +16,9 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 /**
  * Quartz Schedule 에 등록된 Job 을 Spring Batch Job 으로 실행시키기 위한 Executor class.
@@ -43,7 +46,7 @@ public class BatchJobLauncher implements org.quartz.Job {
             jobLauncher.run(jobLocator.getJob(jobName), jobParameters);
             log.info(" ======================= Spring Batch End ====================== ");
         }catch (SchedulerException | NoSuchJobException | JobInstanceAlreadyCompleteException | JobRestartException | JobParametersInvalidException | JobExecutionAlreadyRunningException e) {
-            log.error("Spring Batch ERROR!!!! >>>>>>>> {} 에러 발생 | 이미지 저장중 에러 발생", e.getCause());
+            log.error("Spring Batch ERROR!!!! >>>>>>>> {} 에러 발생 ", e.getCause());
             log.error("====================================================\n" + e + "\n====================================================");
             throw new JobExecutionException();
         }

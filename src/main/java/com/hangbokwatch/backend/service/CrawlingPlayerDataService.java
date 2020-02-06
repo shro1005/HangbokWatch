@@ -15,6 +15,7 @@ import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
 import com.hangbokwatch.backend.dto.PlayerDetailDto;
 import com.hangbokwatch.backend.dto.PlayerListDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -39,6 +40,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CrawlingPlayerDataService {
     private static String GET_PLAYER_LIST_URL = "https://playoverwatch.com/ko-kr/search/account-by-name/";
 //    private static String GET_PLAYER_PROFILE_URL2 = "https://ow-api.com/v1/stats/pc/asia/";  //미사용
@@ -79,6 +81,8 @@ public class CrawlingPlayerDataService {
     @Autowired TracerRepository tracerRepository;
     @Autowired PharahRepository pharahRepository;
     @Autowired HanzoRepository hanzoRepository;
+
+    private final GetRankingDataService grd;
 
     @Value("${spring.HWresource.HWimages}")
     private String portraitPath;
@@ -360,6 +364,8 @@ public class CrawlingPlayerDataService {
                     , playerListDto.getWinGame(), playerListDto.getLoseGame(), playerListDto.getDrawGame(), playerListDto.getPlayTime(), playerListDto.getSpentOnFire(), playerListDto.getEnvKill()
                     , playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());
             playerRepository.save(player);
+
+            grd.updateRankingData(sessionBattleTag, player);
 
             log.debug("{} | crawlingPlayerDetail 진행중 | {}({}) 플레이어 trendline DB저장 완료", sessionBattleTag , playerListDto.getBattleTag(), playerListDto.getId());
             Trendline trendline = new Trendline(playerListDto.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())

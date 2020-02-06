@@ -1,8 +1,9 @@
-package com.hangbokwatch.backend.job.batch;
+package com.hangbokwatch.backend.job.batch.allplayerrefrsh;
 
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import org.apache.commons.logging.Log;
@@ -73,6 +74,9 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                     Player player = ((CompetitiveDetailDto) item).getPlayer();
                     Trendline trendline = ((CompetitiveDetailDto) item).getTrendline();
                     List<PlayerDetail> playerDetailList = ((CompetitiveDetailDto) item).getPlayerDetailList();
+                    PlayerForRanking playerForRanking = ((CompetitiveDetailDto) item).getPlayerForRanking();
+
+                    //탱커
                     Dva dva = ((CompetitiveDetailDto) item).getDva();
                     Orisa orisa = ((CompetitiveDetailDto) item).getOrisa();
                     Reinhardt reinhardt = ((CompetitiveDetailDto) item).getReinhardt();
@@ -81,6 +85,8 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                     Winston winston = ((CompetitiveDetailDto) item).getWinston();
                     Sigma sigma = ((CompetitiveDetailDto) item).getSigma();
                     WreckingBall wreckingBall = ((CompetitiveDetailDto) item).getWreckingBall();
+
+                    //힐러
                     Ana ana = ((CompetitiveDetailDto) item).getAna();
                     Baptiste baptiste = ((CompetitiveDetailDto) item).getBaptiste();
                     Brigitte brigitte = ((CompetitiveDetailDto) item).getBrigitte();
@@ -88,6 +94,8 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                     Mercy mercy = ((CompetitiveDetailDto) item).getMercy();
                     Moira moira = ((CompetitiveDetailDto) item).getMoira();
                     Zenyatta zenyatta = ((CompetitiveDetailDto) item).getZenyatta();
+
+                    //딜러
                     Junkrat junkrat = ((CompetitiveDetailDto) item).getJunkrat();
                     Genji genji = ((CompetitiveDetailDto) item).getGenji();
                     Doomfist doomfist = ((CompetitiveDetailDto) item).getDoomfist();
@@ -118,6 +126,10 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                             entityManager.merge(playerDetail);
                             mergeCount ++;
                         }
+                    }
+                    if(playerForRanking != null) {
+                        entityManager.merge(playerForRanking);
+                        mergeCount++;
                     }
 
                     if (dva != null) {

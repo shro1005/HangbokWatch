@@ -22,7 +22,7 @@ public class PlayerForRanking {
     @Column(name="id", nullable = false)
     private Long id;
 
-    @Column(name="player_level", nullable = false)
+    @Column(name="player_level")
     private Integer playerLevel;
 
     @Column(name="tank_rating_point")
@@ -81,4 +81,34 @@ public class PlayerForRanking {
     @UpdateTimestamp
     @Column(name="udt_dtm", nullable = true)
     private LocalDateTime udtDtm;
+
+    public PlayerForRanking(Long id, Integer playerLevel,
+                  Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
+                  Integer tankWinGame, Integer tankLoseGame, Integer dealWinGame, Integer dealLoseGame, Integer healWinGame, Integer healLoseGame,
+                  Integer winGame, Integer loseGame, Integer drawGame, Long playTime, Long spentOnFire, Integer envKill, String isBaseData) {
+        this.id = id ; this.playerLevel = playerLevel;
+         this.tankRatingPoint = tankRatingPoint; this.dealRatingPoint = dealRatingPoint;
+        this.healRatingPoint = healRatingPoint; this.tankWinGame = tankWinGame; this.tankLoseGame = tankLoseGame;
+        this.dealWinGame = dealWinGame; this.dealLoseGame = dealLoseGame; this.healWinGame = healWinGame; this.healLoseGame = healLoseGame;
+        this.winGame = winGame; this.loseGame = loseGame; this.drawGame = drawGame; this.playTime = playTime;
+        this.spentOnFire = spentOnFire; this.envKill = envKill; this.isBaseData = isBaseData;
+    }
+
+    @Override
+    public String toString() {
+        return "PlayerForRanking : {" +
+                "id : " + id +
+                " / playerLevel : " + playerLevel +
+                " / tankRantingPoint : " + tankRatingPoint +
+                " / dealRatingPoint : " + dealRatingPoint +
+                " / healRatingPoint : " + healRatingPoint +
+                " / winGame : " + winGame +
+                " / loseGame : " + loseGame +
+                " / drawGame : " + drawGame +
+                " / playTime : " + playTime +
+                " / spentOnFire : " + spentOnFire +
+                " / envKill : " + envKill +
+                " / isBaseData : " + isBaseData +
+                "}";
+    }
 }

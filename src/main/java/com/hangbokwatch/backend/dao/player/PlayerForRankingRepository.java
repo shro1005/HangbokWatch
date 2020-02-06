@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlayerForRankingRepository extends JpaRepository<PlayerForRanking, Long> {
+    PlayerForRanking findPlayerForRankingByIsBaseDataAndId(String isBaseData, Long id);
+
     List<PlayerForRanking> findAllByIsBaseDataAndId(String isBaseData, Long id);
 
     // 딜러 점수 상승별 플레이어 데이터

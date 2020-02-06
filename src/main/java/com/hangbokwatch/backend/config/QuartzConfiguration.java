@@ -1,4 +1,4 @@
-package com.hangbokwatch.backend.job;
+package com.hangbokwatch.backend.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.SchedulerException;
@@ -11,6 +11,7 @@ import org.springframework.batch.core.configuration.support.JobRegistryBeanPostP
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
@@ -20,27 +21,28 @@ import java.util.List;
 
 
 @Slf4j
+@Configuration
 //@EnableConfigurationProperties(QuartzProperties.class)
 @EnableBatchProcessing
 public class QuartzConfiguration {
-    /**
-     * JobRegistry에 job를 자동등록하기 위한 설정
-     *   @param jobRegistry ths Spring Batch Job Registry
-     *   @return JobRegistryBeanPostProcessor
-     */
-    @Bean
-    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
-        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
-        return jobRegistryBeanPostProcessor;
-    }
+//    /**
+//     * JobRegistry에 job를 자동등록하기 위한 설정
+//     *   @param jobRegistry ths Spring Batch Job Registry
+//     *   @return JobRegistryBeanPostProcessor
+//     */
+//    @Bean
+//    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+//        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+//        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
+//        return jobRegistryBeanPostProcessor;
+//    }
 
-    /**
-     * Quartz Schedule Job에 의존성 주입
-     *  - QuartzJobBean를 사용하는데신, 필요한 Bean의 Injection을 Spring에게 위임
-     *   @param beanFactory application context beanFactory
-     *   @return Jobfactory
-     */
+//    /**
+//     * Quartz Schedule Job에 의존성 주입
+//     *  - QuartzJobBean를 사용하는데신, 필요한 Bean의 Injection을 Spring에게 위임
+//     *   @param beanFactory application context beanFactory
+//     *   @return Jobfactory
+//     */
 //    @Bean
 //    public JobFactory jobFactory(AutowireCapableBeanFactory beanFactory) {
 //        return new SpringBeanJobFactory(){
@@ -53,48 +55,47 @@ public class QuartzConfiguration {
 //        };
 //    }
 
+//    /**
+//     * Scheduler 전체를 관리하는 Manager.
+//     *
+//     * @param datasource Spring datasource
+//     * @return the scheduler factory bean
+//     * @throws Exception the exception
+//     */
+//    @Bean
+//    public SchedulerFactoryBean schedulerFactoryBean(DataSource datasource, JobFactory jobFactory, Trigger[] registryTrigger) throws Exception {
+//
+//        SchedulerFactoryBean factory = new SchedulerFactoryBean();
+//
+//        factory.setSchedulerName("SampleProject-0.0.1");
+//        //Register JobFactory
+//        factory.setJobFactory(jobFactory);
+//        //Graceful Shutdown 을 위한 설정으로 Job 이 완료될 때까지 Shutdown 을 대기하는 설정
+//        factory.setWaitForJobsToCompleteOnShutdown(true);
+//        //Job Detail 데이터 Overwrite 유무
+//        factory.setOverwriteExistingJobs(true);
+//        //Register QuartzProperties
+////        factory.setQuartzProperties(quartzProperties.toProperties());
+//        //Schedule 관리를 Spring Datasource 에 위임
+//        factory.setDataSource(datasource);
+//        //Register Triggers
+//        factory.setTriggers(registryTrigger);
+//
+//        return factory;
+//    }
+
+//    /**
+//     * Scheduler 에 Trigger 를 자동으로 등록하기 위한 설정.
+//     * @param cronTriggerFactoryBeanList
+//     * @return
+//     */
+//    @Bean
+//    public Trigger[] registryTrigger(List<CronTriggerFactoryBean> cronTriggerFactoryBeanList) {
+//        return cronTriggerFactoryBeanList.stream().map(CronTriggerFactoryBean::getObject).toArray(Trigger[]::new);
+//    }
+
     /**
-     * Scheduler 전체를 관리하는 Manager.
-     *
-     * @param datasource Spring datasource
-     * @return the scheduler factory bean
-     * @throws Exception the exception
-     */
-    @Bean
-    public SchedulerFactoryBean schedulerFactoryBean(DataSource datasource, JobFactory jobFactory, Trigger[] registryTrigger) throws Exception {
-
-        SchedulerFactoryBean factory = new SchedulerFactoryBean();
-
-        factory.setSchedulerName("SampleProject-0.0.1");
-        //Register JobFactory
-        factory.setJobFactory(jobFactory);
-        //Graceful Shutdown 을 위한 설정으로 Job 이 완료될 때까지 Shutdown 을 대기하는 설정
-        factory.setWaitForJobsToCompleteOnShutdown(true);
-        //Job Detail 데이터 Overwrite 유무
-        factory.setOverwriteExistingJobs(true);
-        //Register QuartzProperties
-//        factory.setQuartzProperties(quartzProperties.toProperties());
-        //Schedule 관리를 Spring Datasource 에 위임
-        factory.setDataSource(datasource);
-        //Register Triggers
-        factory.setTriggers(registryTrigger);
-
-        return factory;
-    }
-
-    /**
-     * Scheduler 에 Trigger 를 자동으로 등록하기 위한 설정.
-     * @param cronTriggerFactoryBeanList
-     * @return
-     */
-    @Bean
-    public Trigger[] registryTrigger(List<CronTriggerFactoryBean> cronTriggerFactoryBeanList) {
-        return cronTriggerFactoryBeanList.stream().map(CronTriggerFactoryBean::getObject).toArray(Trigger[]::new);
-    }
-
-    /**
-     * DataSource에 대한 설정을 Spring Framework에게 위임했다면 이 설정을 쓸 수 없습니다.
-     * 그 이유는 Spring Framework가 종료될 때 독립적으로 수행되고 있는 Quartz Job을 기다리지 않기 때문입니다.
+     * Spring Framework가 종료될 때 독립적으로 수행되고 있는 Quartz Job을 기다리지 않는다.
      * 기다리지 않기 때문에 Spring Framework는 DataSource Connection을 close할 것이고, Quartz는 Job이 정상적으로 완료되었다고 할지라도 DataSource 에 정보를 업데이트하지 못한 채 종료가 됩니다.
      * 따라서 Spring Framework 가 종료될 때 Quartz 상태를 체크하고 기다리거나 종료하는 역할을 구현.
      * @param schedulerFactoryBean
@@ -128,6 +129,7 @@ public class QuartzConfiguration {
                 isRunning = false;
                 try {
                     log.info("Quartz Graceful Shutdown... ");
+                    schedulerFactoryBean.setWaitForJobsToCompleteOnShutdown(true);
                     schedulerFactoryBean.destroy();
                 } catch (SchedulerException e) {
                     try {
