@@ -460,15 +460,16 @@ const drawTrendline = () => {
         }, {
             label: '승리 판수',
             data: trend_tank_wingame,
-            backgroundColor: 'rgba(104,113,149,0.7)',
-            borderColor: 'rgba(104,113,149,0.7)',
+            backgroundColor: 'rgba(186,206,252,0.7)',
+            borderColor: 'rgba(186,206,252,0.7)', /*'rgba(104,113,149,0.7)'*/
             type: 'bar',
             yAxisID: 'second-y-axis'
         }, {
             label: '패배 판수',
-            data: trend_tank_losegame,
-            backgroundColor: 'rgba(32,41,61,0.7)',
-            borderColor: 'rgba(32,41,61,0.7)',
+            data: trend_tank_losegame
+            ,
+            backgroundColor: 'rgba(12,12,27,0.7)',
+            borderColor: 'rgba(12,12,27,0.7)',  /*'rgba(32,41,61,0.7)'*/
             type: 'bar',
             yAxisID: 'second-y-axis'
         }]
@@ -488,15 +489,15 @@ const drawTrendline = () => {
         }, {
             label: '승리 판수',
             data: trend_deal_wingame,
-            backgroundColor: 'rgba(104,113,149,0.7)',
-            borderColor: 'rgba(104,113,149,0.7)',
+            backgroundColor: 'rgba(186,206,252,0.7)',
+            borderColor: 'rgba(186,206,252,0.7)',
             type: 'bar',
             yAxisID: 'second-y-axis'
         }, {
             label: '패배 판수',
             data: trend_deal_losegame,
-            backgroundColor: 'rgba(32,41,61,0.7)',
-            borderColor: 'rgba(32,41,61,0.7)',
+            backgroundColor: 'rgba(12,12,27,0.7)',
+            borderColor: 'rgba(12,12,27,0.7)',
             type: 'bar',
             yAxisID: 'second-y-axis'
         }]
@@ -516,15 +517,15 @@ const drawTrendline = () => {
         }, {
             label: '승리 판수',
             data: trend_heal_wingame,
-            backgroundColor: 'rgba(104,113,149,0.7)',
-            borderColor: 'rgba(104,113,149,0.7)',
+            backgroundColor: 'rgba(186,206,252,0.7)',
+            borderColor: 'rgba(186,206,252,0.7)',
             type: 'bar',
             yAxisID: 'second-y-axis'
         }, {
             label: '패배 판수',
             data: trend_heal_losegame,
-            backgroundColor: 'rgba(32,41,61,0.7)',
-            borderColor: 'rgba(32,41,61,0.7)',
+            backgroundColor: 'rgba(12,12,27,0.7)',
+            borderColor: 'rgba(12,12,27,0.7)',
             type: 'bar',
             yAxisID: 'second-y-axis'
         }]

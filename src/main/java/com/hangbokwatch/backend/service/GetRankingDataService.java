@@ -26,9 +26,28 @@ public class GetRankingDataService {
         PlayerForRanking playerForRanking = playerForRankingRepository.findPlayerForRankingByIsBaseDataAndId("Y", playerId);
         log.debug("{} >>>>>>>> updateRankingData 진행 | 베이스 기록을 조회완료 : {}", sessionBattleTag, playerForRanking.toString());
         // (현재 - 기준) 값으로 금주의 랭킹을 보여주기 위함
-        Integer tankRatingPoint = player.getTankRatingPoint() - playerForRanking.getTankRatingPoint();
-        Integer dealRatingPoint = player.getDealRatingPoint() - playerForRanking.getDealRatingPoint();
-        Integer healRatingPoint = player.getHealRatingPoint() - playerForRanking.getHealRatingPoint();
+        Integer tankRatingPoint = 0; Integer dealRatingPoint =0; Integer healRatingPoint =0; int cnt = 0;
+        if(playerForRanking.getTankRatingPoint() != 0) {
+            tankRatingPoint = player.getTankRatingPoint() - playerForRanking.getTankRatingPoint();
+        } else {
+            playerForRanking.updateTankRankingPoint(player.getTankRatingPoint());
+            cnt++;
+        }
+        if(playerForRanking.getDealRatingPoint() != 0) {
+            dealRatingPoint = player.getDealRatingPoint() - playerForRanking.getDealRatingPoint();
+        } else {
+            playerForRanking.updateDealRankingPoint(player.getDealRatingPoint());
+            cnt++;
+        }
+        if(playerForRanking.getHealRatingPoint() != 0) {
+            healRatingPoint = player.getHealRatingPoint() - playerForRanking.getHealRatingPoint();
+        } else {
+            playerForRanking.updateHealRankingPoint(player.getHealRatingPoint());
+            cnt++;
+        }
+
+        if(cnt > 0) { playerForRankingRepository.save(playerForRanking); }
+
         Long playTime = 0l; Long spentOnFire = 0l; Integer envKill = 0;
         Integer winGame = 0; Integer loseGame = 0; Integer drawGame = 0;
         if (player.getPlayTime() != null && playerForRanking.getPlayTime() != null) {

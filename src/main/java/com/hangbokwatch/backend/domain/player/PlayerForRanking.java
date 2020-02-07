@@ -94,6 +94,10 @@ public class PlayerForRanking {
         this.spentOnFire = spentOnFire; this.envKill = envKill; this.isBaseData = isBaseData;
     }
 
+    public void updateTankRankingPoint(Integer tankRatingPoint) {this.tankRatingPoint = tankRatingPoint;}
+    public void updateDealRankingPoint(Integer dealRatingPoint) {this.dealRatingPoint = dealRatingPoint;}
+    public void updateHealRankingPoint(Integer healRatingPoint) {this.healRatingPoint = healRatingPoint;}
+
     @Override
     public String toString() {
         return "PlayerForRanking : {" +

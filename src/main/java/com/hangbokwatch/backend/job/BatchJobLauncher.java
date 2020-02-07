@@ -1,7 +1,5 @@
 package com.hangbokwatch.backend.job;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -16,9 +14,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+
 
 /**
  * Quartz Schedule 에 등록된 Job 을 Spring Batch Job 으로 실행시키기 위한 Executor class.

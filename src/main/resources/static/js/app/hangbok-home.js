@@ -58,6 +58,8 @@ const main = {
                 return false;
             }
         });
+
+        $('.navbar-nav .index-nav').addClass("active");
     },
     search : function (userInput) {
         // alert('main search 호출');
