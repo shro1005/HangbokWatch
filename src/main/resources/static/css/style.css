@@ -10141,7 +10141,106 @@ a:hover {
   font-size: 1.1rem;
   line-height: 1.8rem;
 }
+/*************** Ranking 화면 ***************/
+/*** 탱커 점수 랭킹 ***/
+.tank-rating-ranking-box {
+  height: auto;
+}
+.tank-rating-ranking-box .titular {
+  background: #fcb150;
+  color: white;
+  font-weight: bold;
+}
+.tank-rating-ranking .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
 
+/*** 딜러 점수 랭킹 ***/
+.deal-rating-ranking-box {
+  height: auto;
+}
+.deal-rating-ranking-box .titular {
+  background: #11a8ab;
+  color: white;
+  font-weight: bold;
+}
+.deal-rating-ranking .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
 
+/*** 힐러 점수 랭킹 ***/
+.heal-rating-ranking-box {
+  height: auto;
+}
+.heal-rating-ranking-box .titular {
+  background: #e64c65;
+  color: white;
+  font-weight: bold;
+}
+.heal-rating-ranking .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
 
+/*** 플레이시간 랭킹 ***/
+.playtime-ranking-box {
+  height: auto;
+}
+.playtime-ranking-box .titular {
+  background: #fcb150;
+  color: white;
+  font-weight: bold;
+}
+.playtime-ranking .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
+
+/*** 불탄 시간 랭킹 ***/
+.spendonfire-ranking-box {
+  height: auto;
+}
+.spendonfire-ranking-box .titular {
+  background: #11a8ab;
+  color: white;
+  font-weight: bold;
+}
+.spendonfire-ranking-box .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
+
+/*** 환경 요소 킬 랭킹 ***/
+.envkill-ranking-box {
+  height: auto;
+}
+.envkill-ranking-box .titular {
+  background: #e64c65;
+  color: white;
+  font-weight: bold;
+}
+.envkill-ranking-box .icon {
+  display: inline-block;
+  vertical-align: top;
+  width: 28px;
+  margin-left: 20px;
+  margin-right: 15px;
+}
 

@@ -266,6 +266,7 @@ public class CrawlingPlayerDataService {
             if(playerListDto.getDealRatingPoint() == 0) {cnt--;}
             if(playerListDto.getHealRatingPoint() == 0) {cnt--;}
             if(cnt == 0 ) {cnt = 1;}
+            playerListDto.setTotalAvgRatingPoint((playerListDto.getTankRatingPoint() + playerListDto.getDealRatingPoint() + playerListDto.getHealRatingPoint())/cnt);
             playerListDto.setCnt(cnt);
 
             stopWatch.stop();
@@ -359,7 +360,7 @@ public class CrawlingPlayerDataService {
             log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {}({}) 플레이어 player DB저장 완료", sessionBattleTag , playerListDto.getBattleTag(), playerListDto.getId());
             stopWatch.start("player 테이블에 저장");
             Player player = new Player(playerListDto.getId(), playerListDto.getBattleTag(), playerListDto.getPlayerName(), playerListDto.getPlayerLevel(), playerListDto.getForUrl(), playerListDto.getIsPublic(), playerListDto.getPlatform()
-                    , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint()
+                    , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint(), playerListDto.getTotalAvgRatingPoint()
                     , playerListDto.getTankRatingImg(), playerListDto.getDealRatingImg(), playerListDto.getHealRatingImg(), tankWinGame, tankLoseGame,dealWinGame,dealLoseGame,healWinGame,healLoseGame
                     , playerListDto.getWinGame(), playerListDto.getLoseGame(), playerListDto.getDrawGame(), playerListDto.getPlayTime(), playerListDto.getSpentOnFire(), playerListDto.getEnvKill()
                     , playerListDto.getMostHero1(), playerListDto.getMostHero2(), playerListDto.getMostHero3());

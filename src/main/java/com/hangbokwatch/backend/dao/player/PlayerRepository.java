@@ -1,6 +1,8 @@
 package com.hangbokwatch.backend.dao.player;
 
 import com.hangbokwatch.backend.domain.player.Player;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,4 +22,9 @@ public interface PlayerRepository extends JpaRepository<Player, String> {
     // id로 검색
     Player findPlayerById(Long id);
 
+    // 랭커 조회
+    Page<Player> findAllByIsPublicOrderByTankRatingPointDesc(String isPublic, Pageable pageable);
+    Page<Player> findAllByIsPublicOrderByDealRatingPointDesc(String isPublic, Pageable pageable);
+    Page<Player> findAllByIsPublicOrderByHealRatingPointDesc(String isPublic, Pageable pageable);
+    Page<Player> findAllByIsPublicOrderByTotalAvgRatingPointDesc(String isPublic, Pageable pageable);
 }

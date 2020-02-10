@@ -22,6 +22,7 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private Integer tankRatingPoint;
     private Integer dealRatingPoint;
     private Integer healRatingPoint;
+    private Integer totalAvgRatingPoint;
     private String tankRatingImg;
     private String dealRatingImg;
     private String healRatingImg;

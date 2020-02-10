@@ -1,0 +1,1 @@
+ALTER TABLE player ADD COLUMN total_avg_rating_point integer;

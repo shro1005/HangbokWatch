@@ -1,14 +1,8 @@
 package com.hangbokwatch.backend.controller;
 
-import com.hangbokwatch.backend.dto.PlayerDetailDto;
-import com.hangbokwatch.backend.dto.PlayerListDto;
-import com.hangbokwatch.backend.dto.PlayerSearchDto;
-import com.hangbokwatch.backend.dto.TrendlindDto;
+import com.hangbokwatch.backend.dto.*;
 import com.hangbokwatch.backend.dto.auth.SessionUser;
-import com.hangbokwatch.backend.service.CrawlingPlayerDataService;
-import com.hangbokwatch.backend.service.SearchPlayerListService;
-import com.hangbokwatch.backend.service.ShowPlayerDetailService;
-import com.hangbokwatch.backend.service.ShowUserFavoriteService;
+import com.hangbokwatch.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +26,7 @@ public class WebRestController {
     private final SearchPlayerListService spl;
     private final ShowPlayerDetailService spd;
     private final ShowUserFavoriteService suf;
+    private final GetRankingDataService grd;
     private final HttpSession httpSession;
 
     @PostMapping("/showPlayerList")
@@ -83,7 +78,7 @@ public class WebRestController {
         return map;
     }
 
-    @PostMapping("refreshFavorite")
+    @PostMapping("/refreshFavorite")
     public String refreshFavorite(@RequestBody PlayerSearchDto favorite) {
         Map<String, Object> sessionItems = sessionCheck();
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
@@ -100,7 +95,7 @@ public class WebRestController {
         return "Success";
     }
 
-    @PostMapping("getFavoriteData")
+    @PostMapping("/getFavoriteData")
     public Map<String, Object> getFavoriteData() {
         Map<String, Object> sessionItems = sessionCheck();
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
@@ -115,6 +110,58 @@ public class WebRestController {
         map.put("favoritingMe", favoritingMePlayerList);
 
         log.info("{} >>>>>>>> getFavoriteData 호출 | 즐겨찾기 플레이어 리스트 조회 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return map;
+    }
+
+    @PostMapping("/getRankingData")
+    public Map<String, Object> getRankingData() {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getRankingData 호출 | 랭킹 데이터 추출", sessionBattleTag);
+
+        List<PlayerRankingDto> tankRatingRankingList = grd.getTankRatingRankingData(sessionItems);
+        List<PlayerRankingDto> dealRatingRankingList = grd.getDealRatingRankingData(sessionItems);
+        List<PlayerRankingDto> healRatingRankingList = grd.getHealRatingRankingData(sessionItems);
+        List<PlayerRankingDto> playTimeRankingList = grd.getPlayTimeRankingData(sessionItems);
+        List<PlayerRankingDto> spentOnFireRankingList = grd.getSpentOnFireRankingData(sessionItems);
+        List<PlayerRankingDto> envKillRankingList = grd.getEnvKillRankingData(sessionItems);
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("tankRating", tankRatingRankingList);
+        map.put("dealRating", dealRatingRankingList);
+        map.put("healRating", healRatingRankingList);
+        map.put("playTime", playTimeRankingList);
+        map.put("spentOnFire", spentOnFireRankingList);
+        map.put("envKill", envKillRankingList);
+
+        log.info("{} >>>>>>>> getRankingData 호출 | 랭킹 데이터 추출 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return map;
+    }
+
+    @PostMapping("/getRankingData")
+    public Map<String, Object> getRankerData() {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getRankerData 호출 | 랭커 데이터 추출", sessionBattleTag);
+        List<PlayerListDto> tankRankerList = grd.getTankRankergData(sessionItems);
+        List<PlayerListDto> dealRankerList = grd.getDealRankerData(sessionItems);
+        List<PlayerListDto> healRankerList = grd.getHealRankerData(sessionItems);
+        List<PlayerListDto> totalAvgRankerList = grd.getTotalAvgRankerData(sessionItems);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("tankRanker", tankRankerList);
+        map.put("dealRanker", dealRankerList);
+        map.put("healRanker", healRankerList);
+        map.put("totalAvgRanker", totalAvgRankerList);
+
+        log.info("{} >>>>>>>> getRankerData 호출 | 랭커 데이터 추출 완료", sessionBattleTag);
         log.info("===================================================================");
 
         return map;

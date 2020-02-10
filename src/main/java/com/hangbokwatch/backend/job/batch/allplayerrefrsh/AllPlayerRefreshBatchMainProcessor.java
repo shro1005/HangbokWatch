@@ -103,6 +103,14 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
             }
         }
 
+        // 평균점수 측정
+        int cnt = 3;
+        if(player.getTankRatingPoint() == 0) {cnt--;}
+        if(player.getDealRatingPoint() == 0) {cnt--;}
+        if(player.getHealRatingPoint() == 0) {cnt--;}
+        if(cnt == 0 ) {cnt = 1;}
+        player.setTotalAvgRatingPoint((player.getTankRatingPoint() + player.getDealRatingPoint() + player.getHealRatingPoint())/cnt);
+
         /** 프로필 정보 추출 */
         log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 프로필 사진 추출", JOB_NAME, player.getBattleTag());
         Element portraitEl = rawData.selectFirst("img[class=player-portrait]");

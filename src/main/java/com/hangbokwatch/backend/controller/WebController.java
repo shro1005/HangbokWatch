@@ -132,6 +132,19 @@ public class WebController {
         return "favorites";
     }
 
+    @GetMapping("/ranking")
+    public String goToRanking(Model model) {
+        Map<String, Object> sessionItems = sessionCheck(model);
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> goToRanking 호출 | 랭킹보기 페이지 이동을 위해 연관된 데이터를 조회합니다.", sessionBattleTag);
+
+
+        log.info("{} >>>>>>>> goToRanking 종료 | 랭킹보기 페이지(ranking.html)로 이동", sessionBattleTag);
+        log.info("===================================================================");
+        return "ranking";
+    }
+
 
     private Map<String, Object> sessionCheck(Model model) {
         // CustomOAuth2UserService에서 로그인 성공시 세션에 SessionUser를 저장하도록 구성했으므로
