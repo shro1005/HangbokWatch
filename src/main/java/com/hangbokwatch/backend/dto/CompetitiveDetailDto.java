@@ -52,4 +52,5 @@ public class CompetitiveDetailDto {
     private int count;
     private String favorite;
     private PlayerForRanking playerForRanking;
+    private String message;
 }

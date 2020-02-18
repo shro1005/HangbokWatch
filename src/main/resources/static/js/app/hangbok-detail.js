@@ -64,6 +64,12 @@ const main = {
         });
         drawProgressBar();
         getDetailData();
+
+        const message = $(".message").val();
+        console.log(message);
+        if(message != "success") {
+            alert(message);
+        }
     },
     search : function () {
         // alert('main search 호출');
@@ -75,7 +81,7 @@ const main = {
         }
         // alert("detail playerName - : " + playerName);
         // console.log("검색한 playerName : " + playerName);
-        location.href = "/showPlayerListFromDetail/" + playerName;
+        location.href = "/search/" + playerName;
 
     },
     doRefresh : function () {
@@ -148,6 +154,7 @@ const getDetailData = () => {
                 const playTime = val.playTime;
                 const spentOnFireAvg = val.spentOnFireAvg;
                 const order = val.order;
+                const killPerDeath = val.killPerDeath;
 
                 hero.heros.push({
                     heroName: heroName,
@@ -155,7 +162,10 @@ const getDetailData = () => {
                     playTime: playTime,
                     detail: "javascript:drawDetail("+order+")",
                     src: "/HWimages/hero/" + heroName + "_s.png",
-                    order: order
+                    order: order,
+                    winRate: winRate,
+                    killPerDeath: killPerDeath,
+                    spentOnFireAvg: spentOnFireAvg
                 });
             }
             detailList.push(val);
@@ -205,7 +215,10 @@ const moreHero = () => {
                 playTime: val.playTime,
                 detail: "javascript:drawDetail("+val.order+")",
                 src: "/HWimages/hero/" + heroName + "_s.png",
-                order: val.order
+                order: val.order,
+                winRate: val.winRate,
+                killPerDeath: val.killPerDeath,
+                spentOnFireAvg: val.spentOnFireAvg
             });
         }
     });

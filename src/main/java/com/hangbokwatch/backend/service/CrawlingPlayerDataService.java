@@ -109,7 +109,7 @@ public class CrawlingPlayerDataService {
             String json = Jsoup.connect(GET_PLAYER_LIST_URL+playerName)
                     .ignoreContentType(true)
                     .execute().body();
-
+            System.out.println(json);
             log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 크롤링한 json을 PlayerCrawlingResultDto로 저장", sessionBattleTag);
 
             //위에 선언한 매퍼를 통해 크롤링결과dto에 맞게 파싱하여 list에 추가
@@ -128,7 +128,7 @@ public class CrawlingPlayerDataService {
                 Integer dealRatingPoint = 0;
                 Integer healRatingPoint = 0;
 
-                if(dto.getIsPublic()) { isPublic = "Y"; } else { return playerList; }
+                if(dto.getIsPublic()) { isPublic = "Y"; } else { isPublic = "N"; }
                 if(dto.getPlatform().equals("pc")) {
                     pName = battleTag.substring(0, battleTag.indexOf("#"));
                 }
@@ -145,14 +145,14 @@ public class CrawlingPlayerDataService {
 
             if(e.getClass() == SocketException.class) {
                 playerListDto.setBattleTag("message");
-                playerListDto.setPlayerName("현재 배틀넷 서버 오류로 플레이어 목록을 불러올 수 없습니다.");
+                playerListDto.setPlayerName("연결된 인터넷에서 배틀넷 서버로 접속이 불가하여 정보를 갱신할 수 없습니다.");
                 playerList.add(playerListDto);
                 log.error("{} >>>>>>>> crawlingPlayerList 에러 발생 | 현재 배틀넷 서버 내부 오류로 플레이어 목록을 불러올 수 없습니다.");
                 log.error("====================================================\n" + e + "\n====================================================");
 
             }else if(e.getClass() == UnknownHostException.class){
                 playerListDto.setBattleTag("message");
-                playerListDto.setPlayerName("연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.");
+                playerListDto.setPlayerName("연결된 인터넷에서 배틀넷 서버로 접속이 불가하여 정보를 갱신할 수 없습니다.");
                 playerList.add(playerListDto);
                 log.error("{} >>>>>>>> crawlingPlayerList 에러 발생 | 연결된 인터넷에서 배틀넷 서버로 접속할 수 없습니다.");
                 log.error("====================================================\n" + e + "\n====================================================");
@@ -380,6 +380,7 @@ public class CrawlingPlayerDataService {
         }catch(Exception e) {
             log.error("{} | crawlingPlayerDetail 에러 발생 | {} 상세정보 크롤링 및 파싱 중 에러발생", sessionBattleTag );
             log.error("====================================================\n" + e + "\n====================================================");
+            chdDto.setMessage("연결된 인터넷에서 배틀넷 서버로 접속할 수 없거나 \n 배틀넷 서버 오류로 프로필 갱신을 할 수 가 없습니다.");
             e.printStackTrace();
         }
 

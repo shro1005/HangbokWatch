@@ -19,6 +19,8 @@ public class PlayerRankingDto {
     private String playTime;
     private String spentOnFire;
     private Integer envKill;
+    private String score;
+    private String className;
 
     public PlayerRankingDto(Long id, String battleTag, String playerName, String portrait, Integer tankRatingPoint,
                          Integer dealRatingPoint, Integer healRatingPoint, Integer winGame, Integer loseGame,
@@ -26,5 +28,9 @@ public class PlayerRankingDto {
         this.id = id; this.battleTag = battleTag; this.playerName = playerName; this.portrait = portrait; this.tankRatingPoint = tankRatingPoint;
         this.dealRatingPoint = dealRatingPoint; this.healRatingPoint = healRatingPoint; this.winGame = winGame;
         this.loseGame = loseGame; this.drawGame = drawGame; this.playTime = playTime; this.spentOnFire = spentOnFire; this.envKill = envKill;
+    }
+
+    public PlayerRankingDto(Long id, String battleTag, String playerName, String portrait, String score, String className) {
+        this.id = id; this.battleTag = battleTag; this.playerName = playerName; this.portrait = portrait; this.score = score; this.className = className;
     }
 }

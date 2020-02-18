@@ -36,7 +36,7 @@
             <div class="resultContainer-detail">
                 <div class="player-detail-layout col-md-12">
                     <div class="main-container">
-
+                        <input type="hidden" class="message" value="{{messageFromServer}}">
                         <div class="menu-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
                             <div class="inside-block">
                                 <h2 class="titular">영웅 목록</h2>
@@ -127,7 +127,7 @@
 
         <script id="hero-list" type="text/x-handlebars-template">
             \{{#heros}}
-            <li>
+            <li data-tooltip-text="K/D : \{{killPerDeath}} / 승률 : \{{winRate}} / 평균 폭주 : \{{spentOnFireAvg}}">
                 <a class="menu-box-tab" id="order-\{{order}}" href="\{{detail}};">
                     <img class="\{{heroName}}-img hero-round-img" src="\{{src}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
                     \{{heroNameKR}}
@@ -179,6 +179,7 @@
         </script>
 
         <script type="text/javascript">
+
             const competitive_points = $("#competitive-points").html();
             const template = Handlebars.compile(competitive_points);
 

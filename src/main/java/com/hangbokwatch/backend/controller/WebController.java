@@ -53,17 +53,17 @@ public class WebController {
 
             model.addAttribute("tag", tag);
             model.addAttribute("player", cdDto.getPlayer());
-            model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
+            //model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("count", cdDto.getCount());
             model.addAttribute("favorite", cdDto.getFavorite());
+            model.addAttribute("messageFromServer", cdDto.getMessage());
 //            log.info("like or not : " + cdDto.getFavorite());
         }else {
-            if(forUrl.indexOf("-") != -1) {
-                forUrl = forUrl.replace("-", "#");
-            }
-            model.addAttribute("isFromDetail", "Y");
+
+            model.addAttribute("messageFromServer", cdDto.getMessage());
             model.addAttribute("userInput", forUrl);
-            returnUrl = "index";
+            log.debug("{} >>>>>>>> showPlayerDetail 진행중 | 갱신중 에러 혹은 프로필 비공개로 메세지 전달 ({})", sessionBattleTag, cdDto.getMessage());
+
         }
         log.info("{} >>>>>>>> showPlayerDetail 종료 | {}.html 화면 이동", sessionBattleTag, returnUrl);
         log.info("===================================================================");
@@ -71,18 +71,18 @@ public class WebController {
         return returnUrl;
     }
 
-    @GetMapping("/showPlayerListFromDetail/{userInput}")
-    public String showPlayerListFromDetail(@PathVariable String userInput, Model model) {
+    @GetMapping("/search/{userInput}")
+    public String search(@PathVariable String userInput, Model model) {
         Map<String, Object> sessionItems = sessionCheck(model);
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
 
-        log.info("{} >>>>>>>> showPlayerListFromDetail 호출 | 검색값 : {}", sessionBattleTag, userInput);
+        log.info("{} >>>>>>>> search 호출 | 검색값 : {}", sessionBattleTag, userInput);
         if(userInput.indexOf("-") != -1) {
             userInput = userInput.replace("-", "#");
         }
         model.addAttribute("isFromDetail", "Y");
         model.addAttribute("userInput", userInput);
-        log.info("{} >>>>>>>> showPlayerListFromDetail 종료 | index.html 화면 이동", sessionBattleTag);
+        log.info("{} >>>>>>>> search 종료 | index.html 화면 이동", sessionBattleTag);
         log.info("===================================================================");
         return "index";
     }
@@ -101,17 +101,17 @@ public class WebController {
 
             model.addAttribute("tag", tag);
             model.addAttribute("player", cdDto.getPlayer());
-            model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
+            //model.addAttribute("playerDetails", cdDto.getPlayerDetailList());
             model.addAttribute("favorite", cdDto.getFavorite());
+            model.addAttribute("messageFromServer", cdDto.getMessage());
 
         }else {
-            if(forUrl.indexOf("-") != -1) {
-                forUrl = forUrl.replace("-", "#");
-            }
-            model.addAttribute("isFromDetail", "Y");
+
+            model.addAttribute("messageFromServer", cdDto.getMessage());
+            log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | 갱신중 에러 혹은 프로필 비공개로 메세지 전달 ({})", sessionBattleTag, cdDto.getMessage());
             model.addAttribute("userInput", forUrl);
 
-            returnUrl = "index";
+            returnUrl = "/showPlayerDetail/"+forUrl;
         }
         log.info("{} >>>>>>>> refreshPlayerDetail 종료 | {}.html 화면 이동", sessionBattleTag, returnUrl);
         log.info("===================================================================");

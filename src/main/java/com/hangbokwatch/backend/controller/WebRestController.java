@@ -143,28 +143,32 @@ public class WebRestController {
         return map;
     }
 
-    @PostMapping("/getRankingData")
-    public Map<String, Object> getRankerData() {
+    @PostMapping("/getRankerData")
+    public List<PlayerListDto> getRankerData(@RequestBody HashMap<String, Object> recvMap) {
         Map<String, Object> sessionItems = sessionCheck();
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
 
+        String target = (String) recvMap.get("target");
+        int offset = (int) recvMap.get("offset");
+        int limit = (int) recvMap.get("limit");
+
         log.info("{} >>>>>>>> getRankerData 호출 | 랭커 데이터 추출", sessionBattleTag);
-        List<PlayerListDto> tankRankerList = grd.getTankRankergData(sessionItems);
-        List<PlayerListDto> dealRankerList = grd.getDealRankerData(sessionItems);
-        List<PlayerListDto> healRankerList = grd.getHealRankerData(sessionItems);
-        List<PlayerListDto> totalAvgRankerList = grd.getTotalAvgRankerData(sessionItems);
+        List<PlayerListDto> rankerList = grd.getRankerData(sessionItems, target, offset, limit);
+//        List<PlayerListDto> dealRankerList = grd.getDealRankerData(sessionItems, offset, limit);
+//        List<PlayerListDto> healRankerList = grd.getHealRankerData(sessionItems, offset, limit);
+//        List<PlayerListDto> totalAvgRankerList = grd.getTotalAvgRankerData(sessionItems, offset, limit);
 
-        Map<String, Object> map = new HashMap<>();
-
-        map.put("tankRanker", tankRankerList);
-        map.put("dealRanker", dealRankerList);
-        map.put("healRanker", healRankerList);
-        map.put("totalAvgRanker", totalAvgRankerList);
+//        Map<String, Object> map = new HashMap<>();
+//
+//        map.put("rankerList", tankRankerList);
+//        map.put("dealRanker", dealRankerList);
+//        map.put("healRanker", healRankerList);
+//        map.put("totalAvgRanker", totalAvgRankerList);
 
         log.info("{} >>>>>>>> getRankerData 호출 | 랭커 데이터 추출 완료", sessionBattleTag);
         log.info("===================================================================");
 
-        return map;
+        return rankerList;
     }
 
     private Map<String, Object> sessionCheck() {

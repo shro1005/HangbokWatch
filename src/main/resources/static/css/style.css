@@ -9534,7 +9534,6 @@ a:hover {
 
 .inside-block {
    background: #394264;
-    /*background: #394264;*/
    border-radius: 5px;
 }
 
@@ -10244,3 +10243,156 @@ a:hover {
   margin-right: 15px;
 }
 
+.tank-rating-ranking, .deal-rating-ranking, .heal-rating-ranking, .playtime-ranking, .spendonfire-ranking, .envkill-ranking {
+  padding-top: 23px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+/*.profile-details div:hover.comments .icon {*/
+/*  color: #fcb150;*/
+/*}*/
+/*.profile-details div:hover.views .icon {*/
+/*  color: #11a8ab;*/
+/*}*/
+/*.profile-details div:hover.likes .icon {*/
+/*  color: #e64c65;*/
+/*}*/
+
+.ranking-1 {
+  /*border-top: 4px solid #fcb150;*/
+  display: block;
+  text-align: center;
+  -webkit-transition: background .3s;
+  transition: background .3s;
+  padding: 0;
+  font-size: 20px;
+  color: white;
+}
+.ranking-2 {
+  /*border-top: 4px solid #11a8ab;*/
+  border-left: 1px solid #1f253d;
+  display: block;
+  text-align: center;
+  -webkit-transition: background .3s;
+  transition: background .3s;
+  padding: 0;
+  font-size: 20px;
+  color: white;
+}
+.ranking-3 {
+  /*border-top: 4px solid #e64c65;*/
+  border-left: 1px solid #1f253d;
+  display: block;
+  text-align: center;
+  -webkit-transition: background .3s;
+  transition: background .3s;
+  padding: 0;
+  color: white;
+}
+.ranking-playerName {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 18px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ranking-score p {
+  text-overflow: ellipsis;
+  font-size: 17px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/*
+	css-only-tooltip version 1.0.0
+	ⓒ 2015 AHN JAE-HA http://github.com/eu81273
+	MIT License
+*/
+
+
+[data-tooltip-text]:hover {
+  position: relative;
+}
+
+[data-tooltip-text]:after {
+  -webkit-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+  -moz-transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+  transition: bottom .3s ease-in-out, opacity .3s ease-in-out;
+
+  background-color: rgba(0, 0, 0, 0.8);
+
+  -webkit-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+  -moz-box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+  box-shadow: 0px 0px 3px 1px rgba(50, 50, 50, 0.4);
+
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+
+  color: #FFFFFF;
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding: 7px 12px;
+  position: absolute;
+  width: auto;
+  min-width: 50px;
+  max-width: 300px;
+  word-wrap: break-word;
+
+  z-index: 9999;
+
+  opacity: 0;
+  left: -9999px;
+  top: 90%;
+
+  content: attr(data-tooltip-text);
+}
+
+[data-tooltip-text]:hover:after {
+  top: 100%;
+  left: 10px;
+  opacity: 1;
+}
+
+.ranking-tab {
+  width: 100%;
+  height: 70px;
+}
+@media (min-width: 576px) {
+  .ranking-tab {
+    max-width: 100%; } }
+@media (min-width: 768px) {
+  .ranking-tab {
+    max-width: 100%; } }
+@media (min-width: 992px) {
+  .ranking-tab {
+    max-width: 75%; } }
+@media (min-width: 1200px) {
+  .ranking-tab {
+    max-width: 50%; } }
+
+.ranking-tab div {
+  float: left;
+  padding: 0;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 25%;
+  flex: 0 0 25%;
+  max-width: 25%;
+  border-right: 1px solid transparent;
+}
+
+.ranking-tab .titular {
+  background: #394264;
+  color: white;
+  font-weight: bold;
+}
+
+.ranking-tab .active {
+  background: #fcb150;
+}

@@ -34,7 +34,7 @@ const header = {
         }
         // alert("detail playerName - : " + playerName);
         // console.log("검색한 playerName : " + playerName);
-        location.href = "/showPlayerListFromDetail/" + playerName;
+        location.href = "/search/" + playerName;
     }
 };
 

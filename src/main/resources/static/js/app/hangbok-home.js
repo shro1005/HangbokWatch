@@ -9,7 +9,7 @@ const main = {
             const userInput = $('.fromDetail').attr("value");;
             // console.log("flag : " + flag + " , userInput : " + userInput);
             if(flag=='Y') {
-                _this.search(userInput);
+                _this.searchReal(userInput);
 
                 event.preventDefault();
 
@@ -76,15 +76,26 @@ const main = {
         let playerName = $('input[id="playerName"]').val();
         const playerName_tap = $('input[id="playerName-tap"]').val();
 
-        if(playerName == "" && playerName_tap =="") {
+        if (playerName == "" && playerName_tap == "") {
             playerName = userInput;
-        }else if(playerName == "" && playerName_tap !="") {
+        } else if (playerName == "" && playerName_tap != "") {
             playerName = playerName_tap;
         }
         const inputName = {
             playerName: playerName
         };
 
+        if (playerName.indexOf("#") != -1) {
+            playerName.replace("#", "-");
+        }
+        location.href = "/search/" + playerName;
+    },
+    searchReal : function (userInput) {
+        playerName = userInput;
+
+        const inputName = {
+            playerName: playerName
+        };
         // console.log("playerName : " + playerName);
         $.ajax({
             type: 'POST',
@@ -209,13 +220,14 @@ function playerDetail(obj) {
     // console.log($(obj).attr('attr-p'), $(obj).attr('attr-u'));
     const isPublic = $(obj).attr('attr-p');
     const forUrl = $(obj).attr('attr-u');
-    if(isPublic == 'Y') {
-        location.href = "/showPlayerDetail/"+forUrl;
-    } else {
-        alert("플레이어가 프로필을 비공개했습니다.\n" +
-            "인게임에서 프로필 공개 이후 다시 검색해주세요.");
-        return;
-    }
+    location.href = "/showPlayerDetail/"+forUrl;
+    // if(isPublic == 'Y') {
+    //     location.href = "/showPlayerDetail/"+forUrl;
+    // } else {
+    //     alert("플레이어가 프로필을 비공개했습니다.\n" +
+    //         "인게임에서 프로필 공개 이후 다시 검색해주세요.");
+    //     return;
+    // }
 }
 
 function drawList(data) {

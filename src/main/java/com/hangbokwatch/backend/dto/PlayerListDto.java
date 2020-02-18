@@ -41,6 +41,36 @@ public class PlayerListDto implements Comparable<PlayerListDto> {
     private List<PlayerListDto> list;
 
     public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
+                         String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint, Integer totalAvgRatingPoint,
+                         String tankRatingImg, String dealRatingImg, String healRatingImg, Integer winGame, Integer loseGame,
+                         Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3, String udtDtm){ //) {
+        this.id = id;
+        this.playerName = playerName;
+        this.playerLevel = playerLevel;
+        this.isPublic = isPublic;
+        this.platform = platform;
+        this.portrait = portrait;
+        this.tankRatingPoint = tankRatingPoint;
+        this.dealRatingPoint = dealRatingPoint;
+        this.healRatingPoint = healRatingPoint;
+        this.totalAvgRatingPoint = totalAvgRatingPoint;
+        this.tankRatingImg = tankRatingImg;
+        this.dealRatingImg = dealRatingImg;
+        this.healRatingImg = healRatingImg;
+        this.winGame = winGame;
+        this.loseGame = loseGame;
+        this.drawGame = drawGame;
+        this.winRate = winRate;
+        this.mostHero1 = mostHero1;
+        this.mostHero2 = mostHero2;
+        this.mostHero3 = mostHero3;
+        this.battleTag = battleTag;
+        this.forUrl = forUrl;
+        this.udtDtm = udtDtm;
+//        this.list = list;
+    }
+
+    public PlayerListDto(Long id, String battleTag, String playerName, String forUrl, Integer playerLevel, String isPublic, String platform,
                          String portrait, Integer tankRatingPoint, Integer dealRatingPoint, Integer healRatingPoint,
                          String tankRatingImg, String dealRatingImg, String healRatingImg, Integer winGame, Integer loseGame,
                          Integer drawGame, String winRate, String mostHero1, String mostHero2, String mostHero3, String udtDtm){ //) {

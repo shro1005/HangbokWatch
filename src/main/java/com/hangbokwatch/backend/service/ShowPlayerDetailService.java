@@ -70,10 +70,11 @@ public class ShowPlayerDetailService {
             }else {
                 log.debug("{} >>>>>>>> showPlayerDetailService 진행중 | {} : player DB에서 조회 성공", sessionBattleTag, forUrl);
                 Player player = playerRepository.findPlayerByBattleTag(forUrl);
-                if("N".equals(player.getIsPublic())) {
-                    return cdDto;
-                }
-
+//                if("N".equals(player.getIsPublic())) {
+//                    cdDto.setMessage("프로필을 비공개한 유저입니다. \n정보 갱신은 프로필을 공개한 유저만 할 수 있습니다.");
+//                }else {
+//                    cdDto.setMessage("success");
+//                }
                 //로그인한 유저인지 확인하여 즐겨찾기를 조회
                 SessionUser sessionUser = (SessionUser)sessionItems.get("loginUser");
 
@@ -95,7 +96,7 @@ public class ShowPlayerDetailService {
                         favorite = "N";
                     }
                 }
-
+                cdDto.setMessage("success");
                 cdDto.setPlayer(player);
                 cdDto.setFavorite(favorite);
             }
@@ -108,7 +109,7 @@ public class ShowPlayerDetailService {
 
     public CompetitiveDetailDto refreshPlayerDetail(String forUrl, Map<String, Object> sessionItems) {
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
-
+        String baseForUrl = forUrl;
         log.info("{} >>>>>>>> refreshPlayerDetail 호출 | 조회 url : {}", sessionBattleTag, forUrl);
         CompetitiveDetailDto cdDto = new CompetitiveDetailDto();
         StopWatch stopWatch = new StopWatch();
@@ -120,38 +121,52 @@ public class ShowPlayerDetailService {
             log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} : 새로고침 크롤링 시작", sessionBattleTag, forUrl);
             List<PlayerListDto> playerListDtos = cpd.crawlingPlayerList(forUrl, sessionItems);
             stopWatch.stop();
+            System.out.println(playerListDtos.size());
+            if(playerListDtos.size() == 0) {
+                cdDto = showPlayerDetailService(baseForUrl, sessionItems);
+                cdDto.setMessage("플레이어명이 변경 됐거나, 삭제된 플레이어 입니다. \n정확한 배틀태그로 다시 검색해 주세요.");
+            }
 
             for (PlayerListDto playerListDto : playerListDtos) {
-                if ("Y".equals(playerListDto.getIsPublic())) {
-                    stopWatch.start("경쟁전 디테일 크롤링 및 데이터 저장 까지 총 시간");
-                    cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto, sessionItems);
-                    stopWatch.stop();
-                    log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} : {}", sessionBattleTag, forUrl, stopWatch.prettyPrint());
+                if(!"message".equals(playerListDto.getBattleTag())) {
+                    if ("Y".equals(playerListDto.getIsPublic())) {
+                        stopWatch.start("경쟁전 디테일 크롤링 및 데이터 저장 까지 총 시간");
+                        cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto, sessionItems);
+                        stopWatch.stop();
+                        log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} : {}", sessionBattleTag, forUrl, stopWatch.prettyPrint());
 
-                    //로그인한 유저인지 확인하여 즐겨찾기를 조회
-                    SessionUser sessionUser = (SessionUser)sessionItems.get("loginUser");
+                        cdDto.setMessage("success");
+                        //로그인한 유저인지 확인하여 즐겨찾기를 조회
+                        SessionUser sessionUser = (SessionUser) sessionItems.get("loginUser");
 
-                    String favorite = "N";
-                    if(sessionUser == null) {
-                        //로그인 하지 않은 유저인 경우 session을 검색
-                        log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | 세션에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
-                        Map<Long, FavoriteDto> favoriteList = (Map<Long, FavoriteDto>) httpSession.getAttribute("favoriteList");
-                        if (favoriteList != null) {
-                            if(favoriteList.get(playerListDto.getId()) != null) {
-                                favorite = favoriteList.get(playerListDto.getId()).getLikeOrNot();
+                        String favorite = "N";
+                        if (sessionUser == null) {
+                            //로그인 하지 않은 유저인 경우 session을 검색
+                            log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | 세션에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
+                            Map<Long, FavoriteDto> favoriteList = (Map<Long, FavoriteDto>) httpSession.getAttribute("favoriteList");
+                            if (favoriteList != null) {
+                                if (favoriteList.get(playerListDto.getId()) != null) {
+                                    favorite = favoriteList.get(playerListDto.getId()).getLikeOrNot();
+                                }
+                            }
+                        } else {
+                            log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | DB에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
+                            try {
+                                favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), playerListDto.getId()).getLikeornot();
+                            } catch (NullPointerException e) {
+                                favorite = "N";
                             }
                         }
-                    }else {
-                        log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | DB에 {} 즐겨찾기 존재여부 확인 및 처리", sessionBattleTag, forUrl);
-                        try {
-                            favorite = favoriteRepository.findFavoriteByIdAndClickedId(sessionUser.getId(), playerListDto.getId()).getLikeornot();
-                        }catch (NullPointerException e) {
-                            favorite = "N";
-                        }
+                        cdDto.setFavorite(favorite);
+                    } else {
+                        log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} 의 경우 프로필 비공개 유저로 경고창을 띄웁니다..", sessionBattleTag, forUrl);
+                        cdDto = showPlayerDetailService(baseForUrl, sessionItems);
+                        cdDto.setMessage("프로필을 비공개한 유저입니다. \n정보 갱신은 프로필을 공개한 유저만 할 수 있습니다.");
                     }
-                    cdDto.setFavorite(favorite);
                 }else {
-                    log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} 의 경우 프로필 비공개 유저로 검색화면을 반환합니다.", sessionBattleTag, forUrl);
+                    cdDto = showPlayerDetailService(baseForUrl, sessionItems);
+                    cdDto.setMessage(playerListDto.getPlayerName());
+                    break;
                 }
             }
         }

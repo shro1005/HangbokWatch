@@ -36,79 +36,36 @@
             <div class="resultContainer-detail">
                 <div class="player-detail-layout col-md-12">
                     <div class="main-container">
-
-                        <div class="tank-rating-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 상한가(탱커편)</h2>
-                                <ul class="tank-rating-ranking">
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="deal-rating-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 상한가(딜려편)</h2>
-                                <ul class=deal-rating-ranking>
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="heal-rating-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 상한가(힐러편)</h2>
-                                <ul class="heal-rating-ranking">
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="playtime-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 오버워치 덕후</h2>
-                                <ul class="playtime-ranking">
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="spendonfire-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 핫피플</h2>
-                                <ul class="spendonfire-ranking">
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="envkill-ranking-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
-                            <div class="inside-block">
-                                <h2 class="titular">금주의 낙사왕</h2>
-                                <ul class="envkill-ranking">
-                                    <!-- js로 영웅 목록 li 채워 넣는 부분 -->
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="row justify-content-center">
-                            <div class="col-md-12 heading-section text-center mb-5">
-                                <span class="subheading">랭커 보기</span>
-                            </div>
-                        </div>
-                        <div class="player-list-container mb-5">
-                            {{#if isLogin}}
-
-                            {{else}}
-                                <div class="not-fount-base row"><div class="not-found-player col-md-12">
-                                    배틀넷 연동한 플레이어만 확인할 수 있습니다.
-                                </div></div>
-                            {{/if}}
-                        </div>
-                        <div class="" id="player-list-container-more-button">
-                        </div>
-
+                        <!-- js를 통해 플레이어리스트 출력-->
                     </div> <!-- end main-container -->
+                </div>
+
+            </div>
+            <div class="resultContainer-detail">
+                <!-- 랭커보기 -->
+                <div class="row justify-content-center pt-5">
+                    <div class="col-md-12 heading-section text-center mb-5">
+                        <span class="subheading">랭커 보기</span>
+                    </div>
+                </div>
+                <div class="ranking-tab">
+                    <div class="total-tab-block col-md-3" onclick="showRankerList('total'); return false;" style="cursor: pointer;">
+                        <h2 class="titular total_titular active">종합</h2>
+                    </div>
+                    <div class="tank-tab-block col-md-3" onclick="showRankerList('tank'); return false;" style="cursor: pointer;">
+                        <h2 class="titular tank_titular">돌격</h2>
+                    </div>
+                    <div class="deal-tab-block col-md-3" onclick="showRankerList('deal'); return false;" style="cursor: pointer;">
+                        <h2 class="titular deal_titular">공격</h2>
+                    </div>
+                    <div class="heal-tab-block col-md-3" onclick="showRankerList('heal'); return false;" style="cursor: pointer;">
+                        <h2 class="titular heal_titular">지원</h2>
+                    </div>
+                </div>
+                <div class="player-list-container mb-5">
+                    <!-- js를 통해 플레이어리스트 출력-->
+                </div>
+                <div class="" id="player-list-container-more-button">
                 </div>
             </div>
         </section>
@@ -116,127 +73,137 @@
 
     {{!--=================== scripts content ======================--}}
     {{#*inline "scripts-blick"}}
-        <script src="/js/Chart.min.js"></script>
-        <script src="/js/chartjs.addon.js"></script>
-        <script src="/js/moment.min.js"></script>
-        <script src="/js/moment-with-locales.min.js"></script>
+<!--        <script src="/js/Chart.min.js"></script>-->
+<!--        <script src="/js/chartjs.addon.js"></script>-->
+<!--        <script src="/js/moment.min.js"></script>-->
+<!--        <script src="/js/moment-with-locales.min.js"></script>-->
 
-        <script id="favorite-button-check" type="text/x-handlebars-template">
-            \{{#isLike}}
-            <button class="btn action-btn btn-like btn-outline-danger btn-rounded clicked">
-                <i class="mdi mdi-heart"></i>
-            </button>
-            \{{else}}
-            <button class="btn action-btn btn-like btn-outline-danger btn-rounded">
-                <i class="mdi mdi-heart-outline"></i>
-            </button>
-            \{{/isLike}}
+        <script id="our-ranking-list" type="text/x-handlebars-template">
+            \{{#list}}
+            <div class="\{{className}}-box block"> <!-- MENU BOX (LEFT-CONTAINER) -->
+                <div class="inside-block">
+                    <h2 class="titular">\{{title}}</h2>
+                    <div class="\{{className}}">
+                        <!-- js로 영웅 목록 li 채워 넣는 부분 -->
+                    </div>
+                </div>
+            </div>
+            \{{/list}}
         </script>
 
-        <script id="competitive-points" type="text/x-handlebars-template">
-            \{{#roles}}
-            <div class="col-4 \{{role}}">
+        <script id="our-ranking-contents" type="text/x-handlebars-template">
+            \{{#ranking}}
+            <div class="col-4 \{{ranking}}" onclick="playerDetail(this); return false;" attr-u="\{{forUrl}}" style="cursor: pointer;">
                 <div class="rank-role">
-                    <img src="\{{roleImgPath}}">
+                    <img src="\{{rankingImgPath}}">
                 </div>
                 <div class="rank-image">
-                    <img src="\{{rankImgPath}}" onerror="this.src ='/HWimages/tier/default.png';" alt=""></br>\{{rankPoint}}
+                    <img src="\{{playerPortrait}}" onerror="this.src ='/HWimages/tier/default.png';" alt="">
                 </div>
                 <div class="col-12">
-                    <div class="progress-container" id="\{{wingame}}/\{{losegame}}"></div>
-                    <div class="winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+                    <div class="ranking-playerName" data-tooltip-text="\{{playerName}}">\{{playerName}}</div>
+                    <div class="ranking-score" data-tooltip-text="\{{score}}"><p>\{{score}}</p></div>
                 </div>
             </div>
-            \{{/roles}}
+            \{{/ranking}}
         </script>
 
-        <script id="hero-list" type="text/x-handlebars-template">
-            \{{#heros}}
-            <li>
-                <a class="menu-box-tab" id="order-\{{order}}" href="\{{detail}};">
-                    <img class="\{{heroName}}-img hero-round-img" src="\{{src}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
-                    \{{heroNameKR}}
-                    <div class="menu-box-number"><p class="menu-text">\{{playTime}}</p></div>
-                </a>
-            </li>
-            \{{/heros}}
-        </script>
+        <script id="ranking_player_list" type="text/x-handlebars-template" charset="UTF-8">
+            <div class="row" id="search-result">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>순위</th>
+                            <th>플레이어</th>
+                            <th>플랫폼</th>
+                            <th>돌격</th>
+                            <th>공격</th>
+                            <th>지원</th>
+                            <th>승률</th>
+                            <th>모스트</th>
+                        </tr>
+                        </thead>
+                        <tbody class="tbody">
+                        \{{#players}}
+                        <tr>
+                            <td>\{{ranking}}</td>
+                            <td class="align-items-left" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;">
+                                <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+                                <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+                            </td>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <div class="player-platform">\{{platform}}</div>
+                            </td>
 
-        <script id="hero-detail" type="text/x-handlebars-template">
-            \{{#detail}}
-            <div class="titular detail-header">
-                <div class="left-side"><img class="\{{heroName}}-img hero-round-img2" src="\{{src}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">\{{heroNameKR}}</div>
-                <div class="right-side">
-                    <div class="detail-header-text"><div class="detail-content"><div class="title">K/D</div><div class="content">\{{killPerDeath}}</div></div></div>
-                    <div class="detail-header-text"><div class="detail-content"><div class="title">승률</div><div class="content">\{{winRate}}</div></div></div>
-                    <div class="detail-header-text"><div class="detail-content"><div class="title">평균 폭주</div><div class="content">\{{spentOnFireAvg}}</div></div></div>
-                    <div class="detail-header-text"><div class="detail-content"><div class="title">플레이시간</div><div class="content">\{{playTime}}</div></div></div>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                                <div>\{{tankRatingPoint}}</div>
+                            </td>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                                <div>\{{dealRatingPoint}}</div>
+                            </td>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                                <div>\{{healRatingPoint}}</div>
+                            </td>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <div class="progress progress-slim">
+                                    <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+                            </td>
+                            <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                                <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                                <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                                <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                            </td>
+                        </tr>
+                        \{{/players}}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="detail-body">
-                <div class="index-chart">
-                    <canvas id="chartjs-radar-chart" width="100%" height="100%"></canvas>
-                </div>
-                <div class="index-text">
-
-                </div>
-            </div>
-            \{{/detail}}
         </script>
 
-        <script id="detail-text" type="text/x-handlebars-template">
-            \{{#detailText}}
-            <div class="index-border">
-                <div class="index-title">\{{title}}</div>
-                <div class="index">\{{index}}</div>
-            </div>
-            \{{/detailText}}
-        </script>
+        <script id="more_player_list" type="text/x-handlebars-template" charset="UTF-8">
+            \{{#players}}
+            <tr>
+                <td>\{{ranking}}</td>
+                <td class="align-items-left" href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer; text-align: left;">
+                    <img class="profile-img mr-2" src="\{{portrait}}" onerror="this.src = '/HWimages/portrait/default.png';" alt="">
+                    <div class="player-name" title="\{{battleTag}}"> \{{battleTag}} <br>Lv. \{{playerLevel}}</div>
+                </td>
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <div class="player-platform">\{{platform}}</div>
+                </td>
 
-        <script id="trendline-body" type="text/x-handlebars-template">
-            \{{#role}}
-            <div class="\{{role}}-trendline">
-                <div class="rank-role2"><img src="\{{roleImgPath}}"></div>
-                <canvas id="\{{role}}-trendline-chart" style="display:block; width:100%; height: 100%"></canvas>
-            </div>
-            \{{/role}}
-            <!--    <div style="height: 10px;"></div>-->
-        </script>
-
-        <script type="text/javascript">
-            const competitive_points = $("#competitive-points").html();
-            const template = Handlebars.compile(competitive_points);
-
-
-            let ratingPoint = ["{{player.tankRatingPoint}}","{{player.dealRatingPoint}}", "{{player.healRatingPoint}}"];
-            $.each(ratingPoint, function (i, point) {
-                if(point == "0") {ratingPoint[i] = "배치중";}
-            });
-
-            const data = {
-                roles:[
-                    {role: "tank-container", roleImgPath: "/HWimages/role/icon-tank-8a52daaf01.png", rankImgPath: "{{player.tankRatingImg}}", rankPoint: ratingPoint[0], wingame: "{{player.tankWinGame}}", losegame: "{{player.tankLoseGame}}"},
-                    {role: "deal-container", roleImgPath: "/HWimages/role/icon-offense-6267addd52.png", rankImgPath: "{{player.dealRatingImg}}", rankPoint: ratingPoint[1], wingame: "{{player.dealWinGame}}", losegame: "{{player.dealLoseGame}}"},
-                    {role: "heal-container", roleImgPath: "/HWimages/role/icon-support-46311a4210.png", rankImgPath: "{{player.healRatingImg}}", rankPoint: ratingPoint[2], wingame: "{{player.healWinGame}}", losegame: "{{player.healLoseGame}}"}
-                ]
-            };
-            const item = template(data);
-            $('.profile-details').append(item);
-
-            Handlebars.registerHelper('isLike',function (options) {
-                console.log('즐겨찾기 여부 : {{favorite}}');
-                const like_or_not = '{{favorite}}';
-                if(like_or_not === 'Y') {
-                    return options.fn(this);
-                }else {
-                    return options.inverse(this);
-                }
-            });
-
-            const favorite_button_check = $("#favorite-button-check").html();
-            const template_favorite_button = Handlebars.compile(favorite_button_check);
-            const favorite_button = template_favorite_button();
-            $('.profile-buttons').append(favorite_button);
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <img class="player-tier" src="\{{tankRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                    <div>\{{tankRatingPoint}}</div>
+                </td>
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <img class="player-tier" src="\{{dealRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                    <div>\{{dealRatingPoint}}</div>
+                </td>
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <img class="player-tier" src="\{{healRatingImg}}" onerror="this.src = '/HWimages/tier/default.png';" alt="">
+                    <div>\{{healRatingPoint}}</div>
+                </td>
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <div class="progress progress-slim">
+                        <div class="progress-bar bg-info progress-bar-striped" role="progressbar" style="width: \{{winRate}}%" aria-valuenow="\{{winRate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="player-winlose"><div class="wingame">W \{{wingame}}</div><div class="losegame">L \{{losegame}}</div></div>
+                </td>
+                <td href="javascript:void(0);" onclick="playerDetail(this); return false;" attr-p="\{{isPublic}}" attr-u="\{{forUrl}}" style="cursor: pointer">
+                    <img class="most-hero" id="most1" src="\{{mostHero1}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                    <img class="most-hero" id="most2" src="\{{mostHero2}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                    <img class="most-hero" id="most3" src="\{{mostHero3}}" onerror="this.src = '/HWimages/hero/default.png';" alt="">
+                </td>
+            </tr>
+            \{{/players}}
         </script>
 
         <script src="/js/app/hangbok-header.js"></script>
