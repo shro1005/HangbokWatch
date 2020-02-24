@@ -66,7 +66,7 @@ const main = {
         getDetailData();
 
         const message = $(".message").val();
-        console.log(message);
+        // console.log(message);
         if(message != "success") {
             alert(message);
         }

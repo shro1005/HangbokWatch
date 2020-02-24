@@ -10396,3 +10396,22 @@ a:hover {
 .ranking-tab .active {
   background: #fcb150;
 }
+
+.inner-button {
+  display: block;
+  width: 100px;
+  line-height: 25px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 auto;
+  border-radius: 5px;
+  background: #fcb150;
+  color: white;
+  transition: background .3s;
+}
+.inner-button:hover {
+  text-decoration: none;
+}
+
+

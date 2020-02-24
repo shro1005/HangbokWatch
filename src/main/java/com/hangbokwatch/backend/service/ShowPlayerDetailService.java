@@ -63,6 +63,10 @@ public class ShowPlayerDetailService {
                         cdDto = cpd.crawlingPlayerDetail(playerListDto, cdDto, sessionItems);
                         stopWatch.stop();
                         log.debug("{} >>>>>>>> showPlayerDetailService 진행중 | {} : {}", sessionBattleTag, forUrl, stopWatch.prettyPrint());
+
+                        cdDto.setMessage("success");
+                    }else {
+                        cdDto.setMessage("배틀태그 입력이 잘못 됐거나, \n프로필 비공개인 유저입니다.");
                     }
                 }
 
@@ -121,7 +125,7 @@ public class ShowPlayerDetailService {
             log.debug("{} >>>>>>>> refreshPlayerDetail 진행중 | {} : 새로고침 크롤링 시작", sessionBattleTag, forUrl);
             List<PlayerListDto> playerListDtos = cpd.crawlingPlayerList(forUrl, sessionItems);
             stopWatch.stop();
-            System.out.println(playerListDtos.size());
+
             if(playerListDtos.size() == 0) {
                 cdDto = showPlayerDetailService(baseForUrl, sessionItems);
                 cdDto.setMessage("플레이어명이 변경 됐거나, 삭제된 플레이어 입니다. \n정확한 배틀태그로 다시 검색해 주세요.");

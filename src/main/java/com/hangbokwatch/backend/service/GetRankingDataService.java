@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,10 @@ public class GetRankingDataService {
         return showingData;
     }
 
+    public LocalDateTime getLastUdtDtmBase() {
+        return playerForRankingRepository.selectMaxUdtDtmWhereBase("Y",0,1);
+    }
+
     public List<PlayerRankingDto> getTankRatingRankingData(Map<String, Object> sessionItems) {
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
         List<PlayerRankingDto> playerRankingDtoList = new ArrayList<>();
@@ -100,7 +105,7 @@ public class GetRankingDataService {
 //        Pageable page = new OffsetBasedPageRequest(3, 3);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderByTankRatingPointDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByTankRatingPointDesc("N",0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByTankRatingPointDesc("N",0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "TR");
         log.info("{} >>>>>>>> getTankRatingRankingData 종료 | 탱커 점수 상승폭 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -114,7 +119,7 @@ public class GetRankingDataService {
         log.info("{} >>>>>>>> getDealRatingRankingData 호출 | 딜러 점수 상승폭 랭킹 데이터 추출 시작 ", sessionBattleTag);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderByDealRatingPointDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByDealRatingPointDesc("N", 0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByDealRatingPointDesc("N", 0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "DR");
         log.info("{} >>>>>>>> getDealRatingRankingData 종료 | 딜러 점수 상승폭 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -128,7 +133,7 @@ public class GetRankingDataService {
         log.info("{} >>>>>>>> getHealRatingRankingData 호출 | 힐러 점수 상승폭 랭킹 데이터 추출 시작 ", sessionBattleTag);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderByHealRatingPointDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByHealRatingPointDesc("N", 0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByHealRatingPointDesc("N", 0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "HR");
         log.info("{} >>>>>>>> getHealRatingRankingData 종료 | 힐러 점수 상승폭 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -142,7 +147,7 @@ public class GetRankingDataService {
         log.info("{} >>>>>>>> getPlayTimeRankingData 호출 | 플레이시간 상승폭 랭킹 데이터 추출 시작 ", sessionBattleTag);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderByPlayTimeDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByPlayTimeDesc("N", 0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByPlayTimeDesc("N", 0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "PT");
         log.info("{} >>>>>>>> getPlayTimeRankingData 종료 | 플레이시간 상승폭 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -156,7 +161,7 @@ public class GetRankingDataService {
         log.info("{} >>>>>>>> getSpentOnFireRankingData 호출 | 불탄시간 상승폭 랭킹 데이터 추출 시작 ", sessionBattleTag);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderBySpentOnFireDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderBySpentOnFireDesc("N", 0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderBySpentOnFireDesc("N", 0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "SF");
         log.info("{} >>>>>>>> getSpentOnFireRankingData 종료 | 불탄시간 상승폭 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -170,7 +175,7 @@ public class GetRankingDataService {
         log.info("{} >>>>>>>> getEnvKillRankingData 호출 | 환경요소처치 랭킹 데이터 추출 시작 ", sessionBattleTag);
 //        Pageable page = PageRequest.of(1,3);
 //        List<PlayerForRanking> rankingDataList = playerForRankingRepository.findPlayerForRankingsByIsBaseDataOrderByEnvKillDesc("N", page).getContent();
-        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByEnvKillDesc("N", 0,3);
+        List<PlayerForRanking> rankingDataList = playerForRankingRepository.selectAllFromPlyaerForRankingOrderByEnvKillDesc("N", 0,3, getLastUdtDtmBase());
         playerRankingDtoList = parseDomainToDTO(rankingDataList, "EK");
         log.info("{} >>>>>>>> getEnvKillRankingData 종료 | 환경요소처치 랭킹 데이터 추출 완료 ", sessionBattleTag);
 
@@ -257,7 +262,7 @@ public class GetRankingDataService {
     public List<PlayerRankingDto> parseDomainToDTO(List<PlayerForRanking> rankingDataList, String index) {
         List<PlayerRankingDto> playerRankingDtoList = new ArrayList<>();
         for (PlayerForRanking data : rankingDataList) {
-            System.out.println(data);
+//            System.out.println(data);
 //            System.out.println(data.getId());
             Player player = playerRepository.findPlayerById(data.getId());
             String score = ""; String className = "";

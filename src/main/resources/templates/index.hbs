@@ -5,7 +5,8 @@
 
     {{!--=================== Main content ======================--}}
     {{#*inline "content-block"}}
-        <input type="hidden" class="fromDetail" style="display: none" id="{{isFromDetail}}" value="{{userInput}}"></input>
+        <input type="hidden" class="fromDetail" style="display: none" id="{{isFromDetail}}" value="{{userInput}}" >
+        <input type="hidden" class="message" value="{{messageFromServer}}">
         <div class="hero-wrap ftco-degree-bg" style="background-image: url('/HWimages/background/bg_1.jpg');" data-stellar-background-ratio="0.5">
             <div class="overlay"></div>
             <div class="container">

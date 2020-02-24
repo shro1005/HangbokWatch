@@ -26,6 +26,10 @@
 <!--                <li class="nav-item findduo-nav"><a href="/agent.html" class="nav-link">듀오찾기</a></li>   &lt;!&ndash;leaderBoard&ndash;&gt;-->
                 <li class="nav-item ranking-nav"><a href="/ranking" class="nav-link">랭킹보기</a></li>   <!--scream-->
 <!--                <li class="nav-item news-nav"><a href="/news.html" class="nav-link">소식보기</a></li>   &lt;!&ndash;news&ndash;&gt;-->
+                {{#if isAdmin}}
+                    <li class="nav-item"><a href="/oNlYAdMIn" class="nav-link">관리자 화면</a></li>
+                {{else}}
+                {{/if}}
                 {{#if isLogin}}
                     <li class="nav-item"><a href="/logout" class="nav-link">로그아웃</a></li>
                 {{else}}

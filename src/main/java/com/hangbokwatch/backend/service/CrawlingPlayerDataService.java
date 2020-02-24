@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hangbokwatch.backend.dao.*;
 import com.hangbokwatch.backend.dao.hero.*;
 import com.hangbokwatch.backend.dao.player.PlayerDetailRepository;
+import com.hangbokwatch.backend.dao.player.PlayerForRankingRepository;
 import com.hangbokwatch.backend.dao.player.PlayerRepository;
 import com.hangbokwatch.backend.dao.player.TrendlineRepository;
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerDetail;
+import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.dto.PlayerCrawlingResultDto;
@@ -49,6 +51,7 @@ public class CrawlingPlayerDataService {
     @Autowired PlayerDetailRepository playerDetailRepository;
     @Autowired TrendlineRepository trendlineRepository;
     @Autowired SeasonRepository seasonRepository;
+    @Autowired PlayerForRankingRepository playerForRankingRepository;
 
     @Autowired DvaRepositroy dvaRepositroy;
     @Autowired OrisaRepository orisaRepository;
@@ -109,7 +112,7 @@ public class CrawlingPlayerDataService {
             String json = Jsoup.connect(GET_PLAYER_LIST_URL+playerName)
                     .ignoreContentType(true)
                     .execute().body();
-            System.out.println(json);
+
             log.debug("{} >>>>>>>> crawlingPlayerList 진행중 | 크롤링한 json을 PlayerCrawlingResultDto로 저장", sessionBattleTag);
 
             //위에 선언한 매퍼를 통해 크롤링결과dto에 맞게 파싱하여 list에 추가
@@ -359,6 +362,18 @@ public class CrawlingPlayerDataService {
 
             log.debug("{} >>>>>>>> crawlingPlayerDetail 진행중 | {}({}) 플레이어 player DB저장 완료", sessionBattleTag , playerListDto.getBattleTag(), playerListDto.getId());
             stopWatch.start("player 테이블에 저장");
+
+            // 최초 등록자의 경우 PlayerForRanking의 base 데이터를 등록해줘야 한다.
+            if( playerForRankingRepository.countByIsBaseDataAndId("Y", playerListDto.getId()) == 0) {
+                PlayerForRanking playerForRanking = new PlayerForRanking(playerListDto.getId(), playerListDto.getPlayerLevel(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(),
+                        playerListDto.getHealRatingPoint(), tankWinGame, tankLoseGame, dealWinGame,dealLoseGame,healWinGame,healLoseGame,
+                        playerListDto.getWinGame(), playerListDto.getLoseGame(), playerListDto.getDrawGame(), playerListDto.getPlayTime(), playerListDto.getSpentOnFire(), playerListDto.getEnvKill(),
+                        "Y");
+
+                playerForRankingRepository.save(playerForRanking);
+            }
+
+            //그 다음 player 데이터 저장
             Player player = new Player(playerListDto.getId(), playerListDto.getBattleTag(), playerListDto.getPlayerName(), playerListDto.getPlayerLevel(), playerListDto.getForUrl(), playerListDto.getIsPublic(), playerListDto.getPlatform()
                     , playerListDto.getPortrait(), playerListDto.getTankRatingPoint(), playerListDto.getDealRatingPoint(), playerListDto.getHealRatingPoint(), playerListDto.getTotalAvgRatingPoint()
                     , playerListDto.getTankRatingImg(), playerListDto.getDealRatingImg(), playerListDto.getHealRatingImg(), tankWinGame, tankLoseGame,dealWinGame,dealLoseGame,healWinGame,healLoseGame

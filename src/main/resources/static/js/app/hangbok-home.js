@@ -60,6 +60,12 @@ const main = {
         });
 
         $('.navbar-nav .index-nav').addClass("active");
+
+        const message = $(".message").val();
+        console.log(message);
+        if(message != "") {
+            alert(message);
+        }
     },
     search : function (userInput) {
         // alert('main search 호출');
@@ -81,14 +87,16 @@ const main = {
         } else if (playerName == "" && playerName_tap != "") {
             playerName = playerName_tap;
         }
-        const inputName = {
-            playerName: playerName
-        };
-
+        // alert(playerName + " / "+ playerName.indexOf("#"));
         if (playerName.indexOf("#") != -1) {
-            playerName.replace("#", "-");
+            playerName = playerName.replace("#", "-");
         }
-        location.href = "/search/" + playerName;
+        if(playerName == "") {
+
+        }else {
+            // console.log(playerName);
+            location.href = "/search/" + playerName;
+        }
     },
     searchReal : function (userInput) {
         playerName = userInput;

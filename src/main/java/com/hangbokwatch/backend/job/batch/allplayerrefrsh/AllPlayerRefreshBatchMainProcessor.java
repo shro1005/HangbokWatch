@@ -149,6 +149,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
             pdDto.setId(player.getId());
 //            pdDto.setSeason(seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())));
             pdDto.setSeason(season);
+//            pdDto.setSeason(20l);
             String hero = playHero.text().trim();
             pdDto.setOrder(++count);
             if("D.Va".equals(hero)) { pdDto.setHeroNameKR("디바"); }else { pdDto.setHeroNameKR(hero); }

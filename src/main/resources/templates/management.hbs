@@ -1,0 +1,158 @@
+{{!-- managemnet page => managemnet.hbs --}}
+
+{{#> layouts/base title="관리자 화면"}}
+{{!--=================== head content ======================--}}
+    {{#*inline "head-block"}}
+        <link rel="stylesheet" href="/fonts/iconfonts/mdi/css/materialdesignicons.css">
+    {{/inline}}
+
+    {{!--=================== Main content ======================--}}
+    {{#*inline "content-block"}}
+        <div class="hero-wrap-s" style="background-image: url('/HWimages/background/bg_5.jpg');" data-stellar-background-ratio="0.5">
+            <div class="overlay"></div>
+            <div class="container">
+                <div class="row justify-content-center align-items-center no-gutters slider-text-s">
+                    <div class="col-md-9 ftco-animate pb-5 text-center">   <!--class="col-lg-8 col-md-6 ftco-animate text-center"-->
+                        <div class="text text-center">
+                            <form action="#" class="search-location-s mt-md-5">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-10 align-items-end">
+                                        <div class="form-group">
+                                            <div class="form-field">
+                                                <input type="text" id="playerName" class="form-control" placeholder="'플레이어명' 혹은 '플레이어명#배틀태그'를 입력해주세요">
+                                                <button type="button" id="btn-search"><span class="ion-ios-search"></span></button>  <!---->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="ftco-section goto-here">
+            <div class="resultContainer-s">
+                <div class="row justify-content-center">
+                    <div class="col-md-12 heading-section text-center mb-5">
+                        <span class="subheading">시즌 정보 관리</span>
+                    </div>
+                </div>
+                <div class="season-list-container">
+
+                </div>
+                <div class="more_btn_div mb-5" align="center">
+                    <hr style="margin-top: 0; margin-bottom: 10px;"><a id="more_btn" href="javascript:moreSeason();">추가하기</a><hr style="margin-top: 10px; margin-bottom: 0">
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-12 heading-section text-center mb-5">
+                        <span class="subheading">배치 관리</span>
+                    </div>
+                </div>
+                <div class="job-list-container">
+
+                </div>
+
+            </div>
+
+        </section>
+    {{/inline}}
+
+    {{!--=================== scripts content ======================--}}
+    {{#*inline "scripts-blick"}}
+        <script id="season_list" type="text/x-handlebars-template" charset="UTF-8">
+            <div class="row" id="search-result">
+                <div class="table-responsive">
+                    <table class="table table-hover" style="margin: 0;">
+                        <thead>
+                        <tr>
+                            <th>시즌</th>
+                            <th>시작일</th>
+                            <th>종료일</th>
+                            <th>   </th>
+                        </tr>
+                        </thead>
+                        <tbody class="tbody">
+                        \{{#seasons}}
+                        <tr class="season_data">
+                            <td class="season">
+                                \{{season}}
+                            </td>
+                            <td class="start-date">
+                                \{{startDate}}
+                            </td>
+                            <td class="end-date">
+                                \{{endDate}}
+                            </td>
+                            <td class="mgt-button"><div class="modify inner-button" href="javascript:void(0);" onclick="modifySeason(this); return false;" style="cursor: pointer">수정</div></td>
+                        </tr>
+                        \{{/seasons}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </script>
+
+        <script id="add_season_list" type="text/x-handlebars-template" charset="UTF-8">
+            \{{#seasons}}
+            <tr class="season_data">
+                <td class="season">
+                    <input class="season_input" align="left" value="">
+                </td>
+                <td class="start-date">
+                    <input class="start_date_input" align="left" value="">
+                </td>
+                <td class="end-date">
+                    <input class="end_date_input" align="left" value="">
+                </td>
+                <td class="mgt-button">
+                    <div class="save inner-button" href="javascript:void(0);" onclick="saveSeason(this); return false;" style="cursor: pointer">저장</div>
+                </td>
+            </tr>
+            \{{/seasons}}
+        </script>
+
+        <script id="job_list" type="text/x-handlebars-template" charset="UTF-8">
+            <div class="row" id="search-result">
+                <div class="table-responsive">
+                    <table class="table table-hover" style="margin: 0;">
+                        <thead>
+                        <tr>
+                            <th>job이름</th>
+                            <th>상태</th>
+                            <th>최종시작시간</th>
+                            <th>최종종료시간</th>
+                            <th>수동 작동</th>
+                        </tr>
+                        </thead>
+                        <tbody class="tbody">
+                        \{{#jobs}}
+                        <tr class="job-data">
+                            <td class="job-name">
+                                \{{jobName}}
+                            </td>
+                            <td class="job-status">
+                                \{{status}}
+                            </td>
+                            <td class="last-start-time">
+                                \{{lastStartTime}}
+                            </td>
+                            <td class="last-end-time">
+                                \{{lastEndTime}}
+                            </td>
+                            <td class="mgt-button"><div class="resume inner-button job-\{{index}}" href="javascript:void(0);" onclick="resumeJob(this); return false;" style="cursor: pointer">재기동</div></td>
+                        </tr>
+                        \{{/jobs}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </script>
+
+        <script src="/js/app/hangbok-header.js"></script>
+        <script src="/js/app/hangbok-management.js"></script>
+    {{/inline}}
+
+{{/layouts/base}}

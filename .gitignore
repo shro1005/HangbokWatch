@@ -10,6 +10,7 @@ HangbokWatch_Resource/
 src/main/resources/*.yml
 src/main/resources/*.properties
 keystore.p12
+*.pem
 
 ### STS ###
 .apt_generated

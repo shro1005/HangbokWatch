@@ -1,5 +1,6 @@
 package com.hangbokwatch.backend.controller;
 
+import com.hangbokwatch.backend.domain.Season;
 import com.hangbokwatch.backend.dto.*;
 import com.hangbokwatch.backend.dto.auth.SessionUser;
 import com.hangbokwatch.backend.service.*;
@@ -27,6 +28,7 @@ public class WebRestController {
     private final ShowPlayerDetailService spd;
     private final ShowUserFavoriteService suf;
     private final GetRankingDataService grd;
+    private final ManagementPageService mps;
     private final HttpSession httpSession;
 
     @PostMapping("/showPlayerList")
@@ -169,6 +171,72 @@ public class WebRestController {
         log.info("===================================================================");
 
         return rankerList;
+    }
+
+    @PostMapping("/getSeasonData")
+    public List<Season> getSeasonData() {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getSeasonData 호출 | 관리자 화면에서 시즌 정보 추출", sessionBattleTag);
+
+        List<Season> seasonList = mps.getSeasonListInService(sessionItems);
+
+        log.info("{} >>>>>>>> getSeasonData 호출 | 시즌 정보 추출 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return seasonList;
+    }
+
+    @PostMapping("/saveSeasonData")
+    public SeasonDto saveSeassonData(@RequestBody HashMap<String, Object> recvMap) {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        Long season =  Long.parseLong((String)recvMap.get("season"));
+        String startDate = (String) recvMap.get("startDate");
+        String endDate = (String) recvMap.get("endDate");
+
+        log.info("{} >>>>>>>> saveSeassonData 호출 | 관리자 화면에서 시즌 정보 등록 및 수정 | season : {} , startDate : {}, endDate : {}", sessionBattleTag , season, startDate, endDate);
+
+        SeasonDto seasonDto = mps.saveSeasonDataInService(sessionItems, season, startDate, endDate);
+
+        log.info("{} >>>>>>>> saveSeassonData 호출 | 시즌 정보 등록 및 수정 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return seasonDto;
+    }
+
+    @PostMapping("/getJobData")
+    public List<JobDto> getJobData() {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getJobData 호출 | 관리자 화면에서 배치 잡 정보 추출 ", sessionBattleTag);
+
+        List<JobDto> jobDtoList = mps.getJobDataInService(sessionItems);
+
+        log.info("{} >>>>>>>> getJobData 호출 | 배치 잡 정보 추출 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return jobDtoList;
+    }
+
+    @PostMapping("/resumeJob")
+    public JobDto resumeJob(@RequestBody HashMap<String, Object> recvMap) {
+        Map<String, Object> sessionItems = sessionCheck();
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        String jobName = (String) recvMap.get("jobName");
+
+        log.info("{} >>>>>>>> resumeJob 호출 | 관리자 화면에서 {} 배치 수동 재기동 ", sessionBattleTag , jobName);
+
+        JobDto jobDto = mps.resumeJobInService(sessionItems, jobName);
+
+        log.info("{} >>>>>>>> resumeJob 호출 | 배치 수동 재기동 완료", sessionBattleTag);
+        log.info("===================================================================");
+
+        return jobDto;
     }
 
     private Map<String, Object> sessionCheck() {

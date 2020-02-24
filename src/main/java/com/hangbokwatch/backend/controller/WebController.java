@@ -64,6 +64,8 @@ public class WebController {
             model.addAttribute("userInput", forUrl);
             log.debug("{} >>>>>>>> showPlayerDetail 진행중 | 갱신중 에러 혹은 프로필 비공개로 메세지 전달 ({})", sessionBattleTag, cdDto.getMessage());
 
+            returnUrl = "index";
+
         }
         log.info("{} >>>>>>>> showPlayerDetail 종료 | {}.html 화면 이동", sessionBattleTag, returnUrl);
         log.info("===================================================================");
@@ -145,6 +147,18 @@ public class WebController {
         return "ranking";
     }
 
+    @GetMapping("/oNlYAdMIn")
+    public String goToManagement(Model model) {
+        Map<String, Object> sessionItems = sessionCheck(model);
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> goToManagement 호출 | 관리자 화면으로 이동합니다..", sessionBattleTag);
+
+
+        log.info("{} >>>>>>>> goToManagement 종료 | 관리자 페이지(management.html)로 이동", sessionBattleTag);
+        log.info("===================================================================");
+        return "management";
+    }
 
     private Map<String, Object> sessionCheck(Model model) {
         // CustomOAuth2UserService에서 로그인 성공시 세션에 SessionUser를 저장하도록 구성했으므로
@@ -154,6 +168,11 @@ public class WebController {
         if(user != null) {
             model.addAttribute("SessionUserId", user.getId());
             model.addAttribute("SessionBattleTag", user.getBattleTag());
+            boolean isAdmin = false;
+            if("ADMIN".equals(user.getRole().name())) {
+                isAdmin = true;
+            }
+            model.addAttribute("isAdmin", isAdmin);
             model.addAttribute("isLogin", true);
             battleTag = user.getBattleTag();
         }else {

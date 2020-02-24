@@ -1,5 +1,6 @@
 package com.hangbokwatch.backend.dto.auth;
 
+import com.hangbokwatch.backend.domain.user.Role;
 import com.hangbokwatch.backend.domain.user.User;
 import lombok.Getter;
 
@@ -17,6 +18,7 @@ public class SessionUser implements Serializable {
     private String email;
     private Integer trollIndex;
     private Integer badSpeakerIndex;
+    private Role role;
 
     public SessionUser(User user) {
         this.battleTag = user.getBattleTag();
@@ -24,5 +26,6 @@ public class SessionUser implements Serializable {
         this.email = user.getEmail();
         this.trollIndex = user.getTrollIndex();
         this.badSpeakerIndex = user.getBadSpeakerIndex();
+        this.role = user.getRole();
     }
 }

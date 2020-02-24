@@ -78,6 +78,8 @@ const getRankingData = () => {
         contentType: 'application/json; charset=utf-8',
         async : false
     }).done(function (datas) {
+        // console.log("test111111111111");
+        // console.log(datas);
         // const tankRating = datas.tankRating;
         // const dealRating = datas.dealRating;
         // const healRating = datas.healRating;
@@ -85,6 +87,8 @@ const getRankingData = () => {
         // const spentOnFire = datas.spentOnFire;
         // const envKill = datas.envKill;
         $.each(datas, function (j, data) {
+            // console.log("test2222222222222");
+            // console.log(data);
             let ranking_contents = $("#our-ranking-contents").html();
             let ranking_cpontents_template = Handlebars.compile(ranking_contents);
 
@@ -93,6 +97,8 @@ const getRankingData = () => {
             };
             let className = "";
             $.each(data, function (i, val) {
+                // console.log("test33333333333");
+                // console.log(val);
                 let forUrl = val.battleTag.replace("#", '-');
                 ranking.ranking.push({ranking : "ranking-" + (i+1), rankingImgPath : "/HWimages/ranking/icon-"+(i+1)+"-ranking.png", playerPortrait : val.portrait, playerName: val.playerName, score : val.score, forUrl: forUrl})
                 className = val.className;
