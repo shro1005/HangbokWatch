@@ -14,4 +14,7 @@ public interface JobInstanceRepository extends JpaRepository<JobInstance, Long >
     @Query(nativeQuery = true, name = "JobInstance.fromJobName")
     JobDto selectLastJobInstanceIdWhereJobName(String jobName);
 
+    @Query(nativeQuery = true, value = "SELECT b.* FROM batch_job_instance b WHERE b.job_name = ?1 ORDER BY b.job_instance_id DESC offset ?2 limit ?3")
+    List<JobInstance> selectAllFromJobInstanceWhereJobName(String jobName, int offset, int limit);
+
 }

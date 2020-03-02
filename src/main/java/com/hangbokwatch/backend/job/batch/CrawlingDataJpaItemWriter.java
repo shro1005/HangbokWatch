@@ -1,4 +1,4 @@
-package com.hangbokwatch.backend.job.batch.allplayerrefrsh;
+package com.hangbokwatch.backend.job.batch;
 
 import com.hangbokwatch.backend.domain.hero.*;
 import com.hangbokwatch.backend.domain.player.Player;
@@ -6,6 +6,7 @@ import com.hangbokwatch.backend.domain.player.PlayerDetail;
 import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.domain.player.Trendline;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -19,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
+@Slf4j
 public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
     protected static final Log logger = LogFactory.getLog(JpaItemWriter.class);
 
@@ -113,9 +115,10 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                     Pharah pharah = ((CompetitiveDetailDto) item).getPharah();
                     Hanzo hanzo = ((CompetitiveDetailDto) item).getHanzo();
 
-
-                    entityManager.merge(player);
-                    mergeCount++;
+                    if(player != null) {
+                        entityManager.merge(player);
+                        mergeCount++;
+                    }
 
                     if (trendline != null) {
                         entityManager.merge(trendline);
@@ -123,6 +126,7 @@ public class CrawlingDataJpaItemWriter<T> implements ItemWriter<T>, Initializing
                     }
                     if (playerDetailList != null && playerDetailList.size() > 0) {
                         for (PlayerDetail playerDetail : playerDetailList) {
+//                            log.debug("{}", playerDetail.getHeroName());
                             entityManager.merge(playerDetail);
                             mergeCount ++;
                         }

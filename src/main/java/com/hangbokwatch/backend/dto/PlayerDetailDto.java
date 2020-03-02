@@ -13,26 +13,26 @@ public class PlayerDetailDto {
     private Integer order;
     private String heroName;
     private String heroNameKR;
-    private String killPerDeath;
+    private String killPerDeath;  //1
     private String winRate;
     private String playTime;
-    private String deathAvg;
+    private String deathAvg;     //2
     private String spentOnFireAvg;
-    private String healPerLife;
-    private String blockDamagePerLife;
-    private String lastHitPerLife;
-    private String damageToHeroPerLife;
-    private String damageToShieldPerLife;
-    private String index1;
-    private String index2;
-    private String index3;
-    private String index4;
-    private String index5;
-    private String title1;
-    private String title2;
-    private String title3;
-    private String title4;
-    private String title5;
+    private String healPerLife; //3
+    private String blockDamagePerLife; //4
+    private String lastHitPerLife;  //5
+    private String damageToHeroPerLife;  //6
+    private String damageToShieldPerLife;  //7
+    private String index1;  //8
+    private String index2;  //9
+    private String index3;  //10
+    private String index4;  //11
+    private String index5;  //12
+    private String title1;  //13
+    private String title2;  //14
+    private String title3;  //15
+    private String title4;  //16
+    private String title5;  //17
 
     public String toString() {
         return "Detail{" +

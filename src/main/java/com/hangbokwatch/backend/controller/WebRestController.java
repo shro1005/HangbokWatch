@@ -70,9 +70,13 @@ public class WebRestController {
         Long id = playerSearchDto.getId();
         log.info("{} >>>>>>>> getDetailData 호출 | 플레이어의 상세 정보를 조회합니다. 검색값(id) : {}({})", sessionBattleTag, id, playerSearchDto.getBattleTag());
         List<PlayerDetailDto> playerDetailList = spd.selectPlayerHeroDetail(id, sessionItems);
+        List<PlayerDetailDto> tierDetailList = spd.getTierDetail(id, sessionItems, playerDetailList);
+        List<PlayerDetailDto> rankerDetailList = spd.getRankerDetail(id, sessionItems, playerDetailList);
         List<TrendlindDto> trendlindList = spd.selectPlayerTrendline(id, sessionItems);
 
         map.put("detail", playerDetailList);
+        map.put("tierDetail", tierDetailList);
+        map.put("rankerDetail", rankerDetailList);
         map.put("trendline", trendlindList);
 
         log.info("{} >>>>>>>> getDetailData 종료 | detail {}건, trendline {}건 회신", sessionBattleTag, playerDetailList.size(), trendlindList.size());

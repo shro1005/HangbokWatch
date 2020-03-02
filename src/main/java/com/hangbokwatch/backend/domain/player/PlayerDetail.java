@@ -13,7 +13,7 @@ import javax.persistence.IdClass;
 @Getter
 @Entity(name = "playerdetail")
 @IdClass(PlayerDetailId.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class PlayerDetail {
 
     @Id

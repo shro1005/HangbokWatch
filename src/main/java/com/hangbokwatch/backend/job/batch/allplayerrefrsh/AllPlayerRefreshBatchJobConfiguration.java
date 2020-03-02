@@ -4,6 +4,7 @@ import com.hangbokwatch.backend.dao.SeasonRepository;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.dto.CompetitiveDetailDto;
 import com.hangbokwatch.backend.job.BatchSettingHelper;
+import com.hangbokwatch.backend.job.batch.CrawlingDataJpaItemWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -62,7 +63,7 @@ public class AllPlayerRefreshBatchJobConfiguration {
     @Bean
     public CronTriggerFactoryBean allPlayerRefreshTrigger() throws DuplicateJobException {
         return BatchSettingHelper.cronTriggerFactoryBeanBuilder()
-                .cronExpression("0 15 * * * ?")
+                .cronExpression("0 1 0 * * ?")
                 .jobDetailFactoryBean(allPlayerRefreshSchedule())
                 .name(JOB_NAME + "_trigger")
                 .build();

@@ -1,7 +1,11 @@
 package com.hangbokwatch.backend.service;
 
+import com.hangbokwatch.backend.dao.JobExecutionRepository;
+import com.hangbokwatch.backend.dao.JobInstanceRepository;
 import com.hangbokwatch.backend.dao.player.PlayerForRankingRepository;
 import com.hangbokwatch.backend.dao.player.PlayerRepository;
+import com.hangbokwatch.backend.domain.job.JobExecution;
+import com.hangbokwatch.backend.domain.job.JobInstance;
 import com.hangbokwatch.backend.domain.player.Player;
 import com.hangbokwatch.backend.domain.player.PlayerForRanking;
 import com.hangbokwatch.backend.dto.PlayerListDto;
@@ -29,6 +33,10 @@ public class GetRankingDataService {
     PlayerForRankingRepository playerForRankingRepository;
     @Autowired
     PlayerRepository playerRepository;
+    @Autowired
+    JobInstanceRepository jobInstanceRepository;
+    @Autowired
+    JobExecutionRepository jobExecutionRepository;
 
     private final HttpSession httpSession;
 
@@ -94,7 +102,18 @@ public class GetRankingDataService {
     }
 
     public LocalDateTime getLastUdtDtmBase() {
-        return playerForRankingRepository.selectMaxUdtDtmWhereBase("Y",0,1);
+//        return playerForRankingRepository.selectMaxUdtDtmWhereBase("Y",0,1);
+        LocalDateTime result = null;
+        List<JobInstance> jobInstanceList = jobInstanceRepository.selectAllFromJobInstanceWhereJobName("rankingBaseDataUpdateBatch", 0, 100);
+        for (JobInstance jobInstance : jobInstanceList) {
+            JobExecution jobExecution = jobExecutionRepository.selectJobExecutionByJobInstanceId(jobInstance.getJobInstanceId(),0,1);
+            if("COMPLETED".equals(jobExecution.getStatus())) {
+                result = jobExecution.getEndTime();
+                break;
+            }
+        }
+        log.debug(" >>>>>>>> getLastUdtDtmBase 호출 | 가장 최근 baseUpdate배치 완료 시간 {}", result );
+        return result;
     }
 
     public List<PlayerRankingDto> getTankRatingRankingData(Map<String, Object> sessionItems) {

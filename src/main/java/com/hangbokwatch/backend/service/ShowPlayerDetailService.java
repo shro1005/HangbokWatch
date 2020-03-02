@@ -213,6 +213,110 @@ public class ShowPlayerDetailService {
         return list;
     }
 
+    public List<PlayerDetailDto> getTierDetail(Long playerId, Map<String, Object> sessionItems, List<PlayerDetailDto> playerDetailList) {
+        String healHero = "/아나/바티스트/브리기테/루시우/메르시/모이라/젠야타";
+        String dealHero = "/애쉬/바스티온/둠피스트/겐지/한조/정크랫/맥크리/메이/파라/리퍼/솔저: 76/솜브라/시메트라/토르비욘/트레이서/위도우메이커";
+        String tankHero = "/디바/오리사/라인하르트/윈스턴/자리야/로드호그/레킹볼/시그마";
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getTierDetail 호출 | {} 플레이어의 티어 평균 데이터를 추출", sessionBattleTag, playerId);
+        List<PlayerDetailDto> list = new ArrayList<PlayerDetailDto>();
+
+        Player player = playerRepository.findPlayerById(playerId);
+        log.debug("{} >>>>>>>> getTierDetail 진행중 | 조회할 플레이어의 player data 추출 {}", sessionBattleTag, player.getBattleTag());
+
+        int tankRatingPoint = player.getTankRatingPoint();
+        int dealRatingPoint = player.getDealRatingPoint();
+        int healRatingPoint = player.getHealRatingPoint();
+
+        Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
+        log.debug("{} >>>>>>>> getTierDetail 진행중 | 현재 시즌 조회 : {}", sessionBattleTag, season);
+
+        for(PlayerDetailDto pd : playerDetailList) {
+            String heroName = pd.getHeroNameKR();
+
+            PlayerDetail playerDetail = new PlayerDetail();
+            //힐러일경우
+            if(healHero.indexOf(heroName) != -1) {
+                if(healRatingPoint >= 4000) { healRatingPoint = 4000; }
+                else if(healRatingPoint >= 3500 && healRatingPoint < 4000) { healRatingPoint = 3500; }
+                else if(healRatingPoint >= 3000 && healRatingPoint < 3500) { healRatingPoint = 3000; }
+                else if(healRatingPoint >= 2500 && healRatingPoint < 3000) { healRatingPoint = 2500; }
+                else if(healRatingPoint >= 2000 && healRatingPoint < 2500) { healRatingPoint = 2000; }
+                else if(healRatingPoint >= 1500 && healRatingPoint < 2000) { healRatingPoint = 1500; }
+                else if(healRatingPoint >= 1 && healRatingPoint < 1500) { healRatingPoint = 1; }
+
+                playerDetail = playerDetailRepository.findByIdAndSeasonAndHeroNameKR((long)healRatingPoint, season, heroName);
+
+            }else if (dealHero.indexOf(heroName) != -1) {
+                if(dealRatingPoint >= 4000) { dealRatingPoint = 4000; }
+                else if(dealRatingPoint >= 3500 && dealRatingPoint < 4000) { dealRatingPoint = 3500; }
+                else if(dealRatingPoint >= 3000 && dealRatingPoint < 3500) { dealRatingPoint = 3000; }
+                else if(dealRatingPoint >= 2500 && dealRatingPoint < 3000) { dealRatingPoint = 2500; }
+                else if(dealRatingPoint >= 2000 && dealRatingPoint < 2500) { dealRatingPoint = 2000; }
+                else if(dealRatingPoint >= 1500 && dealRatingPoint < 2000) { dealRatingPoint = 1500; }
+                else if(dealRatingPoint >= 1 && dealRatingPoint < 1500) { dealRatingPoint = 1; }
+
+                playerDetail = playerDetailRepository.findByIdAndSeasonAndHeroNameKR((long)dealRatingPoint, season, heroName);
+
+            }else if (tankHero.indexOf(heroName) != -1) {
+                if(tankRatingPoint >= 4000) { tankRatingPoint = 4000; }
+                else if(tankRatingPoint >= 3500 && tankRatingPoint < 4000) { tankRatingPoint = 3500; }
+                else if(tankRatingPoint >= 3000 && tankRatingPoint < 3500) { tankRatingPoint = 3000; }
+                else if(tankRatingPoint >= 2500 && tankRatingPoint < 3000) { tankRatingPoint = 2500; }
+                else if(tankRatingPoint >= 2000 && tankRatingPoint < 2500) { tankRatingPoint = 2000; }
+                else if(tankRatingPoint >= 1500 && tankRatingPoint < 2000) { tankRatingPoint = 1500; }
+                else if(tankRatingPoint >= 1 && tankRatingPoint < 1500) { tankRatingPoint = 1; }
+
+                playerDetail = playerDetailRepository.findByIdAndSeasonAndHeroNameKR((long)tankRatingPoint, season, heroName);
+
+            }
+
+            if(playerDetail != null) {
+
+                PlayerDetailDto playerDetailDto = new PlayerDetailDto(playerDetail.getId(), playerDetail.getSeason(), playerDetail.getHeroOrder(), playerDetail.getHeroName()
+                        , playerDetail.getHeroNameKR(), playerDetail.getKillPerDeath(), playerDetail.getWinRate(), playerDetail.getPlayTime()
+                        , playerDetail.getDeathAvg(), playerDetail.getSpentOnFireAvg(), playerDetail.getHealPerLife(), playerDetail.getBlockDamagePerLife(), playerDetail.getLastHitPerLife()
+                        , playerDetail.getDamageToHeroPerLife(), playerDetail.getDamageToShieldPerLife()
+                        , playerDetail.getIndex1(), playerDetail.getIndex2(), playerDetail.getIndex3(), playerDetail.getIndex4(), playerDetail.getIndex5()
+                        , playerDetail.getTitle1(), playerDetail.getTitle2(), playerDetail.getTitle3(), playerDetail.getTitle4(), playerDetail.getTitle5());
+
+                log.debug("{} >>>>>>>> selectPlayerHeroDetail 진행중 | {} ", sessionBattleTag, playerDetailDto.toString());
+                list.add(playerDetailDto);
+            }
+        }
+
+        return list;
+    }
+
+    public List<PlayerDetailDto> getRankerDetail(Long playerId, Map<String, Object> sessionItems, List<PlayerDetailDto> playerDetailList) {
+        String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
+
+        log.info("{} >>>>>>>> getTierDetail 호출 | {} 상위권 데이터를 추출", sessionBattleTag, playerId);
+        List<PlayerDetailDto> list = new ArrayList<PlayerDetailDto>();
+
+        Long season = seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis()));
+        log.debug("{} >>>>>>>> getTierDetail 진행중 | 현재 시즌 조회 : {}", sessionBattleTag, season);
+
+        for(PlayerDetailDto pd : playerDetailList) {
+            String heroName = pd.getHeroNameKR();
+
+            PlayerDetail playerDetail = playerDetailRepository.findByIdAndSeasonAndHeroNameKR(4000l, season, heroName);
+
+            PlayerDetailDto playerDetailDto = new PlayerDetailDto(playerDetail.getId(), playerDetail.getSeason(), playerDetail.getHeroOrder(), playerDetail.getHeroName()
+                    , playerDetail.getHeroNameKR(), playerDetail.getKillPerDeath(), playerDetail.getWinRate(), playerDetail.getPlayTime()
+                    , playerDetail.getDeathAvg(), playerDetail.getSpentOnFireAvg(), playerDetail.getHealPerLife(), playerDetail.getBlockDamagePerLife(), playerDetail.getLastHitPerLife()
+                    , playerDetail.getDamageToHeroPerLife(), playerDetail.getDamageToShieldPerLife()
+                    , playerDetail.getIndex1(), playerDetail.getIndex2(), playerDetail.getIndex3(), playerDetail.getIndex4(), playerDetail.getIndex5()
+                    , playerDetail.getTitle1(), playerDetail.getTitle2(), playerDetail.getTitle3(), playerDetail.getTitle4(), playerDetail.getTitle5());
+
+            log.debug("{} >>>>>>>> selectPlayerHeroDetail 진행중 | {} ", sessionBattleTag, playerDetailDto.toString());
+            list.add(playerDetailDto);
+        }
+
+        return list;
+    }
+
     public List<TrendlindDto> selectPlayerTrendline(Long playerId, Map<String, Object> sessionItems) {
         String sessionBattleTag = (String) sessionItems.get("sessionBattleTag");
 

@@ -12,4 +12,8 @@ public interface PlayerDetailRepository extends JpaRepository<PlayerDetail, Long
 
     @Transactional
     void deletePlayerDetailsByIdAndSeason(Long id, Long season);
+
+    PlayerDetail findByIdAndSeasonAndHeroNameKR(Long id, Long season, String heroNameKr);
+
+
 }

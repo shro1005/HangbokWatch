@@ -148,8 +148,8 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
             PlayerDetailDto pdDto = new PlayerDetailDto();
             pdDto.setId(player.getId());
 //            pdDto.setSeason(seasonRepository.selectSeason(new SimpleDateFormat("yyyyMMddHHmmss").format(System.currentTimeMillis())));
-            pdDto.setSeason(season);
-//            pdDto.setSeason(20l);
+//            pdDto.setSeason(season);
+            pdDto.setSeason(20l);
             String hero = playHero.text().trim();
             pdDto.setOrder(++count);
             if("D.Va".equals(hero)) { pdDto.setHeroNameKR("디바"); }else { pdDto.setHeroNameKR(hero); }
@@ -208,7 +208,14 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
         competitiveDetailDto.setPlayerForRanking(playerForRanking);
 
         log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> trendline객체 JopParameter에 저장", JOB_NAME , player.getBattleTag(), player.getId());
-        Trendline trendline = new Trendline(player.getId(), new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis())
+        String currentTime = new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis());
+        log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> 현재시간 측정 : {}", JOB_NAME , player.getBattleTag(), player.getId(), currentTime);
+        if(Integer.parseInt(new SimpleDateFormat("HHmm").format(System.currentTimeMillis())) <= 110) {
+            log.debug("{} >>>>>>>> playerDetailItemProcessor | {} 플레이어 ({}) >>> 방금 저녁 12시를 넘겼으니 어제 날짜로 데이터 등록 : {}", JOB_NAME , player.getBattleTag(), player.getId(), currentTime);
+            currentTime = new SimpleDateFormat("yyyyMMdd").format(System.currentTimeMillis() - 1000*60*60*24);
+        }
+
+        Trendline trendline = new Trendline(player.getId(), currentTime
                 ,player.getTankRatingPoint(), player.getDealRatingPoint(), player.getHealRatingPoint()
                 ,tankWinGame, tankLoseGame, dealWinGame, dealLoseGame, healWinGame, healLoseGame);
 
@@ -427,7 +434,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000004D1":                  // 평균 메카 자폭 킬 (10분)
+                            case "0x08600000000004D1":                  // 평균 메카 자폭 처치 (10분)
                                 td = tr.select("td");
                                 mechaSuicideKillAvg = td.last().text();
                                 break;
@@ -451,7 +458,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            mechaSuicideKillAvg, mechaCallAvg, "", "", "", "평균 자폭 킬", "평균 메카호출", "", "", "");
+                            mechaSuicideKillAvg, mechaCallAvg, "", "", "", "평균 자폭 처치", "평균 메카호출", "", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -529,15 +536,15 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000004E7":                  // 평균 대지강타 킬 (10분)
+                            case "0x08600000000004E7":                  // 평균 대지강타 처치 (10분)
                                 td = tr.select("td");
                                 earthshatterKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004E5":                  // 평균 돌진 킬 (10분)
+                            case "0x08600000000004E5":                  // 평균 돌진 처치 (10분)
                                 td = tr.select("td");
                                 chargeKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004E8":                  // 평균 화염강타 킬 (10분)
+                            case "0x08600000000004E8":                  // 평균 화염강타 처치 (10분)
                                 td = tr.select("td");
                                 fireStrikeKillAvg = td.last().text();
                                 break;
@@ -557,7 +564,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, "", "", "평균 대지분쇄 킬", "평균 돌진 킬", "평균 화염강타 킬", "", "");
+                            earthshatterKillAvg, chargeKillAvg, fireStrikeKillAvg, "", "", "평균 대지분쇄 처치", "평균 돌진 처치", "평균 화염강타 처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -587,15 +594,15 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 energyAvg = td.last().text();
                                 break;
-                            case "0x08600000000004F0":                  // 평균 고에너지 킬 (10분)
+                            case "0x08600000000004F0":                  // 평균 고에너지 처치 (10분)
                                 td = tr.select("td");
                                 highEnergyKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004F1":                  // 중력자탄 킬 (10분)
+                            case "0x08600000000004EF":                  // 중력자탄 처치 (10분)
                                 td = tr.select("td");
                                 gravitonSurgeKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004EF":                  // 평균 주는방벽 (10분)
+                            case "0x08600000000004F1":                  // 평균 주는방벽 (10분)
                                 td = tr.select("td");
                                 projectedBarrierAvg = td.last().text();
                                 break;
@@ -609,13 +616,13 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     Zarya zarya = new Zarya(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
                             blockDamagePerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(), energyAvg,
-                            highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, goldMedal, silverMedal, bronzeMedal);
+                            highEnergyKillAvg, gravitonSurgeKillAvg, projectedBarrierAvg,  goldMedal, silverMedal, bronzeMedal);
 
                     competitiveDetailDto.setZarya(zarya);
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            energyAvg, highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, "", "평균 에너지", "평균 고에너지 킬", "평균 주는방벽", "평균 중력자탄 킬", "");
+                            energyAvg, highEnergyKillAvg, projectedBarrierAvg, gravitonSurgeKillAvg, "", "평균 에너지", "평균 고에너지 처치", "평균 주는방벽", "평균 중력자탄 처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -637,7 +644,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x0860000000000500":                  // 평균 대재앙 킬 (10분)
+                            case "0x0860000000000500":                  // 평균 대재앙 처치 (10분)
                                 td = tr.select("td");
                                 wholeHogKillAvg = td.last().text();
                                 break;
@@ -653,7 +660,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 selfHeal = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000004EA":                  // 평균 단독 처치 (10분)
+                            case "0x08600000000004DA":                  // 평균 단독 처치 (10분)
                                 td = tr.select("td");
                                 soloKillAvg = td.last().text();
                                 break;
@@ -674,7 +681,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "", "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            wholeHogKillAvg, chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), soloKillAvg, "평균 돼재앙 킬", "갈고리 명중률", "평균 끈 적", "목숭당 자힐량", "평균 단독처치");
+                            wholeHogKillAvg, chainHookAccuracy, hookingEnemyAvg, selfHealPerLife.toString(), soloKillAvg, "평균 돼재앙 처치", "갈고리 명중률", "평균 끈 적", "목숭당 자힐량", "평균 단독처치");
 
                     playerDetailList.add(playerDetail);
 
@@ -699,11 +706,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x0860000000000508":                  // 평균 점프팩 킬 (10분)
+                            case "0x0860000000000508":                  // 평균 점프팩 처치 (10분)
                                 td = tr.select("td");
                                 jumpPackKillAvg = td.last().text();
                                 break;
-                            case "0x086000000000050B":                  // 평균 원시의 분노 킬 (10분)
+                            case "0x086000000000050B":                  // 평균 원시의 분노 처치 (10분)
                                 td = tr.select("td");
                                 primalRageKillAvg = td.last().text();
                                 break;
@@ -727,7 +734,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            jumpPackKillAvg, primalRageKillAvg, pushEnmeyAvg, "", "", "평균 점프팩 킬", "평균 원시의분노 킬", "평균 밀친 적", "", "");
+                            jumpPackKillAvg, primalRageKillAvg, pushEnmeyAvg, "", "", "평균 점프팩 처치", "평균 원시의분노 처치", "평균 밀친 적", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -756,11 +763,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 absorptionDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000006C0":                  // 평균 중력붕괴 킬 (10분)
+                            case "0x08600000000006C0":                  // 평균 중력붕괴 처치 (10분)
                                 td = tr.select("td");
                                 graviticFluxKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000006BB":                  // 평균 강착 킬 (10분)
+                            case "0x08600000000006BB":                  // 평균 강착 처치 (10분)
                                 td = tr.select("td");
                                 accretionKillAvg = td.last().text();
                                 break;
@@ -781,7 +788,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            absorptionDamagePerLife.toString(), graviticFluxKillAvg, accretionKillAvg, "", "", "목숨당 흡수한 피해", "평균 중력붕괴 킬", "평균 강착 킬", "", "");
+                            absorptionDamagePerLife.toString(), graviticFluxKillAvg, accretionKillAvg, "", "", "목숨당 흡수한 피해", "평균 중력붕괴 처치", "평균 강착 처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -806,15 +813,15 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x086000000000064C":                  // 평균 갈고리 킬 (10분)
+                            case "0x086000000000064C":                  // 평균 갈고리 처치 (10분)
                                 td = tr.select("td");
                                 grapplingClawKillAvg = td.last().text();
                                 break;
-                            case "0x086000000000064F":                  // 평균 파일드라이브 킬 (10분)
+                            case "0x086000000000064F":                  // 평균 파일드라이브 처치 (10분)
                                 td = tr.select("td");
                                 piledriverKillAvg = td.last().text();
                                 break;
-                            case "0x086000000000064D":                  // 평균 지뢰밭 킬 (10분)
+                            case "0x086000000000064D":                  // 평균 지뢰밭 처치 (10분)
                                 td = tr.select("td");
                                 minefieldKillAvg = td.last().text();
                                 break;
@@ -834,7 +841,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), "0", damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            grapplingClawKillAvg, piledriverKillAvg, minefieldKillAvg, "", "", "평균 갈고리 킬", "평균 파일드라이버 킬", "평균 지뢰밭 킬", "", "");
+                            grapplingClawKillAvg, piledriverKillAvg, minefieldKillAvg, "", "", "평균 갈고리 처치", "평균 파일드라이버 처치", "평균 지뢰밭 처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -859,7 +866,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 nanoBoosterAvg = td.last().text();
                                 break;
-                            case "0x086000000000043C":                  // 평균 생체 수류탄 킬 (10분)
+                            case "0x086000000000043C":                  // 평균 생체 수류탄 처치 (10분)
                                 td = tr.select("td");
                                 bioticGrenadeKill = Long.parseLong(td.last().text());
                                 break;
@@ -883,7 +890,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString(), "", "", "평균 나노강화제 주입", "평균 생체수류탄 킬", "평균 재운적", "", "");
+                            nanoBoosterAvg, sleepDartAvg, bioticGrenadeKillPerLife.toString(), "", "", "평균 나노강화제 주입", "평균 생체수류탄 처치", "평균 재운적", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1077,7 +1084,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 selfHeal = Long.parseLong(td.last().text());
                                 break;
-                            case "0x086000000000058A":                  // 평균 융화 킬 (10분)
+                            case "0x086000000000058A":                  // 평균 융화 처치 (10분)
                                 td = tr.select("td");
                                 coalescenceKillAvg = td.last().text();
                                 break;
@@ -1100,7 +1107,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), "", "", "평균 융화 킬", "평균 융화 힐", "목숭당 자힐량", "", "");
+                            coalescenceKillAvg, coalescenceHealAvg, selfHealPerLife.toString(), "", "", "평균 융화 처치", "평균 융화 힐", "목숭당 자힐량", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1115,14 +1122,24 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     /**젠야타 시작*/
                 } else if ("0x02E0000000000020".equals(heroDetails.attr("data-category-id"))) {
                     //젠야타 영웅 특별 데이터
-                    String transcendenceHealAvg = "0";
+                    Long transcendenceHeal = 0l; String timeValue = "0";
 
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
                             case "0x0860000000000352":
                                 td = tr.select("td");
-                                transcendenceHealAvg = td.last().text(); // 평균 초월 힐량 (10분)
+                                transcendenceHeal = Long.parseLong(td.last().text()); // 총 초월 힐량
+                                break;
+                            case "0x0860000000000021":
+                                td = tr.select("td");
+                                timeValue = td.last().text();
+
+                                if (td.last().text().length() >= 8) {
+                                    time += Long.parseLong(timeValue.substring(0, timeValue.indexOf(":"))) * 60 * 60;
+                                }
+                                time += Long.parseLong(timeValue.substring(timeValue.lastIndexOf(":")-2, timeValue.lastIndexOf(":"))) * 60;
+                                time += Long.parseLong(timeValue.substring(timeValue.lastIndexOf(":")+1));
                                 break;
                             default:
                                 break;
@@ -1130,14 +1147,15 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     }
                     Double healPerLife = Math.round((heal / ((double) death + 1)) * 100) / 100.0;
                     Double damageToHeroPerLife = Math.round((damageToHero / ((double) death + 1)) * 100) / 100.0;
+                    Double transcendenceHealAvg = Math.round((transcendenceHeal / time * 60d) * 100) / 100.0;
 
                     Zenyatta zenyatta = new Zenyatta(player.getId(), winGame, loseGame, entireGame, winRate, playTime, killPerDeath, spentOnFireAvg, deathAvg,
-                            healPerLife.toString(), damageToHeroPerLife.toString(), transcendenceHealAvg, goldMedal, silverMedal, bronzeMedal);
+                            healPerLife.toString(), damageToHeroPerLife.toString(), transcendenceHealAvg.toString(), goldMedal, silverMedal, bronzeMedal);
 
                     competitiveDetailDto.setZenyatta(zenyatta);
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, healPerLife.toString(), "0", "0", damageToHeroPerLife.toString(), "0",
-                            transcendenceHealAvg, "", "", "", "", "평균 초월 힐", "", "", "", "");
+                            transcendenceHealAvg.toString(), "", "", "", "", "평균 초월 힐", "", "", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1163,11 +1181,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 steelTrapEnemyAvg = td.last().text();
                                 break;
-                            case "0x08600000000005B9":                  // 평균 충격 지뢰 킬 (10분)
+                            case "0x08600000000005B9":                  // 평균 충격 지뢰 처치 (10분)
                                 td = tr.select("td");
                                 concussionMineAvg = td.last().text();
                                 break;
-                            case "0x08600000000004EA":                  // 평균 죽이는 타이어 킬 (10분)
+                            case "0x08600000000004EA":                  // 평균 죽이는 타이어 처치 (10분)
                                 td = tr.select("td");
                                 ripTireKillAvg = td.last().text();
                                 break;
@@ -1190,7 +1208,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, "", "", "평균 덫으로 묶은 적", "평균 충격 지뢰 킬", "평균 죽이는 타이어 킬", "평균 단독처치", "");
+                            steelTrapEnemyAvg, concussionMineAvg, ripTireKillAvg, soloKillAvg, "", "평균 덫으로 묶은 적", "평균 충격 지뢰 처치", "평균 죽이는 타이어 처치", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1211,7 +1229,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x08600000000004DD":                  // 평균 용검 킬 (10분)
+                            case "0x08600000000004DD":                  // 평균 용검 처치 (10분)
                                 td = tr.select("td");
                                 dragonbladeKillAvg = td.last().text();
                                 break;
@@ -1238,7 +1256,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, "", "", "평균 용검 킬", "평균 튕겨낸 피해량", "평균 단독처치", "", "");
+                            dragonbladeKillAvg, deflectDamageAvg, soloKillAvg, "", "", "평균 용검 처치", "평균 튕겨낸 피해량", "평균 단독처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1268,7 +1286,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 createShieldAvg = td.last().text();
                                 break;
-                            case "0x086000000000051E":                  // 평균 파멸의 일격 킬 (10분)
+                            case "0x086000000000051E":                  // 평균 파멸의 일격 처치 (10분)
                                 td = tr.select("td");
                                 meteorStrikeKillAvg = td.last().text();
                                 break;
@@ -1291,7 +1309,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, "", "평균 기술로 준 피해", "평균 보호막 생성량", "평균 파멸의 일격 킬", "평균 단독처치", "");
+                            skillDamageAvg, createShieldAvg, meteorStrikeKillAvg, soloKillAvg, "", "평균 기술로 준 피해", "평균 보호막 생성량", "평균 파멸의 일격 처치", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1311,7 +1329,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x08600000000004FD":                  // 평균 죽음의 꽃 킬 (10분)
+                            case "0x08600000000004FD":                  // 평균 죽음의 꽃 처치 (10분)
                                 td = tr.select("td");
                                 deathBlossomKillAvg = td.last().text();
                                 break;
@@ -1334,7 +1352,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            deathBlossomKillAvg, soloKillAvg, "", "", "", "평균 죽음의꽃 킬", "평균 단독처치", "", "", "");
+                            deathBlossomKillAvg, soloKillAvg, "", "", "", "평균 죽음의꽃 처치", "평균 단독처치", "", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1354,7 +1372,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x08600000000004CE":                  // 평균 난사 킬 (10분)
+                            case "0x08600000000004CE":                  // 평균 난사 처치 (10분)
                                 td = tr.select("td");
                                 peacekeeperKillAvg = td.last().text();
                                 break;
@@ -1385,7 +1403,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, "", "평균 난사 킬", "평균 황야의 무법자 킬", "치명타 명중률", "평균 단독처치", "");
+                            peacekeeperKillAvg, deadeyeKillAvg, criticalHitRate, soloKillAvg, "", "평균 난사 처치", "평균 황야의 무법자 처치", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1409,11 +1427,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000004CE":                  // 평균 눈보라 킬 (10분)
+                            case "0x08600000000004EB":                  // 평균 눈보라 처치 (10분)
                                 td = tr.select("td");
                                 blizzardKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004CD":                  // 평균 얼린적 (10분)
+                            case "0x08600000000004ED":                  // 평균 얼린적 (10분)
                                 td = tr.select("td");
                                 freezingEnemyAvg = td.last().text();
                                 break;
@@ -1437,7 +1455,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            blizzardKillAvg, freezingEnemyAvg, soloKillAvg, "", "", "평균 눈보라 킬", "평균 얼린적", "평균 단독처치", "", "");
+                            blizzardKillAvg, freezingEnemyAvg, soloKillAvg, "", "", "평균 눈보라 처치", "평균 얼린적", "평균 단독처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1457,7 +1475,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x08600000000004DF":                  // 평균 경계모드 킬 (10분)
+                            case "0x08600000000004DF":                  // 평균 경계모드 처치 (10분)
                                 td = tr.select("td");
                                 sentryModeKillAvg = td.last().text();
                                 break;
@@ -1488,7 +1506,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 킬", "평균 수색모드 킬", "평균 전차모드 킬", "평균 단독처치", "");
+                            sentryModeKillAvg, reconModeKillAvg, tankModeKillAvg, soloKillAvg, "", "평균 경계모드 처치", "평균 수색모드 처치", "평균 전차모드 처치", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1540,7 +1558,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,healPerLife.toString(), "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, "", "평균 나선 로켓 킬", "평균 전술조준경 킬", "치명타 명중률", "평균 단독처치", "");
+                            helixRocketKillAvg, tacticalVisorKillAvg, criticalHitRate, soloKillAvg, "", "평균 나선 로켓 처치", "평균 전술조준경 처치", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1615,11 +1633,11 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 blockDamage = Long.parseLong(td.last().text());
                                 break;
-                            case "0x08600000000004CE":                  // 평균 감시포탑 킬 (10분)
+                            case "0x086000000000050E":                  // 평균 감시포탑 처치 (10분)
                                 td = tr.select("td");
                                 turretKillAvg = td.last().text();
                                 break;
-                            case "0x08600000000004CD":                  // 평균 순간이동한 플레이어 (10분)
+                            case "0x086000000000050D":                  // 평균 순간이동한 플레이어 (10분)
                                 td = tr.select("td");
                                 teleportUsingAvg = td.last().text();
                                 break;
@@ -1643,7 +1661,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg,"0", blockDamagePerLife.toString(), lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            turretKillAvg, teleportUsingAvg, soloKillAvg, "", "", "평균 감시포탑 킬", "평균 순간이동한 아군", "평균 단독처치", "", "");
+                            turretKillAvg, teleportUsingAvg, soloKillAvg, "", "", "평균 감시포탑 처치", "평균 순간이동한 아군", "평균 단독처치", "", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1663,15 +1681,15 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                     for (Element tr : detailDatas) {
                         Elements td;
                         switch (tr.attr("data-stat-id")) {
-                            case "0x0860000000000668":                  // 평균 충격샷건 킬 (10분)
+                            case "0x0860000000000668":                  // 평균 충격샷건 처치 (10분)
                                 td = tr.select("td");
                                 coachGunKillAvg = td.last().text();
                                 break;
-                            case "0x0860000000000664":                  // 평균 다이너마이트 킬 (10분)
+                            case "0x0860000000000664":                  // 평균 다이너마이트 처치 (10분)
                                 td = tr.select("td");
                                 dynamiteKillAvg = td.last().text();
                                 break;
-                            case "0x086000000000066D":                  // 평균 BOB 킳 (10분)
+                            case "0x086000000000066D":                  // 평균 BOB 처치 (10분)
                                 td = tr.select("td");
                                 BOBKillAvg = td.last().text();
                                 break;
@@ -1698,7 +1716,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, "평균 충격샷건 킬", "평균 다이너마이트 킬","평균 BOB 킳", "저격 치명타 명중률", "평균 단독처치");
+                            coachGunKillAvg, dynamiteKillAvg, BOBKillAvg, scopeCriticalHitRate, soloKillAvg, "평균 충격샷건 처치", "평균 다이너마이트 처치","평균 BOB 처치", "저격 치명타 명중률", "평균 단독처치");
 
                     playerDetailList.add(playerDetail);
 
@@ -1721,7 +1739,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
                                 td = tr.select("td");
                                 sightSupportAvg = td.last().text();
                                 break;
-                            case "0x086000000000066D":                  // 저격 명중률
+                            case "0x0860000000000218":                  // 저격 명중률
                                 td = tr.select("td");
                                 scopeHitRate = td.last().text();
                                 break;
@@ -1854,7 +1872,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, selfHealPerLife.toString(), soloKillAvg, "평균 펄스폭탄 부착", "평균 펄스폭탄 킬", "치명타 명중률", "목숨당 자힐량", "평균 단독처치");
+                            pulseBombStickAvg, pulseBombKillAvg, criticalHitRate, soloKillAvg, "", "평균 펄스폭탄 부착", "평균 펄스폭탄 처치", "치명타 명중률", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1904,7 +1922,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, "", "평균 로켓 명중", "직격률", "평균 포화 킿", "평균 단독처치", "");
+                            rocketHitRateAvg, straitHitRate, barrageKillAvg, soloKillAvg, "", "평균 로켓 명중", "직격률", "평균 포화 처치", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 
@@ -1954,7 +1972,7 @@ public class AllPlayerRefreshBatchMainProcessor implements ItemProcessor<Player,
 
                     PlayerDetail playerDetail = new PlayerDetail(pdDto.getId(), pdDto.getSeason(), pdDto.getOrder(), hero, pdDto.getHeroNameKR(), killPerDeath,
                             winRate, playTime, deathAvg, spentOnFireAvg, "0", "0", lastHitPerLife.toString(), damageToHeroPerLife.toString(), damageToShieldPerLife.toString(),
-                            dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, "", "평균 용의 일격 킬", "평균 폭풍 화살 킬", "평균 처치시야 지원", "평균 단독처치", "");
+                            dragonStrikeKillAvg, stormArrowKillAvg, sightSupportAvg, soloKillAvg, "", "평균 용의 일격 처치", "평균 폭풍 화살 처치", "평균 처치시야 지원", "평균 단독처치", "");
 
                     playerDetailList.add(playerDetail);
 

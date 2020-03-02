@@ -148,7 +148,7 @@ const moreSeason = () => {
         seasons : [{season : "add_season"}]
     };
     const seasons = template(item);
-    $('.tbody:last').append(seasons);
+    $('.season-tbody:last').append(seasons);
 };
 
 const getJobData = () => {

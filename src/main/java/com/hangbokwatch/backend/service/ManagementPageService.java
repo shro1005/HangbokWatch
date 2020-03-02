@@ -90,7 +90,7 @@ public class ManagementPageService {
 
         for (JobDto jobDto : jobDtoList) {
             log.debug("{} >>>>>>>> getJobDataInService 진행중 | {} 의 jobExecution 정보를 가져온다. ", sessionBattleTag, jobDto.getJobName());
-            JobExecution jobExecution = jobExecutionRepository.findJobExecutionByJobInstanceId(jobDto.getJobInstanceId());
+            JobExecution jobExecution = jobExecutionRepository.selectJobExecutionByJobInstanceId(jobDto.getJobInstanceId(), 0, 1);
 
             String lastStartTime = jobExecution.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             String lastEndTime = "배치 작동중...";
@@ -137,7 +137,7 @@ public class ManagementPageService {
             jobDto.setIsNormal("N");
         }
 
-        JobExecution jobExecution = jobExecutionRepository.findJobExecutionByJobInstanceId(jobDto.getJobInstanceId());
+        JobExecution jobExecution = jobExecutionRepository.selectJobExecutionByJobInstanceId(jobDto.getJobInstanceId(), 0, 1);
         jobDto.setStatus(jobExecution.getStatus());
         jobDto.setLastStartTime(jobExecution.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         jobDto.setLastEndTime(jobExecution.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
